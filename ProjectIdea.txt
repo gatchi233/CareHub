@@ -1,0 +1,56 @@
+
+
+
+
+
+HEALTHCARE
+MANAGEMENT
+Devi (000489919)
+Samuel (000499865)
+Tanvi (000489679)
+Alice (000488835)
+
+February 6, 2026
+
+
+
+
+DATS CareHub: An AI-Integrated Digital Care Management System
+1 Introduction
+DATS CareHub is a modern healthcare management application designed for both desktop and mobile platforms. Its primary purpose is to support the high-pressure, daily operations found in assisted living facilities, long-term care homes, and community care settings.  By centralizing resident information, medication records, and staff observations into one user-friendly digital hub, the system aims to move care providers away from outdated methods.
+In many care environments today, staff still rely on a fragmented mix of paper notes, complex spreadsheets, and disconnected software.  This often leads to ?data silos? where important information is hard to find or easy to lose.  DATS CareHub solves these issues by creating a single ?source of truth?.  Built with the .NET MAUI framework, the app provides a smooth, consistent experience whether a staff member is checking a tablet in a resident?s room or using a desktop computer at a nursing station.
+The ultimate goal is to lift the heavy administrative weight off the shoulders of care providers.  By making data entry and retrieval easier, staff can spend less time looking at screens or filling out forms and more time focusing on providing high-quality care to their residents.
+
+2 System Architecture and Core Design
+To ensure the app is reliable and easy to update, DATS CareHub uses a layered MVVM (Model?View?ViewModel) architecture.  This approach keeps the ?look? of the app (User Interface) completely separate from the ?brains? (business logic) and the ?memory? (data).
+2.1 The Data Layer
+Currently, DATS CareHub is in its prototype phase and uses local JSON files to store information.  This was a deliberate choice for early-stage development because it allows for rapid testing, easy debugging, and the ability to work offline during demonstrations.
+However, the system is already ?PostgreSQL-ready?.  We will use ?service interfaces? essentially digital placeholders to handle all data requests.  This means that when we move to a professional PostgreSQL database in the future, we won?t have to rebuild the entire app.  We can simply swap the JSON storage for a powerful database connected via an ASP.NET Core Web API.  This upgrade will eventually allow multiple staff members to access the system at the same time and provide the high level of data security and integrity required in healthcare.
+2.2 The Application Layer
+The MVVM design ensures that the app remains modular and organized.
+* Models: These are the basic building blocks, representing things like residents, medications, and care notes.
+* ViewModels: These act as the middleman, taking raw data and preparing it to be displayed on the screen.
+* Views: These are the actual screens the user interacts with, designed to be clean and simple.
+Navigation is handled by MAUI Shell, which makes moving through the app feel intuitive.  Staff can quickly jump from a list of residents to a specific profile, check a medication schedule, or generate a report with just a few taps.
+
+3 Reporting and Care Documentation
+One of the standout features of DATS CareHub is the Resident Report system.  In a typical care home, a shift change can be chaotic as staff try to catch up on what happened earlier in the day.  Our system generates a consolidated care summary that pulls together demographic data, active medications, and recent staff notes into one easy-to-read page.
+This report does more than just save time; it improves safety.  Instead of flipping through multiple folders or screens, a nurse can see the ?big picture? of a resident?s health instantly.  This standardized format is perfect for shift handovers, internal reviews, or sharing updates with visiting doctors.
+
+4 AI Integration
+The ?intelligence? in DATS CareHub comes from its integrated AI layer.  It is important to note that the AI is designed to be assistive, not authoritative.  It doesn't replace the judgment of a trained professional or make medical diagnoses.  Instead, it acts like a highly efficient assistant that helps staff make sense of the data already in the system.
+Key AI Features:
+* Plain-Language Summaries: The AI can take a week?s worth of technical notes and turn them into a simple summary of how a resident is doing.
+* Medication Insights: It provides easy-to-understand explanations of medications and their side effects, which is incredibly helpful for trainees or non-clinical staff.
+* Quality Control: The AI acts as a second pair of eyes, flagging incomplete records or missing dosage info before they become a problem.
+* Trend Awareness: If a resident has been reporting pain more frequently or missing meals, the AI can highlight these patterns so staff can investigate further.
+Safety and Ethics: Because healthcare data is sensitive, we follow strict ethical guidelines. The AI never changes data on its own and never makes "emergency" decisions. Every insight it provides is clearly labeled as "informational only," ensuring that the human staff member always has the final say.
+
+5 Scalability & Development
+DATS CareHub is more than just a prototype; it is a foundation for a much larger system. As the project evolves, we plan to add:
+* Multi-user Support: Adding secure logins and role-based access so different staff members (like managers vs. care aides) see the information relevant to them.
+* Inventory Management: Workflows to track medication stock and automate ordering.
+* Expanded AI: Moving toward deeper care planning assistance and better accessibility for an aging workforce.
+
+6 Conclusion
+DATS CareHub is a bridge between traditional, manual record-keeping and the future of digital healthcare.  By combining smart software design with responsible AI, we?ve created a tool that makes care documentation more efficient and meaningful.  This project demonstrates that technology, when used ethically, can significantly improve the daily lives of both care providers and the residents they serve.
