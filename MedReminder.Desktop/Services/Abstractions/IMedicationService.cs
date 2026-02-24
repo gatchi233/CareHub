@@ -10,6 +10,6 @@ namespace MedReminder.Services.Abstractions
 
         // Inventory helpers
         Task<List<Medication>> GetLowStockAsync();
-        Task AdjustStockAsync(int medicationId, int delta);
+        Task AdjustStockAsync(Guid medicationId, int delta);
     }
 }

@@ -126,7 +126,7 @@ namespace MedReminder.ViewModels
 
     public class ResidentPreview
     {
-        public int Id { get; }
+        public Guid Id { get; }
         public string Name { get; }
         public string Gender { get; }
         public string AgeText { get; }

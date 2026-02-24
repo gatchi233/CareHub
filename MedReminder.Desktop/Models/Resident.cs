@@ -11,7 +11,7 @@ namespace MedReminder.Models
         string _firstName = string.Empty;
         string _lastName = string.Empty;
 
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         public string FirstName
         {
@@ -94,6 +94,7 @@ namespace MedReminder.Models
         public string? Remarks { get; set; }
 
         // --- Room placement ---
+        public string? AdmissionDate { get; set; }
         public string? RoomNumber { get; set; }  // e.g. "202"
         public string? RoomType { get; set; }    // "Single" / "Couple" / "MedicalBackup"
         public string? BedLabel { get; set; }    // "A" / "B" (Couple rooms)

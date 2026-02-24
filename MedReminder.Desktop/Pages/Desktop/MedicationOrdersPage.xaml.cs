@@ -109,7 +109,7 @@ namespace MedReminder.Pages.Desktop
             await CreateOrderForMedicationAsync(createdId, newName);
         }
 
-        private async Task CreateOrderForMedicationAsync(int medicationId, string medName)
+        private async Task CreateOrderForMedicationAsync(Guid medicationId, string medName)
         {
             var qtyText = await DisplayPromptAsync(
                 "Quantity",

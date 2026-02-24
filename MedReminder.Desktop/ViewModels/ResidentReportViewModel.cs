@@ -12,10 +12,10 @@ namespace MedReminder.ViewModels
         private readonly IMedicationService _medicationService;
         private readonly IObservationService _observationService;
         private bool _isLoading;
-        private int _lastLoadedResidentId = -1;
+        private Guid _lastLoadedResidentId = Guid.Empty;
 
-        private int _residentId;
-        public int ResidentId
+        private Guid _residentId;
+        public Guid ResidentId
         {
             get => _residentId;
             set
@@ -43,7 +43,7 @@ namespace MedReminder.ViewModels
             ShareReportCommand = new Command(async () => await ShareAsync());
         }
 
-        public async Task LoadAsync(int residentId)
+        public async Task LoadAsync(Guid residentId)
         {
             _residentId = residentId;
 
@@ -63,7 +63,7 @@ namespace MedReminder.ViewModels
 
             var meds = await _medicationService.LoadAsync();
             var residentMeds = meds
-                .Where(m => m.ResidentId == residentId)
+                .Where(m => m.ResidentId == resident.Id)
                 .ToList();
 
             var obs = await _observationService.LoadAsync();
@@ -118,10 +118,10 @@ namespace MedReminder.ViewModels
             });
         }
 
-        private async Task SafeLoadAsync(int residentId)
+        private async Task SafeLoadAsync(Guid residentId)
         {
             if (_isLoading) return;
-            if (residentId <= 0) return;
+            if (residentId == Guid.Empty) return;
             if (residentId == _lastLoadedResidentId) return;
 
             _isLoading = true;

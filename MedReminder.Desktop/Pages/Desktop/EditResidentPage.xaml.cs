@@ -1,24 +1,25 @@
 using MedReminder.Models;
+using MedReminder.Services;
 using MedReminder.Services.Abstractions;
 using Microsoft.Maui.Controls;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace MedReminder.Pages.Desktop
 {
     [QueryProperty(nameof(ResidentId), "id")]
     [QueryProperty(nameof(RoomNumber), "roomNumber")]
     [QueryProperty(nameof(RoomType), "roomType")]
+    [QueryProperty(nameof(ReturnTo), "returnTo")]
     public partial class EditResidentPage : ContentPage
     {
         private readonly IResidentService _residentService;
 
-        public int ResidentId { get; set; }
+        public Guid ResidentId { get; set; }
         public string? RoomNumber { get; set; }
         public string? RoomType { get; set; }
-
+        public string? ReturnTo { get; set; }
 
         public Resident WorkingCopy { get; private set; } = new();
 
@@ -34,10 +35,21 @@ namespace MedReminder.Pages.Desktop
         {
             base.OnAppearing();
 
-            if (ResidentId > 0)
+            // RBAC: only Admin/Nurse can edit residents
+            var auth = MauiProgram.Services.GetService<AuthService>();
+            var canEditResident = auth?.HasRole(StaffRole.Admin, StaffRole.Nurse) ?? false;
+
+            if (!canEditResident)
+            {
+                await DisplayAlert("Access denied", "You don't have permission to edit resident records.", "OK");
+                await Shell.Current.GoToAsync(GetReturnTarget());
+                return;
+            }
+
+            if (ResidentId > Guid.Empty)
             {
                 var list = await _residentService.LoadAsync();
-                var existing = list.FirstOrDefault(r => r.Id == ResidentId);
+                var existing = list.FirstOrDefault(r => r.Id == Guid.Empty);
 
                 if (existing is null)
                 {
@@ -57,7 +69,7 @@ namespace MedReminder.Pages.Desktop
 
                         // Personal Info
                         FirstName = existing.FirstName,
-                        LastName = existing.LastName, 
+                        LastName = existing.LastName,
                         DOB = existing.DOB,
                         SIN = existing.SIN,
                         Gender = existing.Gender,
@@ -69,6 +81,7 @@ namespace MedReminder.Pages.Desktop
                         PostalCode = existing.PostalCode,
 
                         // Room placement (Floor plan)
+                        AdmissionDate = existing.AdmissionDate,
                         RoomNumber = existing.RoomNumber,
                         RoomType = existing.RoomType,
                         BedLabel = existing.BedLabel,
@@ -104,12 +117,12 @@ namespace MedReminder.Pages.Desktop
                     };
 
                     WorkingCopy.AllergyNone = !WorkingCopy.AllergyPeanuts && !WorkingCopy.AllergyTreeNuts &&
-                                     !WorkingCopy.AllergyMilk && !WorkingCopy.AllergyEggs &&
-                                     !WorkingCopy.AllergyShellfish && !WorkingCopy.AllergyFish &&
-                                     !WorkingCopy.AllergyWheat && !WorkingCopy.AllergySoy &&
-                                     !WorkingCopy.AllergyLatex && !WorkingCopy.AllergyPenicillin &&
-                                     !WorkingCopy.AllergySulfa && !WorkingCopy.AllergyAspirin && 
-                                     string.IsNullOrWhiteSpace(WorkingCopy.AllergyOtherItems);
+                                              !WorkingCopy.AllergyMilk && !WorkingCopy.AllergyEggs &&
+                                              !WorkingCopy.AllergyShellfish && !WorkingCopy.AllergyFish &&
+                                              !WorkingCopy.AllergyWheat && !WorkingCopy.AllergySoy &&
+                                              !WorkingCopy.AllergyLatex && !WorkingCopy.AllergyPenicillin &&
+                                              !WorkingCopy.AllergySulfa && !WorkingCopy.AllergyAspirin &&
+                                              string.IsNullOrWhiteSpace(WorkingCopy.AllergyOtherItems);
 
                     // In case the user opened edit from FloorPlan for an occupied room,
                     // do NOT overwrite existing room fields.
@@ -198,6 +211,9 @@ namespace MedReminder.Pages.Desktop
         {
             return new Resident
             {
+                AdmissionDate = DateTime.Today.ToString("yyyy-MM-dd"),
+                RoomNumber = "",
+                RoomType = "",
                 EmergencyRelationship1 = "Select Relationship",
                 EmergencyRelationship2 = "Select Relationship"
             };
@@ -266,7 +282,8 @@ namespace MedReminder.Pages.Desktop
                                          WorkingCopy.AllergyShellfish || WorkingCopy.AllergyFish ||
                                          WorkingCopy.AllergyWheat || WorkingCopy.AllergySoy ||
                                          WorkingCopy.AllergyLatex || WorkingCopy.AllergyPenicillin ||
-                                         WorkingCopy.AllergySulfa || WorkingCopy.AllergyAspirin || !string.IsNullOrWhiteSpace(WorkingCopy.AllergyOtherItems);
+                                         WorkingCopy.AllergySulfa || WorkingCopy.AllergyAspirin ||
+                                         !string.IsNullOrWhiteSpace(WorkingCopy.AllergyOtherItems);
 
             if (!WorkingCopy.AllergyNone && !hasAnySpecificAllergy)
             {
@@ -278,28 +295,54 @@ namespace MedReminder.Pages.Desktop
                 DisplayAlert("Missing Required Fields", "Please fill in:\n• " + string.Join("\n• ", errors), "OK");
                 return false;
             }
+
             return true;
+        }
+
+        private string GetReturnTarget()
+        {
+            return string.IsNullOrWhiteSpace(ReturnTo)
+                ? $"//{nameof(ResidentsPage)}"
+                : ReturnTo;
         }
 
         private async void OnSaveClicked(object sender, EventArgs e)
         {
+            // Re-check RBAC at save time (extra safety)
+            var auth = MauiProgram.Services.GetService<AuthService>();
+            var canEditResident = auth?.HasRole(StaffRole.Admin, StaffRole.Nurse) ?? false;
+            if (!canEditResident)
+            {
+                await DisplayAlert("Access denied", "You don't have permission to save changes.", "OK");
+                return;
+            }
+
             if (!ValidateForm())
                 return;
 
             await _residentService.UpsertAsync(WorkingCopy);
             await DisplayAlert("Saved", "Resident information saved.", "OK");
 
-            await Shell.Current.GoToAsync($"//{nameof(ResidentsPage)}");
+            await Shell.Current.GoToAsync(GetReturnTarget());
         }
 
         private async void OnSaveAndAddMedClicked(object sender, EventArgs e)
         {
+            // Re-check RBAC at save time (extra safety)
+            var auth = MauiProgram.Services.GetService<AuthService>();
+            var canEditResident = auth?.HasRole(StaffRole.Admin, StaffRole.Nurse) ?? false;
+            if (!canEditResident)
+            {
+                await DisplayAlert("Access denied", "You don't have permission to save changes.", "OK");
+                return;
+            }
+
             if (!ValidateForm())
                 return;
 
             await _residentService.UpsertAsync(WorkingCopy);
 
-            if (WorkingCopy.Id <= 0)
+            if (WorkingCopy.Id <= Guid.Empty)
             {
                 var list = await _residentService.LoadAsync();
                 var latest = list.OrderByDescending(r => r.Id).FirstOrDefault();
@@ -326,7 +369,7 @@ namespace MedReminder.Pages.Desktop
 
         private async void OnCancelClicked(object sender, EventArgs e)
         {
-            await Shell.Current.GoToAsync($"//{nameof(ResidentsPage)}");
+            await Shell.Current.GoToAsync(GetReturnTarget());
         }
     }
 }

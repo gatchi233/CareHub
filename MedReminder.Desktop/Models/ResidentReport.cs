@@ -13,7 +13,7 @@ namespace MedReminder.Models
         public string GeneratedByStaff { get; set; } = "Demo Nurse";
 
         // Who the report is about
-        public int ResidentId { get; set; }
+        public Guid ResidentId { get; set; }
         public string ResidentName { get; set; } = "";
 
         // Optional future extension

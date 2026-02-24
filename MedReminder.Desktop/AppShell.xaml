@@ -37,6 +37,7 @@
 
 
         <ShellContent
+            x:Name="StaffManagementItem"
             Route="StaffManagementPage"
             Title="Staff"
             ContentTemplate="{DataTemplate desktop:StaffManagementPage}" Icon="icons8_caretaker_100.png" />

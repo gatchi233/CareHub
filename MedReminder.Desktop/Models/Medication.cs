@@ -7,7 +7,7 @@ namespace MedReminder.Models
 {
     public class Medication
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
 
         public string MedName { get; set; } = "";
         public string Dosage { get; set; } = "";
@@ -24,8 +24,16 @@ namespace MedReminder.Models
         public int StockQuantity { get; set; } = 0;
         public int ReorderLevel { get; set; } = 10;
 
-        public DateTime ExpiryDate { get; set; } = DateTime.Today.AddMonths(6);
-        
+        public DateTimeOffset ExpiryDate { get; set; } =
+            new DateTimeOffset(DateTime.UtcNow.Date.AddMonths(6), TimeSpan.Zero);
+
+        [JsonIgnore]
+        public DateTime ExpiryDateLocal
+        {
+            get => ExpiryDate.UtcDateTime.Date;
+            set => ExpiryDate = new DateTimeOffset(value.Date, TimeSpan.Zero);
+        }
+
         [JsonIgnore]
         public int StockQty
         {
@@ -33,7 +41,7 @@ namespace MedReminder.Models
             set => StockQuantity = value;
         }
 
-        public int? ResidentId { get; set; }
+        public Guid? ResidentId { get; set; }
         public string? ResidentName { get; set; }
 
         public bool IsDone { get; set; }
@@ -148,10 +156,11 @@ namespace MedReminder.Models
             }
         }
 
-        public bool IsExpired => DateTime.Today > ExpiryDate.Date;
+        public bool IsExpired => DateTimeOffset.UtcNow.Date > ExpiryDate.Date;
 
         public int DaysUntilExpiry =>
-            (int)Math.Ceiling((ExpiryDate.Date - DateTime.Today).TotalDays);
+            (int)Math.Ceiling((ExpiryDate.Date - DateTimeOffset.UtcNow.Date).TotalDays);
+
 
         // Inventory helper
         public bool IsLowStock => StockQuantity <= ReorderLevel;

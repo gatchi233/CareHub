@@ -42,18 +42,17 @@ namespace MedReminder.Services.Local
             await JsonSerializer.SerializeAsync(stream, items, JsonOptions);
         }
 
-        public async Task<MedicationOrder> CreateAsync(int medicationId, int requestedQuantity, string? requestedBy, string? notes)
+        public async Task<MedicationOrder> CreateAsync(Guid medicationId, int requestedQuantity, string? requestedBy, string? notes)
         {
             var list = await LoadAsync();
-            var nextId = list.Count == 0 ? 1 : list.Max(x => x.Id) + 1;
 
             var order = new MedicationOrder
             {
-                Id = nextId,
+                Id = Guid.NewGuid(),
                 MedicationId = medicationId,
                 RequestedQuantity = requestedQuantity,
                 Status = MedicationOrderStatus.Requested,
-                RequestedAt = DateTime.Now,
+                RequestedAt = DateTime.UtcNow,
                 RequestedBy = string.IsNullOrWhiteSpace(requestedBy) ? "Staff" : requestedBy,
                 Notes = notes
             };
@@ -64,7 +63,7 @@ namespace MedReminder.Services.Local
             return order;
         }
 
-        public async Task UpdateStatusAsync(int orderId, MedicationOrderStatus newStatus)
+        public async Task UpdateStatusAsync(Guid orderId, MedicationOrderStatus newStatus)
         {
             var list = await LoadAsync();
             var order = list.FirstOrDefault(x => x.Id == orderId);
@@ -129,14 +128,14 @@ namespace MedReminder.Services.Local
             await SaveAsync(list);
         }
 
-        public async Task DeleteAsync(int orderId)
+        public async Task DeleteAsync(Guid orderId)
         {
             var list = await LoadAsync();
             list.RemoveAll(x => x.Id == orderId);
             await SaveAsync(list);
         }
 
-        public async Task<List<MedicationOrder>> GetByMedicationIdAsync(int medicationId)
+        public async Task<List<MedicationOrder>> GetByMedicationIdAsync(Guid medicationId)
         {
             var list = await LoadAsync();
             return list

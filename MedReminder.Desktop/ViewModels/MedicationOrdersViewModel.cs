@@ -56,16 +56,22 @@ namespace MedReminder.ViewModels
             });
         }
 
+        private static bool IsInventoryMedication(Medication m)
+        {
+            // Inventory meds are not attached to a resident
+            return !m.ResidentId.HasValue || m.ResidentId.Value == Guid.Empty;
+        }
         public async Task LoadAsync()
         {
             IsBusy = true;
+
             try
             {
                 var meds = await _medicationService.LoadAsync();
 
                 // Global inventory only
                 var inventory = meds
-                    .Where(m => m.ResidentId == null || m.ResidentId <= 0)
+                    .Where(IsInventoryMedication)
                     .OrderBy(m => m.MedName)
                     .ToList();
 
@@ -91,7 +97,7 @@ namespace MedReminder.ViewModels
             }
         }
 
-        public async Task CreateOrderAsync(int medicationId, int qty, string? requestedBy, string? notes)
+        public async Task CreateOrderAsync(Guid medicationId, int qty, string? requestedBy, string? notes)
         {
             if (qty <= 0) return;
             await _orderService.CreateAsync(medicationId, qty, requestedBy, notes);
@@ -99,7 +105,7 @@ namespace MedReminder.ViewModels
         }
 
         // Create a new GLOBAL inventory medication item (without using resident schedule edit page)
-        public async Task<int> CreateInventoryMedicationAsync(string medName, int reorderLevel)
+        public async Task<Guid> CreateInventoryMedicationAsync(string medName, int reorderLevel)
         {
             medName = (medName ?? "").Trim();
             if (string.IsNullOrWhiteSpace(medName))
@@ -107,8 +113,7 @@ namespace MedReminder.ViewModels
 
             var list = await _medicationService.LoadAsync();
 
-            var existing = list.FirstOrDefault(m =>
-                (m.ResidentId == null || m.ResidentId <= 0) &&
+            var existing = list.FirstOrDefault(m => IsInventoryMedication(m) &&
                 string.Equals((m.MedName ?? "").Trim(), medName, StringComparison.OrdinalIgnoreCase));
 
             if (existing != null)
@@ -142,7 +147,7 @@ namespace MedReminder.ViewModels
             MedicationName = medName;
         }
 
-        public int OrderId => _o.Id;
+        public Guid OrderId => _o.Id;
         public string MedicationName { get; }
         public string QuantityText => $"Qty: {_o.RequestedQuantity}";
 

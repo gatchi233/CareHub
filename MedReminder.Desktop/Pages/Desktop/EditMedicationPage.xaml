@@ -941,7 +941,7 @@
                        HorizontalOptions="Center">
 
                 <!-- Save -->
-                <Border StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
+                <Border x:Name="SaveAction" StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="4"/>
                     </Border.StrokeShape>
@@ -957,7 +957,7 @@
                 </Border>
 
                 <!-- Delete -->
-                <Border StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
+                <Border x:Name="DeleteAction" StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="4"/>
                     </Border.StrokeShape>

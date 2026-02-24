@@ -15,7 +15,7 @@ namespace MedReminder.Pages.Desktop
         private readonly MedicationViewModel _vm;
 
         public Medication? Item { get; set; }
-        public int ResidentId { get; set; }
+        public Guid ResidentId { get; set; }
         public string? ResidentName { get; set; }
 
         public Medication WorkingCopy { get; private set; } = new();
@@ -50,7 +50,7 @@ namespace MedReminder.Pages.Desktop
             {
                 WorkingCopy = new Medication();
 
-                if (ResidentId > 0)
+                if (ResidentId != Guid.Empty)
                     WorkingCopy.ResidentId = ResidentId;
             }
             else
@@ -337,7 +337,7 @@ namespace MedReminder.Pages.Desktop
             }
 
             if (WorkingCopy.ExpiryDate == default)
-                WorkingCopy.ExpiryDate = DateTime.Today.AddMonths(6);
+                WorkingCopy.ExpiryDate = new DateTimeOffset(DateTime.UtcNow.Date.AddMonths(6), TimeSpan.Zero);
 
             if (Radio1Time.IsChecked) WorkingCopy.TimesPerDay = 1;
             else if (Radio2Times.IsChecked) WorkingCopy.TimesPerDay = 2;

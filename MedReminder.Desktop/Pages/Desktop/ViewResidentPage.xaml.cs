@@ -1,10 +1,11 @@
+using MedReminder.Models;
+using MedReminder.Services;
+using MedReminder.Services.Abstractions;
+using Microsoft.Maui.Controls;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using MedReminder.Models;
-using MedReminder.Services.Abstractions;
-using Microsoft.Maui.Controls;
 
 namespace MedReminder.Pages.Desktop
 {
@@ -15,12 +16,13 @@ namespace MedReminder.Pages.Desktop
         private readonly IResidentService _residentService;
         private readonly IMedicationService _medicationService;
 
-        public int ResidentId { get; set; }
+        public Guid ResidentId { get; set; }
 
         // Where to return when Close is pressed (e.g. //FloorPlanPage or //ResidentsPage)
         public string? ReturnTo { get; set; }
 
         private Resident? _resident;
+        private Guid _ResidentID;
 
         // Bind this from XAML via x:Reference (so we can keep BindingContext = Resident)
         public ObservableCollection<Medication> MedicationSchedules { get; } = new();
@@ -36,8 +38,19 @@ namespace MedReminder.Pages.Desktop
         {
             base.OnAppearing();
 
+            var auth = MauiProgram.Services.GetService<AuthService>();
+            var canEditResident = auth?.HasRole(StaffRole.Admin, StaffRole.Nurse) ?? false;
+
+            if (EditAction != null)
+            {
+                // Disable the Edit action
+                EditAction.IsEnabled = canEditResident;
+                EditAction.InputTransparent = !canEditResident;
+                EditAction.Opacity = canEditResident ? 1.0 : 0.45;
+            }
+
             var residents = await _residentService.LoadAsync();
-            _resident = residents.FirstOrDefault(r => r.Id == ResidentId);
+            _resident = residents.FirstOrDefault(r => r.Id == Guid.Empty);
 
             if (_resident == null)
             {
@@ -55,7 +68,7 @@ namespace MedReminder.Pages.Desktop
             MedicationSchedules.Clear();
             var allMeds = await _medicationService.LoadAsync();
             var residentMeds = allMeds
-                .Where(m => m.ResidentId == _resident.Id)
+                .Where(m => m.ResidentId.HasValue && m.ResidentId.Value == _ResidentID)
                 .OrderBy(m => m.MedName ?? string.Empty);
 
             foreach (var m in residentMeds)
@@ -89,6 +102,15 @@ namespace MedReminder.Pages.Desktop
 
         private async void OnEditClicked(object sender, EventArgs e)
         {
+            var auth = MauiProgram.Services.GetService<AuthService>();
+            var canEditResident = auth?.HasRole(StaffRole.Admin, StaffRole.Nurse) ?? false;
+
+            if (!canEditResident)
+            {
+                await DisplayAlert("Access denied", "You don't have permission to edit resident records.", "OK");
+                return;
+            }
+
             if (_resident == null)
                 return;
 

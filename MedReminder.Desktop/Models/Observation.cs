@@ -8,8 +8,8 @@ namespace MedReminder.Models
 {
     public sealed class Observation
     {
-        public int Id { get; set; }
-        public int ResidentId { get; set; }
+        public Guid Id { get; set; }
+        public Guid ResidentId { get; set; }
 
         // (Optional improvement later) This is denormalized; can be removed once DB exists.
         public string ResidentName { get; set; } = "";

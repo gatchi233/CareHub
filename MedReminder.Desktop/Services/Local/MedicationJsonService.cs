@@ -52,19 +52,14 @@ namespace MedReminder.Services.Local
         {
             var list = await LoadAsync();
 
-            if (item.Id == 0)
-            {
-                item.Id = list.Count == 0 ? 1 : list.Max(m => m.Id) + 1;
-                list.Add(item);
-            }
-            else
-            {
-                var existing = list.FirstOrDefault(m => m.Id == item.Id);
-                if (existing != null)
-                    list.Remove(existing);
+            if (item.Id == Guid.Empty)
+                item.Id = Guid.NewGuid();
 
-                list.Add(item);
-            }
+            var existing = list.FirstOrDefault(m => m.Id == item.Id);
+            if (existing != null)
+                list.Remove(existing);
+
+            list.Add(item);
 
             await SaveAsync(list);
         }
@@ -81,7 +76,7 @@ namespace MedReminder.Services.Local
             var list = await LoadAsync();
 
             // Global inventory (whole retirement home): ResidentId is null (or 0 for older data)
-            var inventory = list.Where(m => m.ResidentId == null || m.ResidentId <= 0);
+            var inventory = list.Where(m => m.ResidentId == null || m.ResidentId == Guid.Empty);
 
             return inventory
                 .Where(m => m.StockQuantity <= m.ReorderLevel)
@@ -89,7 +84,7 @@ namespace MedReminder.Services.Local
                 .ToList();
         }
 
-        public async Task AdjustStockAsync(int medicationId, int delta)
+        public async Task AdjustStockAsync(Guid medicationId, int delta)
         {
             var list = await LoadAsync();
             var med = list.FirstOrDefault(m => m.Id == medicationId);

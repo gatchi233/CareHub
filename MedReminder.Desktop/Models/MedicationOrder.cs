@@ -2,22 +2,22 @@
 {
     public class MedicationOrder
     {
-        public int Id { get; set; }
-        public int MedicationId { get; set; }
+        public Guid Id { get; set; }
+        public Guid MedicationId { get; set; }
         public int RequestedQuantity { get; set; }
 
         public MedicationOrderStatus Status { get; set; }
 
-        public DateTime RequestedAt { get; set; }
+        public DateTimeOffset RequestedAt { get; set; }
         public string? RequestedBy { get; set; }
 
-        public DateTime? OrderedAt { get; set; }
+        public DateTimeOffset? OrderedAt { get; set; }
         public string? OrderedBy { get; set; }
 
-        public DateTime? ReceivedAt { get; set; }
+        public DateTimeOffset? ReceivedAt { get; set; }
         public string? ReceivedBy { get; set; }
 
-        public DateTime? CancelledAt { get; set; }
+        public DateTimeOffset? CancelledAt { get; set; }
         public string? CancelledBy { get; set; }
 
         public string? Notes { get; set; }

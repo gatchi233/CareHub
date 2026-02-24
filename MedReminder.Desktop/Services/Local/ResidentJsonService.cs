@@ -15,20 +15,14 @@ namespace MedReminder.Services.Local
 
         private async Task EnsureSeedDataAsync()
         {
-#if DEBUG
-            await using var inStream = await FileSystem.OpenAppPackageFileAsync("Residents.json");
-            await using var outStream = File.Create(_filePath);
-            await inStream.CopyToAsync(outStream);
-#else
+            // ✅ Always: only seed once if the AppData file doesn't exist
             if (File.Exists(_filePath))
                 return;
 
             await using var inStream = await FileSystem.OpenAppPackageFileAsync("Residents.json");
             await using var outStream = File.Create(_filePath);
             await inStream.CopyToAsync(outStream);
-#endif
         }
-
 
         private async Task<List<Resident>> LoadInternalAsync()
         {
@@ -65,9 +59,11 @@ namespace MedReminder.Services.Local
         {
             var list = await LoadInternalAsync();
 
-            if (item.Id == 0)
+            if (item.Id == Guid.Empty)
             {
-                item.Id = list.Count == 0 ? 1 : list.Max(r => r.Id) + 1;
+                {
+                    item.Id = Guid.NewGuid();
+                }
                 list.Add(item);
             }
             else
@@ -86,7 +82,7 @@ namespace MedReminder.Services.Local
         {
             var list = await LoadInternalAsync();
 
-            if (item.Id > 0)
+            if (item.Id > Guid.Empty)
                 list.RemoveAll(r => r.Id == item.Id);
 
             await SaveInternalAsync(list);

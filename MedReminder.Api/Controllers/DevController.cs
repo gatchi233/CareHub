@@ -22,7 +22,7 @@ public sealed class DevController : ControllerBase
         var r2 = new Resident { FirstName = "David", LastName = "Wong", RoomNumber = "102" };
 
         _db.Residents.AddRange(r1, r2);
-        _db.Medications.Add(new Medication { ResidentId = r1.Id, Name = "Amlodipine", Dosage = "5 mg", Frequency = "Daily" });
+        _db.Medications.Add(new Medication { ResidentId = r1.Id, MedName = "Amlodipine", Dosage = "5 mg", TimesPerDay = 1 });
         _db.Observations.Add(new Observation { ResidentId = r2.Id, Type = "Temp", Value = "36.9C", RecordedBy = "Demo" });
 
         await _db.SaveChangesAsync(ct);

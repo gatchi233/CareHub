@@ -1,5 +1,4 @@
-﻿using MedMinder.Services.Abstractions;
-using MedReminder.Models;
+﻿using MedReminder.Models;
 using MedReminder.Services.Abstractions;
 using System.Text.Json;
 

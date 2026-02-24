@@ -1,7 +1,5 @@
-﻿using MedReminder.Pages.Desktop;
-using MedReminder.Services;
+﻿using MedReminder.Services;
 using Microsoft.Maui.Controls;
-using System;
 using System.Threading.Tasks;
 
 namespace MedReminder.ViewModels
@@ -23,27 +21,22 @@ namespace MedReminder.ViewModels
 
         private async Task OnLoginAsync()
         {
-            try
-            {
-                if (_auth.Login(Username.Trim(), Password))
-                {
-                    await Shell.Current.GoToAsync($"//{nameof(HomePage)}");
+            var success = _auth.Login(Username, Password);
 
-                    return;
-                }
-
-                await Application.Current.MainPage.DisplayAlert(
-                    "Login failed",
-                    "Invalid username or password.",
-                    "OK");
-            }
-            catch (Exception ex)
+            if (!success)
             {
-                await Application.Current.MainPage.DisplayAlert(
-                    "Login error",
-                    ex.Message,
-                    "OK");
+                await Shell.Current.DisplayAlert("Error", "Invalid username or password.", "OK");
+                return;
             }
+
+            Application.Current.MainPage = new AppShell();
+
+            // Small delay to ensure MainPage is set before navigation
+            await Task.Delay(50);
+
+            // Navigate to Home page after login
+            await Shell.Current.GoToAsync("//HomePage");
+
         }
     }
 }

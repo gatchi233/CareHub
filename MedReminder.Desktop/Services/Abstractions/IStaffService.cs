@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MedReminder.Models;
+using MedReminder.Services.Abstractions;
 
-namespace MedMinder.Services.Abstractions
+namespace MedReminder.Services.Abstractions
 {
     public interface IStaffService
     {

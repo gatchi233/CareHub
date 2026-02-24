@@ -4,29 +4,27 @@ using MedReminder.Pages.Desktop;
 using MedReminder.Services;
 using MedReminder.Services.Abstractions;
 using MedReminder.Services.Local;
+using MedReminder.Services.Remote;
 using MedReminder.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Maui.Controls.Hosting;
 using Microsoft.Maui.Hosting;
 using Microsoft.Maui.LifecycleEvents;
-using Microsoft.UI;
-using MedMinder.Services.Abstractions;
-
-
-
-
 
 #if WINDOWS
 using Microsoft.UI.Windowing;
 using Windows.Graphics;
 using WinRT.Interop;
+using static System.Net.WebRequestMethods;
 #endif
 
 namespace MedReminder
 {
     public static class MauiProgram
     {
+        public static IServiceProvider Services { get; private set; } = null!;
+
         public static MauiApp CreateMauiApp()
         {
             var builder = MauiApp.CreateBuilder();
@@ -74,11 +72,28 @@ namespace MedReminder
 #endif
             });
 
-            // Services
-            builder.Services.AddSingleton<IMedicationService, MedicationJsonService>();
+            // One constant BaseUrl
+            var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? "http://localhost:5001/";
+            var apiBase = new Uri(apiBaseUrl);
+
+            // Residents
+            builder.Services.AddHttpClient<IResidentService, ResidentApiService>(client =>
+            {
+                client.BaseAddress = apiBase;
+            });
+
+            // Medications
+            builder.Services.AddHttpClient<IMedicationService, MedicationApiService>(client =>
+            {
+                client.BaseAddress = apiBase;
+            });
+
+            builder.Services.AddHttpClient<IObservationService, ObservationApiService>(client =>
+            {
+                client.BaseAddress = apiBase;
+            });
+
             builder.Services.AddSingleton<IMedicationOrderService, MedicationOrderJsonService>();
-            builder.Services.AddSingleton<IObservationService, ObservationJsonService>();
-            builder.Services.AddSingleton<IResidentService, ResidentJsonService>();
             builder.Services.AddSingleton<IStaffService, StaffJsonService>();
             builder.Services.AddSingleton<AuthService>();
 
@@ -92,6 +107,7 @@ namespace MedReminder
             builder.Services.AddTransient<ResidentReportViewModel>();
             builder.Services.AddTransient<ResidentsPageViewModel>();
             builder.Services.AddTransient<StaffManagementViewModel>();
+            builder.Services.AddTransient<ResidentObservationsViewModel>();
 
             // Pages
             builder.Services.AddTransient<EditMedicationPage>();
@@ -105,13 +121,16 @@ namespace MedReminder
             builder.Services.AddTransient<ResidentsPage>();
             builder.Services.AddTransient<ViewResidentPage>();
             builder.Services.AddTransient<StaffManagementPage>();
+            builder.Services.AddTransient<ResidentObservationsPage>();
             builder.Services.AddTransient<LoginPage>();
-
 
 #if DEBUG
             builder.Logging.AddDebug();
 #endif
-            return builder.Build();
+            var app = builder.Build();
+            Services = app.Services;
+
+            return app;
         }
     }
 }

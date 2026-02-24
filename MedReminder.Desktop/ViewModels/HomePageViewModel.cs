@@ -51,7 +51,7 @@ namespace MedReminder.ViewModels
             Residents.Clear();
 
             // "All Residents" special item (FullName is computed from FirstName + LastName)
-            Residents.Add(new Resident { Id = 0, FirstName = "All", LastName = "residents" });
+            Residents.Add(new Resident { Id = Guid.Empty, FirstName = "All", LastName = "residents" });
 
             var items = await _residentService.LoadAsync();
             foreach (var r in items)
@@ -100,7 +100,7 @@ namespace MedReminder.ViewModels
         {
             IEnumerable<Medication> filtered = _allMedications;
 
-            if (SelectedResident != null && SelectedResident.Id != 0)
+            if (SelectedResident != null && SelectedResident.Id != Guid.Empty)
             {
                 filtered = filtered.Where(m => m.ResidentId == SelectedResident.Id);
             }

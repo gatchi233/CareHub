@@ -15,7 +15,7 @@
         <HorizontalStackLayout Grid.Row="0" Spacing="8">
 
             <!-- Edit -->
-            <Border StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
+            <Border x:Name="EditAction" StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="4"/>
                 </Border.StrokeShape>

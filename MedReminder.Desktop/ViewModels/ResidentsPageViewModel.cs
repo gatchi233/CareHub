@@ -26,11 +26,19 @@ namespace MedReminder.ViewModels
 
         public async Task LoadResidentsAsync()
         {
-            var residents = await _residentService.LoadAsync();
-            System.Diagnostics.Debug.WriteLine($"[ResidentsPage] Loaded residents: {residents?.Count ?? 0}");
-
-            _allResidents = residents?.ToList() ?? new List<Resident>();
-            ApplyFilters();
+            try
+            {
+                var list = await _residentService.LoadAsync();
+                Residents.Clear();
+                foreach (var r in list) Residents.Add(r);
+            }
+            catch (HttpRequestException)
+            {
+                await Shell.Current.DisplayAlert(
+                    "Server not running",
+                    "Cannot reach the API. Start MedReminder.Api and try again.",
+                    "OK");
+            }
         }
 
         public async Task DeleteResidentAsync(Resident resident)

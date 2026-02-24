@@ -87,6 +87,14 @@ namespace MedReminder.Services.Local
             }
         }
 
+        public async Task<List<Observation>> GetByResidentIdAsync(Guid residentId)
+        {
+            var list = await LoadAsync();
+            return list.Where(o => o.ResidentId == residentId)
+                       .OrderByDescending(o => o.ObservedAt)
+                       .ToList();
+        }
+
         private async Task SaveAsync(List<Observation> items)
         {
             for (int attempt = 0; attempt < 3; attempt++)
@@ -113,9 +121,9 @@ namespace MedReminder.Services.Local
         {
             var list = await LoadAsync();
 
-            if (item.Id == 0)
+            if (item.Id == Guid.Empty)
             {
-                item.Id = list.Count == 0 ? 1 : list.Max(m => m.Id) + 1;
+                item.Id = Guid.NewGuid();
                 list.Add(item);
             }
             else
@@ -125,7 +133,7 @@ namespace MedReminder.Services.Local
                     list.Remove(existing);
 
                 list.Add(item);
-            }
+            }   
 
             await SaveAsync(list);
         }
@@ -137,7 +145,7 @@ namespace MedReminder.Services.Local
             await SaveAsync(list);
         }
 
-        public async Task<List<Observation>> LoadByResidentIdAsync(int residentId)
+        public async Task<List<Observation>> LoadByResidentIdAsync(Guid residentId)
         {
             var list = await LoadAsync();
             return list
@@ -146,7 +154,7 @@ namespace MedReminder.Services.Local
                 .ToList();
         }
 
-        public async Task<List<Observation>> LoadRecentAsync(int residentId, int days)
+        public async Task<List<Observation>> LoadRecentAsync(Guid residentId, int days)
         {
             var cutoff = DateTime.Now.AddDays(-days);
             var list = await LoadAsync();
@@ -157,7 +165,7 @@ namespace MedReminder.Services.Local
                 .ToList();
         }
 
-        public async Task<Observation?> LoadLatestAsync(int residentId)
+        public async Task<Observation?> LoadLatestAsync(Guid residentId)
         {
             var list = await LoadAsync();
 

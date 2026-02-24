@@ -14,7 +14,7 @@ namespace MedReminder.Pages.Desktop
     {
         private readonly IMedicationService _medicationService;
 
-        public int ResidentId { get; set; }
+        public Guid ResidentId { get; set; }
         public string? ResidentName { get; set; }
 
         public ObservableCollection<Medication> Medications { get; } =
@@ -120,7 +120,8 @@ namespace MedReminder.Pages.Desktop
 
         private async void OnLogoutClicked(object sender, EventArgs e)
         {
-            await LogoutAsync();
+            if (Shell.Current is AppShell shell)
+                await shell.LogoutAsync();
         }
     }
 }

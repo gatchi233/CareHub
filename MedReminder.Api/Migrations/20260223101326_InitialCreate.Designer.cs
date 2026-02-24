@@ -3,6 +3,7 @@ using System;
 using MedReminder.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MedReminder.Api.Migrations
 {
     [DbContext(typeof(CareHubDbContext))]
-    partial class CareHubDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260223101326_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -164,7 +167,7 @@ namespace MedReminder.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("RecordedAt")
+                    b.Property<DateTime>("RecordedAtUtc")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("RecordedBy")

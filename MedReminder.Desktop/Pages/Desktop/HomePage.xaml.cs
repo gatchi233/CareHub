@@ -93,7 +93,7 @@ namespace MedReminder.Pages.Desktop
             if (MedList != null)
                 MedList.SelectedItem = null;
 
-            if (!m.ResidentId.HasValue || m.ResidentId.Value <= 0)
+            if (!m.ResidentId.HasValue || m.ResidentId.Value <= Guid.Empty)
             {
                 await DisplayAlert("Missing resident", "This medication is not linked to a resident.", "OK");
                 return;
@@ -145,7 +145,7 @@ namespace MedReminder.Pages.Desktop
                 Resident? resident = null;
 
                 if (med.ResidentId.HasValue)
-                    resident = _allResidents.FirstOrDefault(r => r.Id == med.ResidentId.Value);
+                    resident = _allResidents.FirstOrDefault(r => r.Id == med.ResidentId);
 
                 // IMPORTANT: Resident.Name no longer exists
                 med.ResidentName = resident?.FullName;

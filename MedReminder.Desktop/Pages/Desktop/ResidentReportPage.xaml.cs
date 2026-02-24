@@ -22,14 +22,18 @@ namespace MedReminder.Pages.Desktop
 
             if (query.TryGetValue("residentId", out var value) && value != null)
             {
-                if (value is int id)
+                if (value is Guid gid)
                 {
-                    _vm.ResidentId = id;
+                    _vm.ResidentId = gid;
                     return;
                 }
 
-                if (int.TryParse(value.ToString(), out var parsed))
-                    _vm.ResidentId = parsed;
+                var s = value.ToString();
+                if (!string.IsNullOrWhiteSpace(s) && Guid.TryParse(s, out var parsedGuid))
+                {
+                    _vm.ResidentId = parsedGuid;
+                    return;
+                }
             }
         }
 

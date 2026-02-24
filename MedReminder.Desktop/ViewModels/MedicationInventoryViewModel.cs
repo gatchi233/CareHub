@@ -81,7 +81,7 @@ namespace MedReminder.ViewModels
 
                 // Global inventory for the whole retirement home
                 var inventory = list
-                    .Where(m => m.ResidentId == null || m.ResidentId <= 0)
+                    .Where(m => m.ResidentId == null || m.ResidentId == Guid.Empty)
                     .Select(m => new MedicationInventoryRow(m))
                     .ToList();
 
@@ -125,7 +125,7 @@ namespace MedReminder.ViewModels
 
         public Medication Med { get; }
 
-        public int Id => Med.Id;
+        public Guid Id => Med.Id;
         public string MedName => Med.MedName;
         public int StockQuantity => Med.StockQuantity;
         public int ReorderLevel => Med.ReorderLevel;

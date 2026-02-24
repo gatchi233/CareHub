@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using MedReminder.Models;
 using MedReminder.Services.Local;
 using MedReminder.Services.Abstractions;
-using MedMinder.Services.Abstractions;
 using System.ComponentModel;
 using System.Windows.Input;
 using System.Runtime.CompilerServices;

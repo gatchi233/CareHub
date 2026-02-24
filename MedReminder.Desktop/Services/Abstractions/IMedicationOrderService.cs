@@ -7,15 +7,15 @@ namespace MedReminder.Services.Abstractions
         Task<List<MedicationOrder>> LoadAsync();
 
         Task<MedicationOrder> CreateAsync(
-            int medicationId,
+            Guid medicationId,
             int requestedQuantity,
             string? requestedBy,
             string? notes);
 
-        Task UpdateStatusAsync(int orderId, MedicationOrderStatus newStatus);
+        Task UpdateStatusAsync(Guid orderId, MedicationOrderStatus newStatus);
 
-        Task DeleteAsync(int orderId);
+        Task DeleteAsync(Guid orderId);
 
-        Task<List<MedicationOrder>> GetByMedicationIdAsync(int medicationId);
+        Task<List<MedicationOrder>> GetByMedicationIdAsync(Guid medicationId);
     }
 }

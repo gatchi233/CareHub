@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="MedReminder.Pages.Desktop.ResidentObservationsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Observations">
+
+    <Grid RowDefinitions="Auto,Auto,*" Padding="16" RowSpacing="12">
+
+        <!-- Header -->
+        <VerticalStackLayout Spacing="2">
+            <Label Text="{Binding ResidentName}"
+                   FontSize="22"
+                   FontAttributes="Bold"
+                   TextColor="{AppThemeBinding Light={StaticResource TextDark}, Dark=White}" />
+            <Label Text="{Binding Subtitle}"
+                   FontSize="13"
+                   TextColor="Gray" />
+        </VerticalStackLayout>
+
+        <!-- Toolbar row: Refresh + Add -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+            <Label Text="{Binding StatusMessage}"
+                   VerticalOptions="Center"
+                   TextColor="Gray" />
+
+            <Button Grid.Column="1"
+                    Text="Refresh"
+                    Command="{Binding RefreshCommand}"
+                    IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}" />
+
+            <Button Grid.Column="2"
+                    Text="Add"
+                    Command="{Binding AddObservationCommand}"
+                    IsEnabled="{Binding CanAdd}" />
+        </Grid>
+
+        <!-- List -->
+        <RefreshView Grid.Row="2"
+                     IsRefreshing="{Binding IsRefreshing}"
+                     Command="{Binding RefreshCommand}">
+            <CollectionView ItemsSource="{Binding Observations}">
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout Padding="20" Spacing="8">
+                        <Label Text="No observations yet."
+                               FontAttributes="Bold"
+                               HorizontalOptions="Center" />
+                        <Label Text="Tap Add to record a new note or vital."
+                               HorizontalOptions="Center"
+                               TextColor="Gray" />
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border Stroke="LightGray"
+                                StrokeThickness="1"
+                                Padding="12"
+                                Margin="0,0,0,10">
+                            <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto">
+                                <Label Text="{Binding Type}"
+                                       FontAttributes="Bold"
+                                       FontSize="16" />
+                                <Label Grid.Column="1"
+                                       Text="{Binding DisplayTime}"
+                                       TextColor="Gray"
+                                       FontSize="12" />
+
+                                <Label Grid.Row="1"
+                                       Grid.ColumnSpan="2"
+                                       Text="{Binding Value}"
+                                       FontSize="14" />
+
+                                <Label Grid.Row="2"
+                                       Grid.ColumnSpan="2"
+                                       Text="{Binding Notes}"
+                                       TextColor="Gray"
+                                       FontSize="12"
+                                       LineBreakMode="TailTruncation"
+                                       MaxLines="3" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+
+    </Grid>
+</ContentPage>

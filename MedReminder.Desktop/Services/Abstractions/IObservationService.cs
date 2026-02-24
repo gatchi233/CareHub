@@ -10,6 +10,7 @@ namespace MedReminder.Services.Abstractions
     public interface IObservationService
     {
         Task<List<Observation>> LoadAsync();
+        Task<List<Observation>> GetByResidentIdAsync(Guid residentId);
         Task UpsertAsync(Observation item);
         Task DeleteAsync(Observation item);
     }

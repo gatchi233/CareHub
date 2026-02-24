@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MedReminder.Api.Migrations
 {
     [DbContext(typeof(CareHubDbContext))]
-    [Migration("20260220080639_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260223233041_M2_MedicationDateTimeOffset_Fix")]
+    partial class M2_MedicationDateTimeOffset_Fix
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -35,20 +35,124 @@ namespace MedReminder.Api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Frequency")
+                    b.Property<DateTime>("ExpiryDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<TimeSpan>("FriTime1")
+                        .HasColumnType("interval");
+
+                    b.Property<TimeSpan>("FriTime2")
+                        .HasColumnType("interval");
+
+                    b.Property<TimeSpan>("FriTime3")
+                        .HasColumnType("interval");
+
+                    b.Property<bool>("IsDone")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("MedName")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Name")
+                    b.Property<TimeSpan>("MonTime1")
+                        .HasColumnType("interval");
+
+                    b.Property<TimeSpan>("MonTime2")
+                        .HasColumnType("interval");
+
+                    b.Property<TimeSpan>("MonTime3")
+                        .HasColumnType("interval");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("QuantityUnit")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Notes")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<bool>("ReminderFri")
+                        .HasColumnType("boolean");
 
-                    b.Property<Guid>("ResidentId")
+                    b.Property<bool>("ReminderMon")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("ReminderSat")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("ReminderSun")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("ReminderThu")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("ReminderTue")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("ReminderWed")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("ReorderLevel")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid?>("ResidentId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("ResidentName")
+                        .HasColumnType("text");
+
+                    b.Property<TimeSpan>("SatTime1")
+                        .HasColumnType("interval");
+
+                    b.Property<TimeSpan>("SatTime2")
+                        .HasColumnType("interval");
+
+                    b.Property<TimeSpan>("SatTime3")
+                        .HasColumnType("interval");
+
+                    b.Property<int>("StockQuantity")
+                        .HasColumnType("integer");
+
+                    b.Property<TimeSpan>("SunTime1")
+                        .HasColumnType("interval");
+
+                    b.Property<TimeSpan>("SunTime2")
+                        .HasColumnType("interval");
+
+                    b.Property<TimeSpan>("SunTime3")
+                        .HasColumnType("interval");
+
+                    b.Property<TimeSpan>("ThuTime1")
+                        .HasColumnType("interval");
+
+                    b.Property<TimeSpan>("ThuTime2")
+                        .HasColumnType("interval");
+
+                    b.Property<TimeSpan>("ThuTime3")
+                        .HasColumnType("interval");
+
+                    b.Property<int>("TimesPerDay")
+                        .HasColumnType("integer");
+
+                    b.Property<TimeSpan>("TueTime1")
+                        .HasColumnType("interval");
+
+                    b.Property<TimeSpan>("TueTime2")
+                        .HasColumnType("interval");
+
+                    b.Property<TimeSpan>("TueTime3")
+                        .HasColumnType("interval");
+
+                    b.Property<string>("Usage")
+                        .HasColumnType("text");
+
+                    b.Property<TimeSpan>("WedTime1")
+                        .HasColumnType("interval");
+
+                    b.Property<TimeSpan>("WedTime2")
+                        .HasColumnType("interval");
+
+                    b.Property<TimeSpan>("WedTime3")
+                        .HasColumnType("interval");
 
                     b.HasKey("Id");
 
@@ -63,7 +167,7 @@ namespace MedReminder.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("RecordedAtUtc")
+                    b.Property<DateTime>("RecordedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("RecordedBy")
@@ -122,8 +226,7 @@ namespace MedReminder.Api.Migrations
                     b.HasOne("MedReminder.Api.Entities.Resident", null)
                         .WithMany()
                         .HasForeignKey("ResidentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("MedReminder.Api.Entities.Observation", b =>
