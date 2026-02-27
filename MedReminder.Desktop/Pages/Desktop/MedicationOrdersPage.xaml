@@ -5,102 +5,68 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:pages="clr-namespace:MedReminder.Pages"
-    xmlns:vm="clr-namespace:MedReminder.ViewModels"
     Title="Orders"
     BackgroundColor="{StaticResource Medication_Main_Background}">
 
-    <!-- Optional: if you want compiled bindings, uncomment and set the correct type -->
-    <!-- x:DataType="vm:MedicationOrdersViewModel" -->
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Logout" Clicked="OnLogoutClicked" Priority="1" Order="Primary" />
+    </ContentPage.ToolbarItems>
 
-    <Grid Padding="16" RowDefinitions="Auto,*" RowSpacing="12">
+    <Grid Padding="16" RowDefinitions="Auto,Auto,*" RowSpacing="12">
 
-        <!-- Top bar -->
-        <!-- Option B: Grid so ActivityIndicator stays pinned right -->
-        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" ColumnSpacing="12" VerticalOptions="Center">
+        <!-- ── Page header ─────────────────────────────────────────────────── -->
+        <VerticalStackLayout Spacing="2">
+            <Label Text="MEDICATION ORDERS"
+                   FontSize="11" FontAttributes="Bold" CharacterSpacing="1.5"
+                   TextColor="{StaticResource Medication_Font_Secondary}"/>
+            <Label Text="Purchase order management"
+                   FontSize="15" FontAttributes="Bold"
+                   TextColor="{StaticResource Medication_Font_Primary}"/>
+        </VerticalStackLayout>
 
-            <HorizontalStackLayout Grid.Column="0" Spacing="8" VerticalOptions="Center">
+        <!-- ── Top action bar ──────────────────────────────────────────────── -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto" ColumnSpacing="12">
+            <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
 
-                <!-- Refresh -->
-                <Border StrokeThickness="0" HeightRequest="28"
-                        BackgroundColor="{StaticResource Button_Icon_Background}">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="4"/>
-                    </Border.StrokeShape>
-
+                <!-- NEW ORDER -->
+                <Border StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
                     <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
-                        <Image Grid.Column="0" Source="icons8_refresh_100.png"
-                               HeightRequest="16" WidthRequest="16"
-                               HorizontalOptions="Center" VerticalOptions="Center"/>
-                        <Border Grid.Column="1"
-                                BackgroundColor="{StaticResource Button_View}"
-                                Padding="10,0" StrokeThickness="0"
-                                InputTransparent="True">
-                            <Label Text="REFRESH"
-                                   TextColor="{StaticResource Button_Font_Primary}"
-                                   FontSize="12"
-                                   VerticalOptions="Center"
-                                   FontAttributes="Bold"/>
+                        <Image Grid.Column="0" Source="icons8_add_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
+                        <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Add}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
+                            <Label Text="NEW ORDER" TextColor="{StaticResource Button_Font_Primary}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
                         </Border>
                     </Grid>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnNewOrderClicked"/>
+                    </Border.GestureRecognizers>
+                </Border>
 
+                <!-- REFRESH -->
+                <Border StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                    <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
+                        <Image Grid.Column="0" Source="icons8_updates_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
+                        <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Logout}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
+                            <Label Text="REFRESH" TextColor="{StaticResource Button_Font_Primary}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
+                        </Border>
+                    </Grid>
                     <Border.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding RefreshCommand}"/>
                     </Border.GestureRecognizers>
                 </Border>
 
-                <!-- Cancel -->
-                <Border StrokeThickness="0" HeightRequest="28"
-                        BackgroundColor="{StaticResource Button_Icon_Background}">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="4"/>
-                    </Border.StrokeShape>
-
+                <!-- CLOSE -->
+                <Border StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
                     <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
-                        <Image Grid.Column="0" Source="icons8_close_100.png"
-                               HeightRequest="16" WidthRequest="16"
-                               HorizontalOptions="Center" VerticalOptions="Center"/>
-                        <Border Grid.Column="1"
-                                BackgroundColor="{StaticResource Button_Cancel}"
-                                Padding="10,0" StrokeThickness="0"
-                                InputTransparent="True">
-                            <Label Text="CANCEL"
-                                   TextColor="{StaticResource Button_Cancel_Font}"
-                                   FontSize="12"
-                                   VerticalOptions="Center"
-                                   FontAttributes="Bold"/>
+                        <Image Grid.Column="0" Source="icons8_close_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
+                        <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Cancel}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
+                            <Label Text="CLOSE" TextColor="{StaticResource Button_Font_Secondary}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
                         </Border>
                     </Grid>
-
                     <Border.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnCloseClicked"/>
-                    </Border.GestureRecognizers>
-                </Border>
-
-                <!-- New Order -->
-                <Border StrokeThickness="0" HeightRequest="28"
-                        BackgroundColor="{StaticResource Button_Icon_Background}">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="4"/>
-                    </Border.StrokeShape>
-
-                    <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
-                        <Image Grid.Column="0" Source="icons8_add_100.png"
-                               HeightRequest="16" WidthRequest="16"
-                               HorizontalOptions="Center" VerticalOptions="Center"/>
-                        <Border Grid.Column="1"
-                                BackgroundColor="{StaticResource Button_Create}"
-                                Padding="10,0" StrokeThickness="0"
-                                InputTransparent="True">
-                            <Label Text="NEW ORDER"
-                                   TextColor="{StaticResource Button_Create_Font}"
-                                   FontSize="12"
-                                   VerticalOptions="Center"
-                                   FontAttributes="Bold"/>
-                        </Border>
-                    </Grid>
-
-                    <Border.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="OnNewOrderClicked"/>
                     </Border.GestureRecognizers>
                 </Border>
 
@@ -112,187 +78,188 @@
                                VerticalOptions="Center"/>
         </Grid>
 
-        <!-- Orders list -->
-        <CollectionView Grid.Row="1"
-                        ItemsSource="{Binding Orders}"
-                        SelectionMode="None">
+        <!-- ── Orders card ─────────────────────────────────────────────────── -->
+        <Border Grid.Row="2"
+                Padding="12,10"
+                BackgroundColor="{StaticResource Medication_Card_Background}"
+                Stroke="{StaticResource Medication_Card_Border}"
+                StrokeThickness="1">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="12"/>
+            </Border.StrokeShape>
 
-            <CollectionView.EmptyView>
-                <Grid Padding="24">
-                    <VerticalStackLayout Spacing="8" HorizontalOptions="Center" VerticalOptions="Center">
-                        <Label Text="No orders yet"
-                               FontAttributes="Bold"
-                               FontSize="16"
-                               TextColor="{StaticResource Text_Primary}"/>
-                        <Label Text="Click NEW ORDER to create one."
-                               FontSize="13"
-                               TextColor="{StaticResource Text_Secondary}"/>
-                    </VerticalStackLayout>
-                </Grid>
-            </CollectionView.EmptyView>
+            <Grid RowDefinitions="Auto,Auto,*">
 
-            <CollectionView.ItemTemplate>
-                <!-- If you have a specific row type, set x:DataType="model:MedicationOrderRow" -->
-                <DataTemplate>
-                    <Border Padding="14"
-                            Margin="0,0,0,12"
-                            BackgroundColor="White">
-                        <Border.StrokeShape>
-                            <RoundRectangle CornerRadius="12"/>
-                        </Border.StrokeShape>
-                        <Border.Stroke>
-                            <SolidColorBrush Color="#78290F"/>
-                        </Border.Stroke>
+                <Label Text="ORDERS"
+                       FontSize="11" FontAttributes="Bold" CharacterSpacing="1.5"
+                       TextColor="{StaticResource Medication_Font_Secondary}"/>
 
-                        <Grid RowDefinitions="Auto,Auto,Auto"
-                              ColumnDefinitions="*,Auto"
-                              RowSpacing="10"
-                              ColumnSpacing="12">
+                <BoxView Grid.Row="1" HeightRequest="1" Color="{StaticResource Medication_Card_Border}" Margin="0,6,0,10"/>
 
-                            <!-- Header -->
-                            <VerticalStackLayout Grid.Row="0" Grid.Column="0" Spacing="2">
-                                <Label Text="{Binding MedName}"
-                                       FontAttributes="Bold"
-                                       FontSize="16"
-                                       TextColor="#78290F"/>
-                                <Label Text="{Binding Supplier}"
-                                       FontSize="12"
-                                       TextColor="{StaticResource Text_Secondary}"/>
-                            </VerticalStackLayout>
+                <CollectionView Grid.Row="2"
+                                ItemsSource="{Binding Orders}"
+                                SelectionMode="None">
 
-                            <!-- Status pill -->
-                            <Border Grid.Row="0" Grid.Column="1"
-                                    Padding="10,4"
-                                    StrokeThickness="0"
-                                    BackgroundColor="{StaticResource Button_Icon_Background}"
-                                    HorizontalOptions="End"
-                                    VerticalOptions="Start">
+                    <CollectionView.EmptyView>
+                        <VerticalStackLayout Padding="20" Spacing="6"
+                                             VerticalOptions="Center" HorizontalOptions="Center">
+                            <Label Text="No orders yet."
+                                   FontAttributes="Bold" FontSize="14"
+                                   TextColor="{StaticResource Medication_Font_Primary}"
+                                   HorizontalOptions="Center"/>
+                            <Label Text="Use NEW ORDER to raise a purchase request."
+                                   FontSize="12" TextColor="{StaticResource Medication_Font_Secondary}"
+                                   HorizontalOptions="Center"/>
+                        </VerticalStackLayout>
+                    </CollectionView.EmptyView>
+
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Vertical" ItemSpacing="8"/>
+                    </CollectionView.ItemsLayout>
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border Padding="12,10"
+                                    BackgroundColor="{StaticResource Medication_Main_Background}"
+                                    Stroke="{StaticResource Medication_Card_Border}"
+                                    StrokeThickness="1">
                                 <Border.StrokeShape>
-                                    <RoundRectangle CornerRadius="999"/>
+                                    <RoundRectangle CornerRadius="8"/>
                                 </Border.StrokeShape>
-                                <Label Text="{Binding Status}"
-                                       FontSize="12"
-                                       FontAttributes="Bold"
-                                       TextColor="{StaticResource Text_Primary}"/>
+
+                                <Grid RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="6">
+
+                                    <!-- Row 0: Medication name + status badge -->
+                                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                        <Label Text="{Binding MedicationName}"
+                                               FontAttributes="Bold" FontSize="15"
+                                               TextColor="{StaticResource Medication_Font_Primary}"
+                                               VerticalOptions="Center"/>
+                                        <Border Grid.Column="1" Padding="8,3" StrokeThickness="0"
+                                                BackgroundColor="{Binding StatusBadgeColor}"
+                                                VerticalOptions="Center">
+                                            <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                                            <Label Text="{Binding StatusDisplay}"
+                                                   FontSize="10" FontAttributes="Bold"
+                                                   TextColor="White"/>
+                                        </Border>
+                                    </Grid>
+
+                                    <!-- Row 1: Quantity -->
+                                    <Label Grid.Row="1"
+                                           Text="{Binding QuantityText}"
+                                           FontSize="12"
+                                           TextColor="{StaticResource Medication_Font_Secondary}"/>
+
+                                    <!-- Row 2: Timeline -->
+                                    <VerticalStackLayout Grid.Row="2" Spacing="4">
+
+                                        <HorizontalStackLayout Spacing="6">
+                                            <Border Padding="5,1" StrokeThickness="0"
+                                                    BackgroundColor="{Binding RequestedTagColor}"
+                                                    VerticalOptions="Center">
+                                                <Border.StrokeShape><RoundRectangle CornerRadius="3"/></Border.StrokeShape>
+                                                <Label Text="REQUESTED" FontSize="9" FontAttributes="Bold" TextColor="White"/>
+                                            </Border>
+                                            <Label Text="{Binding RequestedLine}" FontSize="11"
+                                                   TextColor="{StaticResource Medication_Font_Secondary}"
+                                                   VerticalOptions="Center"/>
+                                        </HorizontalStackLayout>
+
+                                        <HorizontalStackLayout Spacing="6" IsVisible="{Binding ShowOrderedRow}">
+                                            <Border Padding="5,1" StrokeThickness="0"
+                                                    BackgroundColor="{Binding OrderedTagColor}"
+                                                    VerticalOptions="Center">
+                                                <Border.StrokeShape><RoundRectangle CornerRadius="3"/></Border.StrokeShape>
+                                                <Label Text="ORDERED" FontSize="9" FontAttributes="Bold" TextColor="White"/>
+                                            </Border>
+                                            <Label Text="{Binding OrderedLine}" FontSize="11"
+                                                   TextColor="{StaticResource Medication_Font_Secondary}"
+                                                   VerticalOptions="Center"/>
+                                        </HorizontalStackLayout>
+
+                                        <HorizontalStackLayout Spacing="6" IsVisible="{Binding ShowThirdRow}">
+                                            <Border Padding="5,1" StrokeThickness="0"
+                                                    BackgroundColor="{Binding ThirdTagColor}"
+                                                    VerticalOptions="Center">
+                                                <Border.StrokeShape><RoundRectangle CornerRadius="3"/></Border.StrokeShape>
+                                                <Label Text="{Binding ThirdTagText}" FontSize="9" FontAttributes="Bold"
+                                                       TextColor="White"/>
+                                            </Border>
+                                            <Label Text="{Binding ThirdLineText}" FontSize="11"
+                                                   TextColor="{StaticResource Medication_Font_Secondary}"
+                                                   VerticalOptions="Center"/>
+                                        </HorizontalStackLayout>
+
+                                    </VerticalStackLayout>
+
+                                    <!-- Row 3: Action buttons -->
+                                    <HorizontalStackLayout Grid.Row="3" Spacing="8">
+
+                                        <!-- APPROVE (Requested → Ordered) -->
+                                        <Border StrokeThickness="0" HeightRequest="24"
+                                                BackgroundColor="{StaticResource Button_Icon_Background}"
+                                                IsVisible="{Binding ShowMarkOrdered}">
+                                            <Border.StrokeShape><RoundRectangle CornerRadius="3"/></Border.StrokeShape>
+                                            <Grid ColumnDefinitions="22,Auto" Margin="0" InputTransparent="True">
+                                                <Image Grid.Column="0" Source="icons8_basketpaid_100.png" HeightRequest="12" WidthRequest="12" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                                <Border Grid.Column="1" BackgroundColor="{StaticResource Button_View}" Padding="7,0" StrokeThickness="0" InputTransparent="True">
+                                                    <Label Text="APPROVE" TextColor="{StaticResource Button_Font_Primary}" FontSize="10" VerticalOptions="Center" FontAttributes="Bold"/>
+                                                </Border>
+                                            </Grid>
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer
+                                                    Command="{Binding Source={x:Reference Root}, Path=BindingContext.MarkOrderedCommand}"
+                                                    CommandParameter="{Binding .}"/>
+                                            </Border.GestureRecognizers>
+                                        </Border>
+
+                                        <!-- RECEIVE (Ordered → Received) -->
+                                        <Border StrokeThickness="0" HeightRequest="24"
+                                                BackgroundColor="{StaticResource Button_Icon_Background}"
+                                                IsVisible="{Binding ShowMarkReceived}">
+                                            <Border.StrokeShape><RoundRectangle CornerRadius="3"/></Border.StrokeShape>
+                                            <Grid ColumnDefinitions="22,Auto" Margin="0" InputTransparent="True">
+                                                <Image Grid.Column="0" Source="icons8_basketcollect_100.png" HeightRequest="12" WidthRequest="12" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                                <Border Grid.Column="1" BackgroundColor="{StaticResource Alert_Success}" Padding="7,0" StrokeThickness="0" InputTransparent="True">
+                                                    <Label Text="RECEIVE" TextColor="{StaticResource Button_Font_Primary}" FontSize="10" VerticalOptions="Center" FontAttributes="Bold"/>
+                                                </Border>
+                                            </Grid>
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer
+                                                    Command="{Binding Source={x:Reference Root}, Path=BindingContext.MarkReceivedCommand}"
+                                                    CommandParameter="{Binding .}"/>
+                                            </Border.GestureRecognizers>
+                                        </Border>
+
+                                        <!-- VOID (hidden once completed or already cancelled) -->
+                                        <Border StrokeThickness="0" HeightRequest="24"
+                                                BackgroundColor="{StaticResource Button_Icon_Background}"
+                                                IsVisible="{Binding ShowThirdRow, Converter={StaticResource InverseBoolConverter}}">
+                                            <Border.StrokeShape><RoundRectangle CornerRadius="3"/></Border.StrokeShape>
+                                            <Grid ColumnDefinitions="22,Auto" Margin="0" InputTransparent="True">
+                                                <Image Grid.Column="0" Source="icons8_basketremove_100.png" HeightRequest="12" WidthRequest="12" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                                <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Delete}" Padding="7,0" StrokeThickness="0" InputTransparent="True">
+                                                    <Label Text="VOID" TextColor="{StaticResource Button_Font_Primary}" FontSize="10" VerticalOptions="Center" FontAttributes="Bold"/>
+                                                </Border>
+                                            </Grid>
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer
+                                                    Command="{Binding Source={x:Reference Root}, Path=BindingContext.CancelCommand}"
+                                                    CommandParameter="{Binding .}"/>
+                                            </Border.GestureRecognizers>
+                                        </Border>
+
+                                    </HorizontalStackLayout>
+
+                                </Grid>
                             </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
 
-                            <!-- Meta row -->
-                            <Grid Grid.Row="1" Grid.ColumnSpan="2"
-                                  ColumnDefinitions="Auto,*,Auto"
-                                  ColumnSpacing="10">
-
-                                <Label Grid.Column="0"
-                                       Text="Qty:"
-                                       FontAttributes="Bold"
-                                       FontSize="12"
-                                       TextColor="{StaticResource Text_Primary}"
-                                       VerticalOptions="Center"/>
-
-                                <Label Grid.Column="1"
-                                       Text="{Binding Quantity}"
-                                       FontSize="12"
-                                       TextColor="{StaticResource Text_Primary}"
-                                       VerticalOptions="Center"/>
-
-                                <Label Grid.Column="2"
-                                       Text="{Binding CreatedAt}"
-                                       FontSize="12"
-                                       TextColor="{StaticResource Text_Secondary}"
-                                       VerticalOptions="Center"
-                                       HorizontalOptions="End"/>
-                            </Grid>
-
-                            <!-- Notes -->
-                            <Label Grid.Row="2" Grid.ColumnSpan="2"
-                                   Text="{Binding Notes}"
-                                   FontSize="12"
-                                   TextColor="{StaticResource Text_Secondary}"
-                                   LineBreakMode="TailTruncation"
-                                   MaxLines="2"
-                                   IsVisible="{Binding Notes, Converter={StaticResource StringNotEmptyConverter}}"/>
-
-                            <!-- Action buttons row -->
-                            <Grid Grid.Row="3" Grid.ColumnSpan="2"
-                                  ColumnDefinitions="Auto,Auto,Auto,*"
-                                  ColumnSpacing="8"
-                                  RowSpacing="0">
-
-                                <!-- Approve -->
-                                <Border Grid.Column="0"
-                                        StrokeThickness="0"
-                                        HeightRequest="26"
-                                        BackgroundColor="{StaticResource Button_Icon_Background}">
-                                    <Border.StrokeShape>
-                                        <RoundRectangle CornerRadius="6"/>
-                                    </Border.StrokeShape>
-                                    <Grid ColumnDefinitions="Auto" Padding="10,0" InputTransparent="True">
-                                        <Label Text="APPROVE"
-                                               FontSize="11"
-                                               FontAttributes="Bold"
-                                               VerticalOptions="Center"
-                                               TextColor="{StaticResource Button_Font_Primary}"/>
-                                    </Grid>
-                                    <Border.GestureRecognizers>
-                                        <!-- If you use commands per item, bind them here -->
-                                        <TapGestureRecognizer
-                                            Command="{Binding Source={x:Reference Root}, Path=BindingContext.ApproveOrderCommand}"
-                                            CommandParameter="{Binding .}"/>
-                                    </Border.GestureRecognizers>
-                                </Border>
-
-                                <!-- Receive -->
-                                <Border Grid.Column="1"
-                                        StrokeThickness="0"
-                                        HeightRequest="26"
-                                        BackgroundColor="{StaticResource Button_Icon_Background}">
-                                    <Border.StrokeShape>
-                                        <RoundRectangle CornerRadius="6"/>
-                                    </Border.StrokeShape>
-                                    <Grid ColumnDefinitions="Auto" Padding="10,0" InputTransparent="True">
-                                        <Label Text="RECEIVE"
-                                               FontSize="11"
-                                               FontAttributes="Bold"
-                                               VerticalOptions="Center"
-                                               TextColor="{StaticResource Button_Font_Primary}"/>
-                                    </Grid>
-                                    <Border.GestureRecognizers>
-                                        <TapGestureRecognizer
-                                            Command="{Binding Source={x:Reference Root}, Path=BindingContext.ReceiveOrderCommand}"
-                                            CommandParameter="{Binding .}"/>
-                                    </Border.GestureRecognizers>
-                                </Border>
-
-                                <!-- Cancel order -->
-                                <Border Grid.Column="2"
-                                        StrokeThickness="0"
-                                        HeightRequest="26"
-                                        BackgroundColor="{StaticResource Button_Icon_Background}">
-                                    <Border.StrokeShape>
-                                        <RoundRectangle CornerRadius="6"/>
-                                    </Border.StrokeShape>
-                                    <Grid ColumnDefinitions="Auto" Padding="10,0" InputTransparent="True">
-                                        <Label Text="VOID"
-                                               FontSize="11"
-                                               FontAttributes="Bold"
-                                               VerticalOptions="Center"
-                                               TextColor="{StaticResource Button_Cancel_Font}"/>
-                                    </Grid>
-                                    <Border.GestureRecognizers>
-                                        <TapGestureRecognizer
-                                            Command="{Binding Source={x:Reference Root}, Path=BindingContext.VoidOrderCommand}"
-                                            CommandParameter="{Binding .}"/>
-                                    </Border.GestureRecognizers>
-                                </Border>
-
-                                <!-- Spacer -->
-                                <BoxView Grid.Column="3" Opacity="0"/>
-                            </Grid>
-
-                        </Grid>
-                    </Border>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+                </CollectionView>
+            </Grid>
+        </Border>
 
     </Grid>
 </pages:AuthPage>

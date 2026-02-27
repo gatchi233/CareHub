@@ -78,15 +78,7 @@ namespace MedReminder.Pages.Desktop
         private async void OnSortClicked(object sender, EventArgs e)
         {
             var popup = new ActionPopup();
-            popup.ConfigureList(
-                title: "Sort",
-                items: new[]
-                {
-            ("LowStockFirst", "Low stock first (default)"),
-            ("Name", "Name (A–Z)"),
-            ("Stock", "Stock (low → high)"),
-            ("ReorderLevel", "Reorder level (high → low)")
-                });
+            popup.ConfigureSort();
 
             var result = await this.ShowPopupAsync(popup);
 
@@ -95,10 +87,13 @@ namespace MedReminder.Pages.Desktop
 
             VM.SortMode = r.SelectedKey switch
             {
-                "Name" => InventorySortMode.Name,
-                "Stock" => InventorySortMode.Stock,
-                "ReorderLevel" => InventorySortMode.ReorderLevel,
-                _ => InventorySortMode.LowStockFirst
+                "NameAsc"          => InventorySortMode.NameAsc,
+                "NameDesc"         => InventorySortMode.NameDesc,
+                "StockAsc"         => InventorySortMode.StockAsc,
+                "StockDesc"        => InventorySortMode.StockDesc,
+                "ReorderLevelAsc"  => InventorySortMode.ReorderLevelAsc,
+                "ReorderLevelDesc" => InventorySortMode.ReorderLevelDesc,
+                _                  => InventorySortMode.LowStockFirst
             };
 
             await ReloadAndSyncAsync();
@@ -106,73 +101,46 @@ namespace MedReminder.Pages.Desktop
 
         private async void OnAdjustClicked(object sender, EventArgs e)
         {
-            if (sender is not Button { BindingContext: MedicationInventoryRow row })
+            MedicationInventoryRow? row = null;
+            if (e is TappedEventArgs te && te.Parameter is MedicationInventoryRow r1)
+                row = r1;
+            else if ((sender as BindableObject)?.BindingContext is MedicationInventoryRow r2)
+                row = r2;
+            if (row is null) return;
+
+            var popup = new ActionPopup();
+            popup.ConfigureAdjust(
+                title: "ADJUST STOCK",
+                medName: row.MedName,
+                currentStock: row.StockQuantity,
+                reorderLevel: row.ReorderLevel);
+
+            var result = await this.ShowPopupAsync(popup);
+
+            if (result is not ActionPopup.PopupResult r || r.AdjustDelta is null)
                 return;
 
-            // TODO (later): Supervisor-only adjustment.
-
-            var input = await DisplayPromptAsync(
-                "Adjust Stock",
-                $"Current stock: {row.StockQuantity}\n\nEnter adjustment for {row.MedName}.\nUse + to add, - to subtract (e.g., 10 or -5).",
-                accept: "OK",
-                cancel: "Cancel",
-                placeholder: "e.g., 10 or -5",
-                keyboard: Keyboard.Numeric);
-
-            if (string.IsNullOrWhiteSpace(input))
-                return;
-
-            input = input.Trim();
-
-            if (!int.TryParse(input, out var delta) || delta == 0)
-            {
-                await DisplayAlert("Invalid", "Please enter a non-zero integer (e.g., 10 or -5).", "OK");
-                return;
-            }
-
-            var newStock = row.StockQuantity + delta;
-            if (newStock < 0)
-            {
-                var setToZero = await DisplayAlert(
-                    "Invalid adjustment",
-                    $"That would make stock negative.\n\nCurrent: {row.StockQuantity}\nAdjustment: {delta}\nResult: {newStock}\n\nDo you want to set stock to 0 instead?",
-                    "Set to 0",
-                    "Cancel");
-
-                if (!setToZero)
-                    return;
-
-                delta = -row.StockQuantity;
-
-                if (delta == 0)
-                    return;
-            }
+            var delta = r.AdjustDelta.Value;
+            if (delta == 0) return;
 
             VM.AdjustStockCommand.Execute(Tuple.Create(row.Med, delta));
         }
 
         private async void OnDirectOrderClicked(object sender, EventArgs e)
         {
-            if (sender is not Button { BindingContext: MedicationInventoryRow row })
-                return;
+            MedicationInventoryRow? row = null;
+            if (e is TappedEventArgs te && te.Parameter is MedicationInventoryRow r1)
+                row = r1;
+            else if ((sender as BindableObject)?.BindingContext is MedicationInventoryRow r2)
+                row = r2;
+            if (row is null) return;
 
             var popup = new ActionPopup();
-            popup.ConfigureForm(
-                title: $"Create Order — {row.MedName}",
-                message: null,
-                primaryText: "Create",
-                field1: ("Quantity", "e.g. 30", Keyboard.Numeric),
-                field2: ("Notes (optional)", "e.g., urgent / pharmacy call", Keyboard.Default),
-                validator: (qtyText, notes) =>
-                {
-                    if (string.IsNullOrWhiteSpace(qtyText))
-                        return (false, "Quantity is required.");
-
-                    if (!int.TryParse(qtyText, out var qty) || qty <= 0)
-                        return (false, "Please enter a positive number.");
-
-                    return (true, null);
-                });
+            popup.ConfigureOrder(
+                title: "CREATE ORDER",
+                medName: row.MedName,
+                currentStock: row.StockQuantity,
+                reorderLevel: row.ReorderLevel);
 
             var result = await this.ShowPopupAsync(popup);
 
@@ -181,15 +149,19 @@ namespace MedReminder.Pages.Desktop
 
             var qty = int.Parse(r.Field1);
 
-            VM.CreateOrderCommand.Execute(
-                Tuple.Create(row.Med, qty, r.Field2));
+            VM.CreateOrderCommand.Execute(Tuple.Create(row.Med, qty, r.Field2));
 
             await DisplayAlert("Created", "Order created (Status: Requested).", "OK");
         }
 
         private async void OnOrdersClicked(object sender, EventArgs e)
         {
-            await Shell.Current.GoToAsync(nameof(MedicationOrdersPage));
+            var parameters = new Dictionary<string, object?>
+            {
+                ["returnTo"] = $"//{nameof(MedicationInventoryPage)}"
+            };
+
+            await Shell.Current.GoToAsync(nameof(MedicationOrdersPage), true, parameters);
         }
 
         private async void OnLogoutClicked(object sender, EventArgs e)

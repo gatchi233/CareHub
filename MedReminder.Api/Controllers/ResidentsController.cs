@@ -19,8 +19,8 @@ public sealed class ResidentsController : ControllerBase
     {
         var items = await _db.Residents
             .AsNoTracking()
-            .OrderBy(r => r.LastName)
-            .ThenBy(r => r.FirstName)
+            .OrderBy(r => r.ResidentLName)
+            .ThenBy(r => r.ResidentFName)
             .ToListAsync(ct);
 
         return Ok(items);

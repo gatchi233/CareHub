@@ -7,78 +7,412 @@
 
     <Border
         WidthRequest="420"
-        HeightRequest="420"
         Stroke="{StaticResource Popup_Card_Border}"
         BackgroundColor="{StaticResource Popup_Main_Background}"
         StrokeThickness="1"
-        Padding="14">
+        Padding="16,14">
 
         <Border.StrokeShape>
             <RoundRectangle CornerRadius="12"/>
         </Border.StrokeShape>
 
-        <Grid RowDefinitions="Auto,Auto,*" RowSpacing="10">
+        <Grid RowDefinitions="Auto,Auto,*" RowSpacing="0">
 
-            <!-- Header -->
-            <Grid Grid.Row="0" ColumnDefinitions="*,Auto" VerticalOptions="Center">
-                <Label x:Name="TitleLabel" Text="Popup" FontSize="20" FontAttributes="Bold"
-                       TextColor="{StaticResource Popup_Font_Primary}" />
+            <!-- ── Header ──────────────────────────────────────────────────── -->
+            <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center" Margin="0,0,0,4">
+                <Label x:Name="TitleLabel"
+                       Text="ACTION"
+                       FontSize="11" FontAttributes="Bold" CharacterSpacing="1.5"
+                       TextColor="{StaticResource Popup_Font_Secondary}"
+                       VerticalOptions="Center"/>
 
-                <Border Grid.Column="1" Stroke="{StaticResource Popup_Card_Border}" StrokeThickness="1" 
-                        BackgroundColor="Transparent" HeightRequest="28" WidthRequest="28">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="6"/>
-                    </Border.StrokeShape>
+                <Border Grid.Column="1" StrokeThickness="0"
+                        BackgroundColor="{StaticResource Button_Icon_Background}"
+                        HeightRequest="26" WidthRequest="26"
+                        VerticalOptions="Center">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
                     <Label Text="✕" HorizontalOptions="Center" VerticalOptions="Center"
-                           TextColor="{StaticResource Popup_Font_Secondary}" FontSize="14" />
+                           TextColor="{StaticResource Button_Font_Primary}" FontSize="12"/>
                     <Border.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="OnCloseTapped" />
+                        <TapGestureRecognizer Tapped="OnCloseTapped"/>
                     </Border.GestureRecognizers>
                 </Border>
             </Grid>
 
-            <BoxView Grid.Row="1" HeightRequest="1" Color="{StaticResource Popup_Card_Border}" Opacity="0.8"/>
+            <BoxView Grid.Row="1" HeightRequest="1" Color="{StaticResource Popup_Card_Border}" Margin="0,0,0,12"/>
 
-            <!-- BODY -->
+            <!-- ── Body ────────────────────────────────────────────────────── -->
             <Grid Grid.Row="2">
 
-                <!-- List Mode -->
+                <!-- List mode -->
                 <ScrollView x:Name="ListContainer" IsVisible="False">
-                    <VerticalStackLayout x:Name="ListStack" Spacing="10" />
+                    <VerticalStackLayout x:Name="ListStack" Spacing="8"/>
                 </ScrollView>
 
-                <!-- Form Mode -->
-                <ScrollView x:Name="FormContainer" IsVisible="False">
-                    <VerticalStackLayout Spacing="12">
+                <!-- Sort mode -->
+                <VerticalStackLayout x:Name="SortContainer" IsVisible="False" Spacing="8">
 
+                    <!-- Featured: Low Stock First -->
+                    <Border HeightRequest="46"
+                            BackgroundColor="{StaticResource Alert_Warning}"
+                            StrokeThickness="0">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
+                        <HorizontalStackLayout Spacing="10" HorizontalOptions="Center" VerticalOptions="Center">
+                            <Label Text="⚠" FontSize="18"
+                                   TextColor="{StaticResource Button_Font_Primary}"
+                                   VerticalOptions="Center"/>
+                            <Label Text="Low stock first  (default)" FontSize="13" FontAttributes="Bold"
+                                   TextColor="{StaticResource Button_Font_Primary}"
+                                   VerticalOptions="Center"/>
+                        </HorizontalStackLayout>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnSortOptionTapped" CommandParameter="LowStockFirst"/>
+                        </Border.GestureRecognizers>
+                    </Border>
+
+                    <!-- BY NAME -->
+                    <Label Text="BY NAME" FontSize="10" FontAttributes="Bold" CharacterSpacing="1.2"
+                           TextColor="{StaticResource Popup_Font_Secondary}" Margin="0,6,0,0"/>
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                        <Border BackgroundColor="{StaticResource Popup_Card_Background}"
+                                Stroke="{StaticResource Popup_Card_Border}"
+                                StrokeThickness="1" HeightRequest="38">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                            <Label Text="A → Z" FontSize="12" FontAttributes="Bold"
+                                   TextColor="{StaticResource Popup_Font_Primary}"
+                                   VerticalOptions="Center" HorizontalOptions="Center"/>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnSortOptionTapped" CommandParameter="NameAsc"/>
+                            </Border.GestureRecognizers>
+                        </Border>
+                        <Border Grid.Column="1"
+                                BackgroundColor="{StaticResource Popup_Card_Background}"
+                                Stroke="{StaticResource Popup_Card_Border}"
+                                StrokeThickness="1" HeightRequest="38">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                            <Label Text="Z → A" FontSize="12" FontAttributes="Bold"
+                                   TextColor="{StaticResource Popup_Font_Primary}"
+                                   VerticalOptions="Center" HorizontalOptions="Center"/>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnSortOptionTapped" CommandParameter="NameDesc"/>
+                            </Border.GestureRecognizers>
+                        </Border>
+                    </Grid>
+
+                    <!-- BY STOCK LEVEL -->
+                    <Label Text="BY STOCK LEVEL" FontSize="10" FontAttributes="Bold" CharacterSpacing="1.2"
+                           TextColor="{StaticResource Popup_Font_Secondary}" Margin="0,6,0,0"/>
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                        <Border BackgroundColor="{StaticResource Popup_Card_Background}"
+                                Stroke="{StaticResource Popup_Card_Border}"
+                                StrokeThickness="1" HeightRequest="38">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                            <Label Text="Low → High" FontSize="12" FontAttributes="Bold"
+                                   TextColor="{StaticResource Popup_Font_Primary}"
+                                   VerticalOptions="Center" HorizontalOptions="Center"/>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnSortOptionTapped" CommandParameter="StockAsc"/>
+                            </Border.GestureRecognizers>
+                        </Border>
+                        <Border Grid.Column="1"
+                                BackgroundColor="{StaticResource Popup_Card_Background}"
+                                Stroke="{StaticResource Popup_Card_Border}"
+                                StrokeThickness="1" HeightRequest="38">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                            <Label Text="High → Low" FontSize="12" FontAttributes="Bold"
+                                   TextColor="{StaticResource Popup_Font_Primary}"
+                                   VerticalOptions="Center" HorizontalOptions="Center"/>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnSortOptionTapped" CommandParameter="StockDesc"/>
+                            </Border.GestureRecognizers>
+                        </Border>
+                    </Grid>
+
+                    <!-- BY REORDER LEVEL -->
+                    <Label Text="BY REORDER LEVEL" FontSize="10" FontAttributes="Bold" CharacterSpacing="1.2"
+                           TextColor="{StaticResource Popup_Font_Secondary}" Margin="0,6,0,0"/>
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                        <Border BackgroundColor="{StaticResource Popup_Card_Background}"
+                                Stroke="{StaticResource Popup_Card_Border}"
+                                StrokeThickness="1" HeightRequest="38">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                            <Label Text="Low → High" FontSize="12" FontAttributes="Bold"
+                                   TextColor="{StaticResource Popup_Font_Primary}"
+                                   VerticalOptions="Center" HorizontalOptions="Center"/>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnSortOptionTapped" CommandParameter="ReorderLevelAsc"/>
+                            </Border.GestureRecognizers>
+                        </Border>
+                        <Border Grid.Column="1"
+                                BackgroundColor="{StaticResource Popup_Card_Background}"
+                                Stroke="{StaticResource Popup_Card_Border}"
+                                StrokeThickness="1" HeightRequest="38">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                            <Label Text="High → Low" FontSize="12" FontAttributes="Bold"
+                                   TextColor="{StaticResource Popup_Font_Primary}"
+                                   VerticalOptions="Center" HorizontalOptions="Center"/>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnSortOptionTapped" CommandParameter="ReorderLevelDesc"/>
+                            </Border.GestureRecognizers>
+                        </Border>
+                    </Grid>
+
+                </VerticalStackLayout>
+
+                <!-- Adjust stock mode -->
+                <ScrollView x:Name="AdjustContainer" IsVisible="False">
+                    <VerticalStackLayout Spacing="14">
+
+                        <!-- Current stock card -->
+                        <Border BackgroundColor="{StaticResource Popup_Card_Background}"
+                                Stroke="{StaticResource Popup_Card_Border}"
+                                StrokeThickness="1" Padding="14,12">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                            <Grid ColumnDefinitions="*,Auto">
+                                <VerticalStackLayout VerticalOptions="Center" Spacing="2">
+                                    <Label Text="CURRENT STOCK" FontSize="10" FontAttributes="Bold"
+                                           CharacterSpacing="1.2"
+                                           TextColor="{StaticResource Popup_Font_Secondary}"/>
+                                    <Label x:Name="AdjustMedNameLabel" FontSize="12"
+                                           TextColor="{StaticResource Popup_Font_Secondary}"/>
+                                </VerticalStackLayout>
+                                <Label x:Name="CurrentStockLabel" Grid.Column="1"
+                                       FontSize="28" FontAttributes="Bold"
+                                       TextColor="{StaticResource Popup_Font_Primary}"
+                                       HorizontalOptions="End" VerticalOptions="Center"/>
+                            </Grid>
+                        </Border>
+
+                        <!-- Quick adjustment buttons -->
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="QUICK ADJUST" FontSize="10" FontAttributes="Bold"
+                                   CharacterSpacing="1.2"
+                                   TextColor="{StaticResource Popup_Font_Secondary}"/>
+                            <HorizontalStackLayout x:Name="QuickButtonsRow" Spacing="6"/>
+                        </VerticalStackLayout>
+
+                        <!-- Custom amount entry -->
+                        <VerticalStackLayout Spacing="5">
+                            <Label Text="CUSTOM AMOUNT" FontSize="10" FontAttributes="Bold"
+                                   CharacterSpacing="1.2"
+                                   TextColor="{StaticResource Popup_Font_Secondary}"/>
+                            <Entry x:Name="AdjustEntry"
+                                   Placeholder="e.g. 10 or -5"
+                                   Keyboard="Numeric"
+                                   BackgroundColor="{StaticResource Popup_Card_Background}"
+                                   TextColor="{StaticResource Popup_Font_Primary}"
+                                   PlaceholderColor="{StaticResource Placeholder_Font_Primary}"
+                                   TextChanged="OnAdjustEntryChanged"/>
+                        </VerticalStackLayout>
+
+                        <!-- New stock preview -->
+                        <Border BackgroundColor="{StaticResource Popup_Card_Background}"
+                                Stroke="{StaticResource Popup_Card_Border}"
+                                StrokeThickness="1" Padding="14,12">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                            <VerticalStackLayout Spacing="4">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <Label Text="NEW STOCK" FontSize="10" FontAttributes="Bold"
+                                           CharacterSpacing="1.2"
+                                           TextColor="{StaticResource Popup_Font_Secondary}"
+                                           VerticalOptions="Center"/>
+                                    <Label x:Name="NewStockLabel" Grid.Column="1"
+                                           Text="—" FontSize="22" FontAttributes="Bold"
+                                           TextColor="{StaticResource Popup_Font_Primary}"
+                                           HorizontalOptions="End" VerticalOptions="Center"/>
+                                </Grid>
+                                <Label x:Name="NewStockWarningLabel"
+                                       IsVisible="False" FontSize="11"
+                                       TextColor="{StaticResource Alert_Warning}"/>
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- Action buttons -->
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,4,0,0">
+                            <Border StrokeThickness="0" HeightRequest="34"
+                                    BackgroundColor="{StaticResource Button_Cancel}">
+                                <Border.StrokeShape><RoundRectangle CornerRadius="6"/></Border.StrokeShape>
+                                <Label Text="CANCEL" FontSize="11" FontAttributes="Bold"
+                                       TextColor="{StaticResource Button_Font_Secondary}"
+                                       VerticalOptions="Center" HorizontalOptions="Center"/>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnAdjustCancelTapped"/>
+                                </Border.GestureRecognizers>
+                            </Border>
+                            <Border Grid.Column="1" StrokeThickness="0" HeightRequest="34"
+                                    BackgroundColor="{StaticResource Button_Save}">
+                                <Border.StrokeShape><RoundRectangle CornerRadius="6"/></Border.StrokeShape>
+                                <Label Text="APPLY" FontSize="11" FontAttributes="Bold"
+                                       TextColor="{StaticResource Button_Font_Primary}"
+                                       VerticalOptions="Center" HorizontalOptions="Center"/>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnAdjustApplyTapped"/>
+                                </Border.GestureRecognizers>
+                            </Border>
+                        </Grid>
+
+                    </VerticalStackLayout>
+                </ScrollView>
+
+                <!-- Create order mode -->
+                <ScrollView x:Name="OrderContainer" IsVisible="False">
+                    <VerticalStackLayout Spacing="14">
+
+                        <!-- Medication info card -->
+                        <Border BackgroundColor="{StaticResource Popup_Card_Background}"
+                                Stroke="{StaticResource Popup_Card_Border}"
+                                StrokeThickness="1" Padding="14,12">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                            <Grid ColumnDefinitions="*,Auto">
+                                <VerticalStackLayout Spacing="2" VerticalOptions="Center">
+                                    <Label Text="MEDICATION" FontSize="10" FontAttributes="Bold"
+                                           CharacterSpacing="1.2"
+                                           TextColor="{StaticResource Popup_Font_Secondary}"/>
+                                    <Label x:Name="OrderMedNameLabel" FontSize="16" FontAttributes="Bold"
+                                           TextColor="{StaticResource Popup_Font_Primary}"/>
+                                </VerticalStackLayout>
+                                <VerticalStackLayout Grid.Column="1" Spacing="4"
+                                                     HorizontalOptions="End" VerticalOptions="Center">
+                                    <HorizontalStackLayout Spacing="6" HorizontalOptions="End">
+                                        <Border x:Name="OrderLowBadge"
+                                                BackgroundColor="{StaticResource Alert_Warning}"
+                                                IsVisible="False" StrokeThickness="0"
+                                                Padding="6,2">
+                                            <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                                            <Label Text="LOW" FontSize="10" FontAttributes="Bold"
+                                                   TextColor="{StaticResource Button_Font_Primary}"/>
+                                        </Border>
+                                        <Label x:Name="OrderStockLabel" FontSize="14" FontAttributes="Bold"
+                                               TextColor="{StaticResource Popup_Font_Primary}"
+                                               VerticalOptions="Center"/>
+                                    </HorizontalStackLayout>
+                                    <Label x:Name="OrderReorderLabel" FontSize="11"
+                                           TextColor="{StaticResource Popup_Font_Secondary}"
+                                           HorizontalOptions="End"/>
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Border>
+
+                        <!-- Quick quantity buttons -->
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="QUICK QUANTITY" FontSize="10" FontAttributes="Bold"
+                                   CharacterSpacing="1.2"
+                                   TextColor="{StaticResource Popup_Font_Secondary}"/>
+                            <HorizontalStackLayout x:Name="QuickOrderButtonsRow" Spacing="6"/>
+                        </VerticalStackLayout>
+
+                        <!-- Quantity entry -->
+                        <VerticalStackLayout Spacing="5">
+                            <Label Text="QUANTITY" FontSize="10" FontAttributes="Bold"
+                                   CharacterSpacing="1.2"
+                                   TextColor="{StaticResource Popup_Font_Secondary}"/>
+                            <Entry x:Name="OrderQtyEntry"
+                                   Placeholder="e.g. 30"
+                                   Keyboard="Numeric"
+                                   BackgroundColor="{StaticResource Popup_Card_Background}"
+                                   TextColor="{StaticResource Popup_Font_Primary}"
+                                   PlaceholderColor="{StaticResource Placeholder_Font_Primary}"/>
+                        </VerticalStackLayout>
+
+                        <!-- Notes entry -->
+                        <VerticalStackLayout Spacing="5">
+                            <Label Text="NOTES  (OPTIONAL)" FontSize="10" FontAttributes="Bold"
+                                   CharacterSpacing="1.2"
+                                   TextColor="{StaticResource Popup_Font_Secondary}"/>
+                            <Entry x:Name="OrderNotesEntry"
+                                   Placeholder="e.g. urgent / pharmacy call"
+                                   BackgroundColor="{StaticResource Popup_Card_Background}"
+                                   TextColor="{StaticResource Popup_Font_Primary}"
+                                   PlaceholderColor="{StaticResource Placeholder_Font_Primary}"/>
+                        </VerticalStackLayout>
+
+                        <!-- Action buttons -->
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,4,0,0">
+                            <Border StrokeThickness="0" HeightRequest="34"
+                                    BackgroundColor="{StaticResource Button_Cancel}">
+                                <Border.StrokeShape><RoundRectangle CornerRadius="6"/></Border.StrokeShape>
+                                <Label Text="CANCEL" FontSize="11" FontAttributes="Bold"
+                                       TextColor="{StaticResource Button_Font_Secondary}"
+                                       VerticalOptions="Center" HorizontalOptions="Center"/>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnOrderCancelTapped"/>
+                                </Border.GestureRecognizers>
+                            </Border>
+                            <Border Grid.Column="1" StrokeThickness="0" HeightRequest="34"
+                                    BackgroundColor="{StaticResource Button_Create}">
+                                <Border.StrokeShape><RoundRectangle CornerRadius="6"/></Border.StrokeShape>
+                                <Label Text="CREATE" FontSize="11" FontAttributes="Bold"
+                                       TextColor="{StaticResource Button_Font_Primary}"
+                                       VerticalOptions="Center" HorizontalOptions="Center"/>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnOrderCreateTapped"/>
+                                </Border.GestureRecognizers>
+                            </Border>
+                        </Grid>
+
+                    </VerticalStackLayout>
+                </ScrollView>
+
+                <!-- Form mode -->
+                <ScrollView x:Name="FormContainer" IsVisible="False">
+                    <VerticalStackLayout Spacing="14">
+
+                        <!-- Context message -->
                         <Label x:Name="MessageLabel"
                                Text=""
                                IsVisible="False"
-                               TextColor="{StaticResource Popup_Font_Secondary}" />
+                               FontSize="12"
+                               TextColor="{StaticResource Popup_Font_Secondary}"
+                               Margin="0,0,0,2"/>
 
-                        <VerticalStackLayout x:Name="Field1Container" Spacing="6" IsVisible="False">
-                            <Label x:Name="Field1Label" Text="Field 1" FontAttributes="Bold"
-                                   TextColor="{StaticResource Popup_Font_Primary}" />
-                            <Entry x:Name="Field1Entry" Placeholder=""
+                        <!-- Field 1 -->
+                        <VerticalStackLayout x:Name="Field1Container" Spacing="5" IsVisible="False">
+                            <Label x:Name="Field1Label" Text="Field 1"
+                                   FontSize="11"
+                                   TextColor="{StaticResource Popup_Font_Secondary}"/>
+                            <Entry x:Name="Field1Entry"
                                    BackgroundColor="{StaticResource Popup_Card_Background}"
-                                   TextColor="{StaticResource Popup_Font_Primary}" />
+                                   TextColor="{StaticResource Popup_Font_Primary}"
+                                   PlaceholderColor="{StaticResource Placeholder_Font_Primary}"/>
                         </VerticalStackLayout>
 
-                        <VerticalStackLayout x:Name="Field2Container" Spacing="6" IsVisible="False">
-                            <Label x:Name="Field2Label" Text="Field 2" FontAttributes="Bold"
-                                   TextColor="{StaticResource Popup_Font_Primary}" />
+                        <!-- Field 2 -->
+                        <VerticalStackLayout x:Name="Field2Container" Spacing="5" IsVisible="False">
+                            <Label x:Name="Field2Label" Text="Field 2"
+                                   FontSize="11"
+                                   TextColor="{StaticResource Popup_Font_Secondary}"/>
                             <Entry x:Name="Field2Entry"
-                                   Placeholder=""
                                    BackgroundColor="{StaticResource Popup_Card_Background}"
-                                   TextColor="{StaticResource Popup_Font_Primary}" />
+                                   TextColor="{StaticResource Popup_Font_Primary}"
+                                   PlaceholderColor="{StaticResource Placeholder_Font_Primary}"/>
                         </VerticalStackLayout>
 
-                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
-                            <Button Text="Cancel" Clicked="OnCancelClicked"
-                                    Style="{StaticResource Button_Cancel}" />
+                        <!-- Buttons -->
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,4,0,0">
 
-                            <Button Grid.Column="1" x:Name="PrimaryButton" Text="OK"
-                                    Clicked="OnPrimaryClicked" Style="{StaticResource Button_Save}" />
+                            <Border StrokeThickness="0" HeightRequest="34"
+                                    BackgroundColor="{StaticResource Button_Cancel}">
+                                <Border.StrokeShape><RoundRectangle CornerRadius="6"/></Border.StrokeShape>
+                                <Label Text="CANCEL" FontSize="11" FontAttributes="Bold"
+                                       TextColor="{StaticResource Button_Font_Secondary}"
+                                       VerticalOptions="Center" HorizontalOptions="Center"/>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnCancelClicked"/>
+                                </Border.GestureRecognizers>
+                            </Border>
+
+                            <Border Grid.Column="1" x:Name="PrimaryButton" StrokeThickness="0"
+                                    HeightRequest="34" BackgroundColor="{StaticResource Button_Save}">
+                                <Border.StrokeShape><RoundRectangle CornerRadius="6"/></Border.StrokeShape>
+                                <Label x:Name="PrimaryButtonLabel" Text="OK"
+                                       FontSize="11" FontAttributes="Bold"
+                                       TextColor="{StaticResource Button_Font_Primary}"
+                                       VerticalOptions="Center" HorizontalOptions="Center"/>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnPrimaryClicked"/>
+                                </Border.GestureRecognizers>
+                            </Border>
+
                         </Grid>
 
                     </VerticalStackLayout>

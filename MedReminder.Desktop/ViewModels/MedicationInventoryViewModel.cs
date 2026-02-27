@@ -10,9 +10,12 @@ namespace MedReminder.ViewModels
     public enum InventorySortMode
     {
         LowStockFirst,
-        Name,
-        Stock,
-        ReorderLevel
+        NameAsc,
+        NameDesc,
+        StockAsc,
+        StockDesc,
+        ReorderLevelAsc,
+        ReorderLevelDesc
     }
 
     public class MedicationInventoryViewModel : INotifyPropertyChanged
@@ -87,13 +90,22 @@ namespace MedReminder.ViewModels
 
                 IEnumerable<MedicationInventoryRow> sorted = SortMode switch
                 {
-                    InventorySortMode.Name =>
+                    InventorySortMode.NameAsc =>
                         inventory.OrderBy(x => x.MedName),
 
-                    InventorySortMode.Stock =>
+                    InventorySortMode.NameDesc =>
+                        inventory.OrderByDescending(x => x.MedName),
+
+                    InventorySortMode.StockAsc =>
                         inventory.OrderBy(x => x.StockQuantity).ThenBy(x => x.MedName),
 
-                    InventorySortMode.ReorderLevel =>
+                    InventorySortMode.StockDesc =>
+                        inventory.OrderByDescending(x => x.StockQuantity).ThenBy(x => x.MedName),
+
+                    InventorySortMode.ReorderLevelAsc =>
+                        inventory.OrderBy(x => x.ReorderLevel).ThenBy(x => x.MedName),
+
+                    InventorySortMode.ReorderLevelDesc =>
                         inventory.OrderByDescending(x => x.ReorderLevel).ThenBy(x => x.MedName),
 
                     _ => // LowStockFirst

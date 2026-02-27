@@ -19,9 +19,7 @@ namespace MedReminder.Services.Local
             if (File.Exists(_filePath))
                 return;
 
-            await using var inStream = await FileSystem.OpenAppPackageFileAsync("Inventory.json");
-            await using var outStream = File.Create(_filePath);
-            await inStream.CopyToAsync(outStream);
+            await ResetInventoryFromPackageAsync();
         }
 
         public async Task<List<Medication>> LoadAsync()
@@ -31,12 +29,34 @@ namespace MedReminder.Services.Local
             if (!File.Exists(_filePath))
                 return new List<Medication>();
 
-            await using var stream = File.OpenRead(_filePath);
+            try
+            {
+                await using var stream = File.OpenRead(_filePath);
 
-            var items = await JsonSerializer.DeserializeAsync<List<Medication>>(stream)
-                        ?? new List<Medication>();
+                var items = await JsonSerializer.DeserializeAsync<List<Medication>>(stream)
+                            ?? new List<Medication>();
 
-            return items;
+                return items;
+            }
+            catch (Exception)
+            {
+                // Corrupt/legacy JSON (e.g., old numeric IDs). Re-seed from packaged Inventory.json.
+                await ResetInventoryFromPackageAsync();
+
+                await using var stream = File.OpenRead(_filePath);
+                var items = await JsonSerializer.DeserializeAsync<List<Medication>>(stream)
+                            ?? new List<Medication>();
+                return items;
+            }
+        }
+
+        private static async Task ResetInventoryFromPackageAsync()
+        {
+            var path = Path.Combine(FileSystem.AppDataDirectory, "Medications.json");
+
+            await using var inStream = await FileSystem.OpenAppPackageFileAsync("Inventory.json");
+            await using var outStream = File.Create(path);
+            await inStream.CopyToAsync(outStream);
         }
 
         private async Task SaveAsync(List<Medication> items)

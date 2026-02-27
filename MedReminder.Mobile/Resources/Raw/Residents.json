@@ -1,8 +1,8 @@
 [
     {
         "Id":  "00000000-0000-0000-0000-000000000007",
-        "FirstName":  "Elijah",
-        "LastName":  "Davis",
+        "ResidentFName":  "Elijah",
+        "ResidentLName":  "Davis",
         "Gender":  "Male",
         "SIN":  "789-012-345",
         "DOB":  "1942-03-15",
@@ -39,8 +39,8 @@
     },
     {
         "Id":  "00000000-0000-0000-0000-000000000004",
-        "FirstName":  "Emma",
-        "LastName":  "Jones",
+        "ResidentFName":  "Emma",
+        "ResidentLName":  "Jones",
         "Gender":  "Female",
         "SIN":  "567-890-123",
         "DOB":  "1950-07-08",
@@ -77,8 +77,8 @@
     },
     {
         "Id":  "00000000-0000-0000-0000-00000000000a",
-        "FirstName":  "Isabella",
-        "LastName":  "Hernandez",
+        "ResidentFName":  "Isabella",
+        "ResidentLName":  "Hernandez",
         "Gender":  "Female",
         "SIN":  "345-678-901",
         "DOB":  "1938-01-30",
@@ -115,8 +115,8 @@
     },
     {
         "Id":  "00000000-0000-0000-0000-00000000000b",
-        "FirstName":  "James",
-        "LastName":  "Lopez",
+        "ResidentFName":  "James",
+        "ResidentLName":  "Lopez",
         "Gender":  "Male",
         "SIN":  "456-789-012",
         "DOB":  "1945-09-14",
@@ -153,8 +153,8 @@
     },
     {
         "Id":  "00000000-0000-0000-0000-00000000000c",
-        "FirstName":  "Mia",
-        "LastName":  "Gonzalez",
+        "ResidentFName":  "Mia",
+        "ResidentLName":  "Gonzalez",
         "Gender":  "Female",
         "SIN":  "567-890-123",
         "DOB":  "1955-08-09",
@@ -191,8 +191,8 @@
     },
     {
         "Id":  "00000000-0000-0000-0000-000000000003",
-        "FirstName":  "Noah",
-        "LastName":  "Brown",
+        "ResidentFName":  "Noah",
+        "ResidentLName":  "Brown",
         "Gender":  "Male",
         "SIN":  "123-456-789",
         "DOB":  "1951-11-19",
@@ -229,8 +229,8 @@
     },
     {
         "Id":  "00000000-0000-0000-0000-00000000000f",
-        "FirstName":  "Lucas",
-        "LastName":  "Thomas",
+        "ResidentFName":  "Lucas",
+        "ResidentLName":  "Thomas",
         "Gender":  "Male",
         "SIN":  "890-123-456",
         "DOB":  "1936-04-03",
@@ -267,8 +267,8 @@
     },
     {
         "Id":  "00000000-0000-0000-0000-000000000001",
-        "FirstName":  "Liam",
-        "LastName":  "Johnson",
+        "ResidentFName":  "Liam",
+        "ResidentLName":  "Johnson",
         "Gender":  "Male",
         "SIN":  "452-881-903",
         "DOB":  "1940-10-25",
@@ -305,8 +305,8 @@
     },
     {
         "Id":  "00000000-0000-0000-0000-000000000009",
-        "FirstName":  "William",
-        "LastName":  "Martinez",
+        "ResidentFName":  "William",
+        "ResidentLName":  "Martinez",
         "Gender":  "Male",
         "SIN":  "234-567-890",
         "DOB":  "1948-02-17",
@@ -343,8 +343,8 @@
     },
     {
         "Id":  "00000000-0000-0000-0000-000000000006",
-        "FirstName":  "Ava",
-        "LastName":  "Miller",
+        "ResidentFName":  "Ava",
+        "ResidentLName":  "Miller",
         "Gender":  "Female",
         "SIN":  "654-321-987",
         "DOB":  "1934-05-12",
@@ -381,8 +381,8 @@
     },
     {
         "Id":  "00000000-0000-0000-0000-000000000002",
-        "FirstName":  "Olivia",
-        "LastName":  "Williams",
+        "ResidentFName":  "Olivia",
+        "ResidentLName":  "Williams",
         "Gender":  "Female",
         "SIN":  "987-654-321",
         "DOB":  "1933-09-02",
@@ -419,8 +419,8 @@
     },
     {
         "Id":  "00000000-0000-0000-0000-000000000005",
-        "FirstName":  "Oliver",
-        "LastName":  "Garcia",
+        "ResidentFName":  "Oliver",
+        "ResidentLName":  "Garcia",
         "Gender":  "Male",
         "SIN":  "321-654-987",
         "DOB":  "1931-06-21",
@@ -457,8 +457,8 @@
     },
     {
         "Id":  "00000000-0000-0000-0000-00000000000e",
-        "FirstName":  "Charlotte",
-        "LastName":  "Anderson",
+        "ResidentFName":  "Charlotte",
+        "ResidentLName":  "Anderson",
         "Gender":  "Female",
         "SIN":  "789-012-345",
         "DOB":  "1929-11-23",
@@ -495,8 +495,8 @@
     },
     {
         "Id":  "00000000-0000-0000-0000-000000000008",
-        "FirstName":  "Sophia",
-        "LastName":  "Rodriguez",
+        "ResidentFName":  "Sophia",
+        "ResidentLName":  "Rodriguez",
         "Gender":  "Female",
         "SIN":  "890-123-456",
         "DOB":  "1945-09-14",
@@ -533,8 +533,8 @@
     },
     {
         "Id":  "00000000-0000-0000-0000-00000000000d",
-        "FirstName":  "Benjamin",
-        "LastName":  "Wilson",
+        "ResidentFName":  "Benjamin",
+        "ResidentLName":  "Wilson",
         "Gender":  "Male",
         "SIN":  "678-901-234",
         "DOB":  "1929-11-23",
@@ -570,3 +570,4 @@
         "BedLabel":  "A"
     }
 ]
+

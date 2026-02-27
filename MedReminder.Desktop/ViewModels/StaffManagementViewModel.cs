@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,8 +16,9 @@ namespace MedReminder.ViewModels
         private readonly IStaffService _staffService;
 
         public ObservableCollection<StaffRecord> Staff { get; } = new();
+        public IList<string> Roles { get; } = new List<string> { "Admin", "Care", "Kitchen", "Facilities" };
 
-        public IList<string> Roles { get; } = new List<string> { "Admin", "Staff" };
+        // ── Selection & mode ────────────────────────────────────────────────
 
         private StaffRecord? _selected;
         public StaffRecord? Selected
@@ -26,19 +27,50 @@ namespace MedReminder.ViewModels
             set
             {
                 if (SetProperty(ref _selected, value))
+                {
                     LoadFromSelected();
+                    IsEditing = false;   // clicking a card shows view mode
+                    OnPropertyChanged(nameof(HasSelection));
+                    OnPropertyChanged(nameof(CanEdit));
+                    OnPropertyChanged(nameof(CannotEdit));
+                }
             }
         }
 
-        // Editor fields
+        private bool _isEditing;
+        public bool IsEditing
+        {
+            get => _isEditing;
+            set
+            {
+                if (SetProperty(ref _isEditing, value))
+                {
+                    OnPropertyChanged(nameof(PanelTitle));
+                    OnPropertyChanged(nameof(IsNotEditing));
+                    OnPropertyChanged(nameof(CanEdit));
+                    OnPropertyChanged(nameof(CannotEdit));
+                    OnPropertyChanged(nameof(CanEditFirstAidExpiry));
+                    OnPropertyChanged(nameof(CanEditFoodSafeExpiry));
+                }
+            }
+        }
+
+        public bool IsNotEditing => !IsEditing;
+        public bool HasSelection => Selected != null;
+        public bool CanEdit     => HasSelection && !IsEditing;
+        public bool CannotEdit  => !CanEdit;
+        public string PanelTitle => IsEditing ? "EDIT STAFF RECORD" : "VIEW STAFF RECORD";
+
+        // ── Editor fields ────────────────────────────────────────────────────
+
         private string _employeeId = "";
         public string EmployeeId { get => _employeeId; set => SetProperty(ref _employeeId, value); }
 
-        private string _firstName = "";
-        public string FirstName { get => _firstName; set => SetProperty(ref _firstName, value); }
+        private string _staffFName = "";
+        public string StaffFName { get => _staffFName; set => SetProperty(ref _staffFName, value); }
 
-        private string _lastName = "";
-        public string LastName { get => _lastName; set => SetProperty(ref _lastName, value); }
+        private string _staffLName = "";
+        public string StaffLName { get => _staffLName; set => SetProperty(ref _staffLName, value); }
 
         private string _jobTitle = "";
         public string JobTitle { get => _jobTitle; set => SetProperty(ref _jobTitle, value); }
@@ -55,37 +87,94 @@ namespace MedReminder.ViewModels
         private string _shiftPreference = "";
         public string ShiftPreference { get => _shiftPreference; set => SetProperty(ref _shiftPreference, value); }
 
+        // ── Compliance ───────────────────────────────────────────────────────
+
+        private bool _hasFirstAid;
+        public bool HasFirstAid
+        {
+            get => _hasFirstAid;
+            set
+            {
+                if (SetProperty(ref _hasFirstAid, value))
+                    OnPropertyChanged(nameof(CanEditFirstAidExpiry));
+            }
+        }
+
         private string _firstAidExpiry = "";
-        public string FirstAidExpiry { get => _firstAidExpiry; set => SetProperty(ref _firstAidExpiry, value); }
+        public string FirstAidExpiry
+        {
+            get => _firstAidExpiry;
+            set
+            {
+                if (SetProperty(ref _firstAidExpiry, value) && !string.IsNullOrWhiteSpace(value))
+                    HasFirstAid = true;
+            }
+        }
+
+        // IsEditing AND HasFirstAid both required to type in the expiry date
+        public bool CanEditFirstAidExpiry => IsEditing && HasFirstAid;
 
         private bool _foodSafeCertified;
-        public bool FoodSafeCertified { get => _foodSafeCertified; set => SetProperty(ref _foodSafeCertified, value); }
+        public bool FoodSafeCertified
+        {
+            get => _foodSafeCertified;
+            set
+            {
+                if (SetProperty(ref _foodSafeCertified, value))
+                    OnPropertyChanged(nameof(CanEditFoodSafeExpiry));
+            }
+        }
 
-        private string _role = "Staff";
+        private string _foodSafeExpiry = "";
+        public string FoodSafeExpiry
+        {
+            get => _foodSafeExpiry;
+            set
+            {
+                if (SetProperty(ref _foodSafeExpiry, value) && !string.IsNullOrWhiteSpace(value))
+                    FoodSafeCertified = true;
+            }
+        }
+
+        public bool CanEditFoodSafeExpiry => IsEditing && FoodSafeCertified;
+
+        // ── Account ──────────────────────────────────────────────────────────
+
+        private string _role = "Care";
         public string Role { get => _role; set => SetProperty(ref _role, value); }
 
         private bool _isEnabled = true;
         public bool IsEnabled { get => _isEnabled; set => SetProperty(ref _isEnabled, value); }
 
+        // ── Error ────────────────────────────────────────────────────────────
+
         private string _error = "";
         public string Error { get => _error; set => SetProperty(ref _error, value); }
 
-        public string ToggleEnabledText => IsEnabled ? "Disable" : "Enable";
+        // ── Commands ─────────────────────────────────────────────────────────
 
         public ICommand RefreshCommand { get; }
         public ICommand NewCommand { get; }
         public ICommand SaveCommand { get; }
-        public ICommand ToggleEnabledCommand { get; }
+        public ICommand EditCommand { get; }
+        public ICommand SetActiveCommand { get; }
+        public ICommand SetInactiveCommand { get; }
 
         public StaffManagementViewModel(IStaffService staffService)
         {
             _staffService = staffService;
 
             RefreshCommand = new Command(async () => await RefreshAsync());
-            NewCommand = new Command(NewStaff);
-            SaveCommand = new Command(async () => await SaveAsync());
-            ToggleEnabledCommand = new Command(async () => await ToggleEnabledAsync());
+            NewCommand     = new Command(NewStaff);
+            SaveCommand    = new Command(async () => await SaveAsync());
+
+            // Called from the EDIT button in the toolbar — enters edit mode for the selected record
+            EditCommand       = new Command(() => IsEditing = true);
+            SetActiveCommand   = new Command(() => IsEnabled = true);
+            SetInactiveCommand = new Command(() => IsEnabled = false);
         }
+
+        // ── Data loading ─────────────────────────────────────────────────────
 
         public async Task RefreshAsync()
         {
@@ -103,45 +192,61 @@ namespace MedReminder.ViewModels
             }
         }
 
-        private void NewStaff()
-        {
-            Selected = null;
-            EmployeeId = "";
-            FirstName = "";
-            LastName = "";
-            JobTitle = "";
-            Department = "";
-            EmploymentStatus = "";
-            HourlyWage = 0;
-            ShiftPreference = "";
-            FirstAidExpiry = "";
-            FoodSafeCertified = false;
-            Role = "Staff";
-            IsEnabled = true;
-            Error = "";
-            OnPropertyChanged(nameof(ToggleEnabledText));
-        }
-
         private void LoadFromSelected()
         {
             if (Selected == null) return;
 
-            EmployeeId = Selected.EmployeeId;
-            FirstName = Selected.FirstName;
-            LastName = Selected.LastName;
-            JobTitle = Selected.JobTitle;
-            Department = Selected.Department;
+            EmployeeId       = Selected.EmployeeId;
+            StaffFName       = Selected.StaffFName;
+            StaffLName       = Selected.StaffLName;
+            JobTitle         = Selected.JobTitle;
+            Department       = Selected.Department;
             EmploymentStatus = Selected.EmploymentStatus;
-            HourlyWage = Selected.HourlyWage;
-            ShiftPreference = Selected.ShiftPreference;
+            HourlyWage       = Selected.HourlyWage;
+            ShiftPreference  = Selected.ShiftPreference;
 
-            FirstAidExpiry = Selected.Compliance?.FirstAidExpiry ?? "";
+            HasFirstAid      = Selected.Compliance?.HasFirstAid      ?? false;
+            FirstAidExpiry   = Selected.Compliance?.FirstAidExpiry   ?? "";
             FoodSafeCertified = Selected.Compliance?.FoodSafeCertified ?? false;
+            FoodSafeExpiry   = Selected.Compliance?.FoodSafeExpiry   ?? "";
 
-            Role = string.IsNullOrWhiteSpace(Selected.Role) ? "Staff" : Selected.Role;
+            Role      = string.IsNullOrWhiteSpace(Selected.Role) ? "Care" : Selected.Role;
             IsEnabled = Selected.IsEnabled;
+        }
 
-            OnPropertyChanged(nameof(ToggleEnabledText));
+        // ── Actions ──────────────────────────────────────────────────────────
+
+        private void NewStaff()
+        {
+            Selected         = null;
+            EmployeeId       = GenerateNextEmployeeId();
+            StaffFName       = "";
+            StaffLName       = "";
+            JobTitle         = "";
+            Department       = "";
+            EmploymentStatus = "";
+            HourlyWage       = 0;
+            ShiftPreference  = "";
+            HasFirstAid      = false;
+            FirstAidExpiry   = "";
+            FoodSafeCertified = false;
+            FoodSafeExpiry   = "";
+            Role             = "Care";
+            IsEnabled        = true;
+            Error            = "";
+            IsEditing        = true;
+        }
+
+        private string GenerateNextEmployeeId()
+        {
+            int max = 0;
+            foreach (var s in Staff)
+            {
+                if (s.EmployeeId.StartsWith("EMP-", StringComparison.OrdinalIgnoreCase) &&
+                    int.TryParse(s.EmployeeId[4..], out int n) && n > max)
+                    max = n;
+            }
+            return $"EMP-{max + 1:D3}";
         }
 
         private async Task SaveAsync()
@@ -150,13 +255,13 @@ namespace MedReminder.ViewModels
 
             if (string.IsNullOrWhiteSpace(EmployeeId))
             {
-                Error = "EmployeeId is required (e.g. EMP-019).";
+                Error = "Employee ID is required (e.g. EMP-021).";
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(FirstName) || string.IsNullOrWhiteSpace(LastName))
+            if (string.IsNullOrWhiteSpace(StaffFName) || string.IsNullOrWhiteSpace(StaffLName))
             {
-                Error = "FirstName and LastName are required.";
+                Error = "First name and last name are required.";
                 return;
             }
 
@@ -164,28 +269,32 @@ namespace MedReminder.ViewModels
             {
                 var record = new StaffRecord
                 {
-                    EmployeeId = EmployeeId.Trim(),
-                    FirstName = FirstName.Trim(),
-                    LastName = LastName.Trim(),
-                    JobTitle = JobTitle.Trim(),
-                    Department = Department.Trim(),
+                    EmployeeId       = EmployeeId.Trim(),
+                    StaffFName       = StaffFName.Trim(),
+                    StaffLName       = StaffLName.Trim(),
+                    JobTitle         = JobTitle.Trim(),
+                    Department       = Department.Trim(),
                     EmploymentStatus = EmploymentStatus.Trim(),
-                    HourlyWage = HourlyWage,
-                    ShiftPreference = ShiftPreference.Trim(),
-                    Role = string.IsNullOrWhiteSpace(Role) ? "Staff" : Role,
-                    IsEnabled = IsEnabled,
-                    Compliance = new StaffCompliance
+                    HourlyWage       = HourlyWage,
+                    ShiftPreference  = ShiftPreference.Trim(),
+                    Role             = string.IsNullOrWhiteSpace(Role) ? "Care" : Role,
+                    IsEnabled        = IsEnabled,
+                    Compliance       = new StaffCompliance
                     {
-                        FirstAidExpiry = FirstAidExpiry.Trim(),
-                        FoodSafeCertified = FoodSafeCertified
+                        HasFirstAid       = HasFirstAid,
+                        FirstAidExpiry    = HasFirstAid ? FirstAidExpiry.Trim() : "",
+                        FoodSafeCertified = FoodSafeCertified,
+                        FoodSafeExpiry    = FoodSafeCertified ? FoodSafeExpiry.Trim() : ""
                     }
                 };
 
                 await _staffService.AddOrUpdateAsync(record);
                 await RefreshAsync();
 
-                Selected = Staff.FirstOrDefault(s =>
+                // Re-select the saved record and drop back to view mode
+                Selected  = Staff.FirstOrDefault(s =>
                     s.EmployeeId.Equals(record.EmployeeId, StringComparison.OrdinalIgnoreCase));
+                IsEditing = false;
             }
             catch (Exception ex)
             {
@@ -193,29 +302,7 @@ namespace MedReminder.ViewModels
             }
         }
 
-        private async Task ToggleEnabledAsync()
-        {
-            if (string.IsNullOrWhiteSpace(EmployeeId))
-                return;
-
-            try
-            {
-                var newValue = !IsEnabled;
-                await _staffService.SetEnabledAsync(EmployeeId, newValue);
-
-                IsEnabled = newValue;
-                OnPropertyChanged(nameof(ToggleEnabledText));
-
-                await RefreshAsync();
-
-                Selected = Staff.FirstOrDefault(s =>
-                    s.EmployeeId.Equals(EmployeeId, StringComparison.OrdinalIgnoreCase));
-            }
-            catch (Exception ex)
-            {
-                Error = ex.Message;
-            }
-        }
+        // ── INPC boilerplate ─────────────────────────────────────────────────
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -224,9 +311,7 @@ namespace MedReminder.ViewModels
 
         private bool SetProperty<T>(ref T backing, T value, [CallerMemberName] string? name = null)
         {
-            if (EqualityComparer<T>.Default.Equals(backing, value))
-                return false;
-
+            if (EqualityComparer<T>.Default.Equals(backing, value)) return false;
             backing = value;
             OnPropertyChanged(name);
             return true;

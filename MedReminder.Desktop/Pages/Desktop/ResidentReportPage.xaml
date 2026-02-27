@@ -17,10 +17,10 @@
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="4"/>
                     </Border.StrokeShape>
-                    <Grid ColumnDefinitions="32,Auto" Margin="0">
+                    <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
                         <Image Grid.Column="0" Source="icons8_report_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
-                        <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Export}" Padding="10,0" StrokeThickness="0">
-                            <Label Text="SHARE REPORT" TextColor="{StaticResource Button_Font_Primary}" FontSize="12" VerticalOptions="Center" FontAttributes="Bold"/>
+                        <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Export}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
+                            <Label Text="SHARE REPORT" TextColor="{StaticResource Button_Font_Primary}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
                         </Border>
                     </Grid>
                     <Border.GestureRecognizers>
@@ -33,10 +33,10 @@
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="4"/>
                     </Border.StrokeShape>
-                    <Grid ColumnDefinitions="32,Auto" Margin="0">
+                    <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
                         <Image Grid.Column="0" Source="icons8_close_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
-                        <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Close}" Padding="10,0" StrokeThickness="0">
-                            <Label Text="CLOSE" TextColor="{StaticResource Button_Font_Primary}" FontSize="12" VerticalOptions="Center" FontAttributes="Bold"/>
+                        <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Close}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
+                            <Label Text="CLOSE" TextColor="{StaticResource Button_Font_Primary}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
                         </Border>
                     </Grid>
                     <Border.GestureRecognizers>

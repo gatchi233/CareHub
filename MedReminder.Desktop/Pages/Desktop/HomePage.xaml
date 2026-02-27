@@ -59,10 +59,10 @@
                             <Border.StrokeShape>
                                 <RoundRectangle CornerRadius="4"/>
                             </Border.StrokeShape>
-                            <Grid ColumnDefinitions="32,Auto" Margin="0">
+                            <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
                                 <Image Grid.Column="0" Source="icons8_search_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
-                                <Border Grid.Column="1" BackgroundColor="{StaticResource Button_View}" Padding="10,0" StrokeThickness="0">
-                                    <Label Text="SEARCH" TextColor="{StaticResource Button_Font_Primary}" FontSize="12" VerticalOptions="Center" FontAttributes="Bold"/>
+                                <Border Grid.Column="1" BackgroundColor="{StaticResource Button_View}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
+                                    <Label Text="SEARCH" TextColor="{StaticResource Button_Font_Primary}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
                                 </Border>
                             </Grid>
                             <Border.GestureRecognizers>
@@ -75,10 +75,10 @@
                             <Border.StrokeShape>
                                 <RoundRectangle CornerRadius="4"/>
                             </Border.StrokeShape>
-                            <Grid ColumnDefinitions="32,Auto" Margin="0">
-                                <Image Grid.Column="0" Source="icons8_adduser_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
-                                <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Add}" Padding="10,0" StrokeThickness="0">
-                                    <Label Text="ADD" TextColor="{StaticResource Button_Font_Primary}" FontSize="12" VerticalOptions="Center" FontAttributes="Bold"/>
+                            <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
+                                <Image Grid.Column="0" Source="icons8_add_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Add}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
+                                    <Label Text="ADD" TextColor="{StaticResource Button_Font_Primary}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
                                 </Border>
                             </Grid>
                             <Border.GestureRecognizers>
@@ -175,35 +175,35 @@
                             </Picker>
                         </VerticalStackLayout>
 
-                        <!-- Clear Button -->
+                        <!-- Search Button -->
                         <Border Grid.Column="3" StrokeThickness="0" HeightRequest="28" VerticalOptions="End" Margin="0,0,0,4" BackgroundColor="{StaticResource Button_Icon_Background}">
                             <Border.StrokeShape>
                                 <RoundRectangle CornerRadius="4"/>
                             </Border.StrokeShape>
-                            <Grid ColumnDefinitions="32,Auto" Margin="0">
-                                <Image Grid.Column="0" Source="icons8_clear_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
-                                <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Cancel}" Padding="10,0" StrokeThickness="0">
-                                    <Label Text="CLEAR" TextColor="{StaticResource Button_Font_Primary}" FontSize="12" VerticalOptions="Center" FontAttributes="Bold"/>
-                                </Border>
-                            </Grid>
-                            <Border.GestureRecognizers>
-                                <TapGestureRecognizer Tapped="OnClearDayTimeClicked"/>
-                            </Border.GestureRecognizers>
-                        </Border>
-
-                        <!-- Search Button -->
-                        <Border Grid.Column="4" StrokeThickness="0" HeightRequest="28" VerticalOptions="End" Margin="0,0,0,4" BackgroundColor="{StaticResource Button_Icon_Background}">
-                            <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="4"/>
-                            </Border.StrokeShape>
-                            <Grid ColumnDefinitions="32,Auto" Margin="0">
+                            <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
                                 <Image Grid.Column="0" Source="icons8_search_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
-                                <Border Grid.Column="1" BackgroundColor="{StaticResource Button_View}" Padding="10,0" StrokeThickness="0">
-                                    <Label Text="SEARCH" TextColor="{StaticResource Button_Font_Primary}" FontSize="12" VerticalOptions="Center" FontAttributes="Bold"/>
+                                <Border Grid.Column="1" BackgroundColor="{StaticResource Button_View}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
+                                    <Label Text="SEARCH" TextColor="{StaticResource Button_Font_Primary}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
                                 </Border>
                             </Grid>
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer Tapped="OnSearchClicked"/>
+                            </Border.GestureRecognizers>
+                        </Border>
+
+                        <!-- Clear Button -->
+                        <Border Grid.Column="4" StrokeThickness="0" HeightRequest="28" VerticalOptions="End" Margin="0,0,0,4" BackgroundColor="{StaticResource Button_Icon_Background}">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="4"/>
+                            </Border.StrokeShape>
+                            <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
+                                <Image Grid.Column="0" Source="icons8_clear_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Cancel}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
+                                    <Label Text="CLEAR" TextColor="{StaticResource Button_Font_Primary}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
+                                </Border>
+                            </Grid>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnClearDayTimeClicked"/>
                             </Border.GestureRecognizers>
                         </Border>
                     </Grid>

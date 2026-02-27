@@ -7,21 +7,90 @@
     Title="Medication"
     BackgroundColor="{StaticResource Medication_Main_Background}">
 
-    <ScrollView>
-        <VerticalStackLayout Padding="16" Spacing="16">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Logout" Clicked="OnLogoutClicked" Priority="1" Order="Primary" />
+    </ContentPage.ToolbarItems>
 
+    <Grid Padding="16" RowDefinitions="Auto,Auto,*" RowSpacing="12">
+
+        <!-- ── Page header ─────────────────────────────────────────────────── -->
+        <VerticalStackLayout Spacing="2">
+            <Label Text="MEDICATION DETAILS"
+                   FontSize="11" FontAttributes="Bold" CharacterSpacing="1.5"
+                   TextColor="{StaticResource Medication_Font_Secondary}"/>
             <Label x:Name="ResidentHeaderLabel"
                    Text="Medication for"
-                   FontSize="18"
-                   FontAttributes="Bold"
+                   FontSize="20" FontAttributes="Bold"
                    TextColor="{StaticResource Medication_Font_Primary}" />
+        </VerticalStackLayout>
 
-            <Label Text="Medication Details"
-                   FontSize="20"
-                   FontAttributes="Bold"
-                   TextColor="{StaticResource Medication_Font_Primary}" />
+        <!-- ── Top action bar ──────────────────────────────────────────────── -->
+        <HorizontalStackLayout Grid.Row="1" Spacing="8">
 
-            <!-- Medication name -->
+            <!-- SAVE -->
+            <Border StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
+                <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
+                    <Image Grid.Column="0" Source="icons8_save_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Save}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
+                        <Label Text="SAVE" TextColor="{StaticResource Button_Save_Font}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
+                    </Border>
+                </Grid>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnSave"/>
+                </Border.GestureRecognizers>
+            </Border>
+
+            <!-- CLOSE -->
+            <Border StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
+                <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
+                    <Image Grid.Column="0" Source="icons8_close_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Close}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
+                        <Label Text="CLOSE" TextColor="{StaticResource Button_Font_Primary}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
+                    </Border>
+                </Grid>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnCancel"/>
+                </Border.GestureRecognizers>
+            </Border>
+
+            <!-- DELETE -->
+            <Border x:Name="DeleteAction" StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
+                <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
+                    <Image Grid.Column="0" Source="icons8_delete_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Delete}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
+                        <Label Text="DELETE" TextColor="{StaticResource Button_Delete_Font}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
+                    </Border>
+                </Grid>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnDelete"/>
+                </Border.GestureRecognizers>
+            </Border>
+
+        </HorizontalStackLayout>
+
+        <!-- ── Form card ──────────────────────────────────────────────────── -->
+        <Border Grid.Row="2"
+                Padding="16,14"
+                BackgroundColor="{StaticResource Medication_Card_Background}"
+                Stroke="{StaticResource Medication_Card_Border}"
+                StrokeThickness="1">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="12"/>
+            </Border.StrokeShape>
+
+            <ScrollView>
+                <VerticalStackLayout Spacing="16">
+
+                    <Label Text="MEDICATION DETAILS"
+                           FontSize="11" FontAttributes="Bold" CharacterSpacing="1.5"
+                           TextColor="{StaticResource Medication_Font_Secondary}"
+                           Margin="0,0,0,4"/>
+                    <BoxView HeightRequest="1" Color="{StaticResource Medication_Card_Border}" Margin="0,0,0,4"/>
+
+                    <!-- Medication name -->
             <VerticalStackLayout Spacing="4">
                 <Label Text="Medication name *" TextColor="{StaticResource Medication_Font_Primary}" />
                 <Entry Placeholder="e.g., Amlodipine"
@@ -935,61 +1004,9 @@
                 </Grid>
             </VerticalStackLayout>
 
-            <!-- Button row -->
-            <HorizontalStackLayout Spacing="8"
-                       Padding="0,20,0,0"
-                       HorizontalOptions="Center">
+                </VerticalStackLayout>
+            </ScrollView>
+        </Border>
 
-                <!-- Save -->
-                <Border x:Name="SaveAction" StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="4"/>
-                    </Border.StrokeShape>
-                    <Grid ColumnDefinitions="32,Auto" Margin="0">
-                        <Image Grid.Column="0" Source="icons8_save_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
-                        <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Save}" Padding="10,0" StrokeThickness="0">
-                            <Label Text="SAVE" TextColor="{StaticResource Button_Save_Font}" FontSize="12" VerticalOptions="Center" FontAttributes="Bold"/>
-                        </Border>
-                    </Grid>
-                    <Border.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="OnSave"/>
-                    </Border.GestureRecognizers>
-                </Border>
-
-                <!-- Delete -->
-                <Border x:Name="DeleteAction" StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="4"/>
-                    </Border.StrokeShape>
-                    <Grid ColumnDefinitions="32,Auto" Margin="0">
-                        <Image Grid.Column="0" Source="icons8_delete_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
-                        <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Delete}" Padding="10,0" StrokeThickness="0">
-                            <Label Text="DELETE" TextColor="{StaticResource Button_Delete_Font}" FontSize="12" VerticalOptions="Center" FontAttributes="Bold"/>
-                        </Border>
-                    </Grid>
-                    <Border.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="OnDelete"/>
-                    </Border.GestureRecognizers>
-                </Border>
-
-                <!-- Close -->
-                <Border StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="4"/>
-                    </Border.StrokeShape>
-                    <Grid ColumnDefinitions="32,Auto" Margin="0">
-                        <Image Grid.Column="0" Source="icons8_close_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
-                        <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Close}" Padding="10,0" StrokeThickness="0">
-                            <Label Text="CLOSE" TextColor="{StaticResource Button_Font_Primary}" FontSize="12" VerticalOptions="Center" FontAttributes="Bold"/>
-                        </Border>
-                    </Grid>
-                    <Border.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="OnCancel"/>
-                    </Border.GestureRecognizers>
-                </Border>
-
-            </HorizontalStackLayout>
-
-        </VerticalStackLayout>
-    </ScrollView>
+    </Grid>
 </ContentPage>

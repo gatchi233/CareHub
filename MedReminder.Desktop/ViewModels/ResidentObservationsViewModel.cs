@@ -23,10 +23,17 @@ public class ResidentObservationsViewModel : INotifyPropertyChanged
 
     private ObservationRange _currentRange = ObservationRange.Today;
 
+    public bool IsRangeToday  => _currentRange == ObservationRange.Today;
+    public bool IsRange3Days  => _currentRange == ObservationRange.Last3Days;
+    public bool IsRange7Days  => _currentRange == ObservationRange.Last7Days;
+
     public void SetRange(ObservationRange range)
     {
         _currentRange = range;
         OnPropertyChanged(nameof(Subtitle));
+        OnPropertyChanged(nameof(IsRangeToday));
+        OnPropertyChanged(nameof(IsRange3Days));
+        OnPropertyChanged(nameof(IsRange7Days));
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -90,8 +97,22 @@ public class ResidentObservationsViewModel : INotifyPropertyChanged
             OnPropertyChanged();
             OnPropertyChanged(nameof(IsRefreshing));
             OnPropertyChanged(nameof(CanAdd));
+            OnPropertyChanged(nameof(CanEdit));
             if (_isBusy)
                 StatusMessage = "Loading...";
+        }
+    }
+
+    private Observation? _selectedObservation;
+    public Observation? SelectedObservation
+    {
+        get => _selectedObservation;
+        set
+        {
+            if (_selectedObservation == value) return;
+            _selectedObservation = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(CanEdit));
         }
     }
 
@@ -103,6 +124,7 @@ public class ResidentObservationsViewModel : INotifyPropertyChanged
     public ICommand AddObservationCommand => AddCommand;
     public bool IsRefreshing => IsBusy;
     public bool CanAdd => !IsBusy && ResidentId != Guid.Empty;
+    public bool CanEdit => SelectedObservation != null && !IsBusy;
     private string _statusMessage = "";
     public string StatusMessage
     {
@@ -121,7 +143,24 @@ public class ResidentObservationsViewModel : INotifyPropertyChanged
         ObservationRange.Last7Days => "Last 7 days",
         _ => ""
     };
-    // StatusMessage is updated by callers and also when loading finishes.
+
+    public ICommand TodayCommand => new Command(async () =>
+    {
+        SetRange(ObservationRange.Today);
+        await LoadAsync();
+    });
+
+    public ICommand Last3Command => new Command(async () =>
+    {
+        SetRange(ObservationRange.Last3Days);
+        await LoadAsync();
+    });
+
+    public ICommand Last7Command => new Command(async () =>
+    {
+        SetRange(ObservationRange.Last7Days);
+        await LoadAsync();
+    });
 
     public void SetResident(Guid residentId, string residentName)
     {
@@ -156,6 +195,7 @@ public class ResidentObservationsViewModel : INotifyPropertyChanged
                 Items.Add(item);
 
             StatusMessage = $"{Items.Count} observations";
+            SelectedObservation = null;
         }
         catch (Exception ex)
         {

@@ -2,30 +2,46 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
+    <!-- CORE -->
+    <Color x:Key="WarmBeige">#F5EDE5</Color> 
+    <Color x:Key="SoftTaupe">#D1C4B8</Color>  
+    <Color x:Key="WarmTaupe">#B8A99C</Color>  
+    <Color x:Key="EarthyBrown">#5C4A3E</Color> 
+    <Color x:Key="DeepUmber">#3E2F25</Color>
+    <Color x:Key="MutedRemarks">#7A6657</Color>
 
-    <!-- Resident  -->
-    <Color x:Key="Resident_Main_Background">#FFF1E6</Color>
+    <!-- PAGE-SPECIFIC -->
+
+    <!-- Resident -->
+    <Color x:Key="Resident_Main_Background">#F8F1EB</Color>    
     <Color x:Key="Resident_Card_Border">#CB997E</Color>
     <Color x:Key="Resident_Card_Background">#FFFFFF</Color>
     <Color x:Key="Resident_Font_Primary">#4A3728</Color>
     <Color x:Key="Resident_Font_Secondary">#8B7355</Color>
 
-    <!-- Medication  -->
-    <Color x:Key="Medication_Main_Background">#F0EFEB</Color>
+    <!-- Medication / Inventory -->
+    <Color x:Key="Medication_Main_Background">#F5F7F3</Color> 
     <Color x:Key="Medication_Card_Border">#A5A58D</Color>
     <Color x:Key="Medication_Card_Background">#FFFFFF</Color>
     <Color x:Key="Medication_Font_Primary">#3D3D35</Color>
     <Color x:Key="Medication_Font_Secondary">#6B6B5D</Color>
 
-    <!-- Popup  -->
+    <!-- Observation (personal care / notes style) -->
+    <Color x:Key="Observation_Main_Background">#F8F1EB</Color> 
+    <Color x:Key="Observation_Card_Border">#CB997E</Color>    
+    <Color x:Key="Observation_Card_Background">#FFFFFF</Color>
+    <Color x:Key="Observation_Font_Primary">#4A3728</Color>
+    <Color x:Key="Observation_Font_Secondary">#8B7355</Color>
+
+    <!-- Popup -->
     <Color x:Key="Popup_Main_Background">#EDDCD2</Color>
     <Color x:Key="Popup_Card_Border">#DDBEA9</Color>
     <Color x:Key="Popup_Card_Background">#FFFFFF</Color>
     <Color x:Key="Popup_Font_Primary">#3D3028</Color>
     <Color x:Key="Popup_Font_Secondary">#7A6B5E</Color>
 
-    <!-- Staff  -->
-    <Color x:Key="Staff_Main_Background">#FFF1E6</Color>
+    <!-- Staff -->
+    <Color x:Key="Staff_Main_Background">#F3EDE7</Color> 
     <Color x:Key="Staff_Card_Border">#B7B7A4</Color>
     <Color x:Key="Staff_Card_Background">#FFFFFF</Color>
     <Color x:Key="Staff_Font_Primary">#3D3D35</Color>
@@ -45,49 +61,56 @@
     <Color x:Key="Homepage_Font_Primary">#3D3028</Color>
     <Color x:Key="Homepage_Font_Secondary">#7A6B5E</Color>
 
-    <!-- Button -->
-    <Color x:Key="Button_Icon_Background">#8D959D</Color>
+    <!-- BUTTONS & ICONS -->
 
-    <Color x:Key="Button_Font_Primary">#FFFFFF</Color>
-    <Color x:Key="Button_Add">#388E3C</Color>
+    <Color x:Key="Button_Icon_Background">#B8A99C</Color> 
+
+    <Color x:Key="Button_Font_Primary">#FFFFFF</Color>  
+    <Color x:Key="Button_Font_Secondary">#3E2F25</Color>  
+
+    <!-- Action buttons -->
+    <Color x:Key="Button_Add">#388E3C</Color>    
     <Color x:Key="Button_Create">#43A047</Color>
-    <Color x:Key="Button_Save">#1976D2</Color>
-    <Color x:Key="Button_Login">#3F51B5</Color>
-    <Color x:Key="Button_Logout">#78909C</Color>
+    <Color x:Key="Button_Save">#2E7D32</Color>  
+    <Color x:Key="Button_Login">#5C6BC0</Color>     
+    <Color x:Key="Button_Logout">#8D7A6B</Color>    
     <Color x:Key="Button_Export">#00897B</Color>
-    <Color x:Key="Button_Delete">#E53935</Color>
-    <Color x:Key="Button_Cancel">#BDBDBD</Color>
-    <Color x:Key="Button_View">#1E88E5</Color>
-    <Color x:Key="Button_Close">#546E7A</Color>
-    <Color x:Key="Button_Search">#AB47BC</Color>
+    <Color x:Key="Button_Delete">#B85C5C</Color>             
+    <Color x:Key="Button_Cancel">#D1C4B8</Color>      
+    <Color x:Key="Button_View">#6B8EAD</Color> 
+    <Color x:Key="Button_Close">#8D7A6B</Color> 
+    <Color x:Key="Button_Search">#C97A5E</Color>   
+    <Color x:Key="Button_Edit">#E0B875</Color>    
 
-    <Color x:Key="Button_Font_Secondary">#424242</Color>
-    <Color x:Key="Button_Edit">#FFA726</Color>
-    
-    <!-- Alert -->
-    <Color x:Key="Alert_Info">#1565C0</Color>
+    <!-- ALERTS / STATUS -->
+    <Color x:Key="Alert_Info">#5C6BC0</Color>     
     <Color x:Key="Alert_Success">#2E7D32</Color>
-    <Color x:Key="Alert_Warning">#F57F17</Color>
-    <Color x:Key="Alert_Error">#C62828</Color>
-    <Color x:Key="Alert_Critical">#6A1B9A</Color>
-    
-    <!-- Placeholder -->
-    <Color x:Key="Placeholder_Font_Primary">#A8A8A8</Color>
+    <Color x:Key="Alert_Warning">#E0B875</Color> 
+    <Color x:Key="Alert_Error">#B85C5C</Color>  
+    <Color x:Key="Alert_Critical">#6A4C93</Color>  
+
+    <!-- PLACEHOLDERS & HINTS -->
+    <Color x:Key="Placeholder_Font_Primary">#9A887A</Color> 
     <Color x:Key="Placeholder_Font_Secondary">#B5A99A</Color>
-    <Color x:Key="Placeholder_Font_Third">#C4C4C4</Color>
+    <Color x:Key="Placeholder_Font_Third">#C4B8AE</Color> 
 
-    <!-- Tip/Hint Text -->
-    <Color x:Key="Text_Tip">#78290F</Color>
-    <Color x:Key="Text_Gray">#6B7280</Color>
-    <Color x:Key="Text_DarkGray">#374151</Color>
+    <Color x:Key="Text_Tip">#7A6657</Color>   
+    <Color x:Key="Text_Gray">#8B7A6A</Color> 
+    <Color x:Key="Text_DarkGray">#4A3728</Color> 
 
-    <!-- Accent Colors -->
-    <Color x:Key="Accent_Teal">#15616D</Color>
-    <Color x:Key="Accent_Orange">#FF7D00</Color>
+    <!-- ACCENTS & BADGES -->
+    <Color x:Key="Accent_Teal">#15616D</Color> 
+    <Color x:Key="Accent_Orange">#E0B875</Color>  
+
+    <!-- Role badge colors -->
+    <Color x:Key="Role_Admin">#5C6BC0</Color> 
+    <Color x:Key="Role_Care">#00897B</Color>
+    <Color x:Key="Role_Kitchen">#E0B875</Color>   
+    <Color x:Key="Role_Facilities">#2E7D32</Color>
 
     <!-- Badge Colors -->
-    <Color x:Key="Badge_Time_Background">#FF7D00</Color>
+    <Color x:Key="Badge_Time_Background">#E0B875</Color>   
     <Color x:Key="Badge_Completed_Background">#FFF5DA</Color>
-    <Color x:Key="Badge_Completed_Border">#15616D</Color>
+    <Color x:Key="Badge_Completed_Border">#7A6657</Color> 
 
 </ResourceDictionary>

@@ -40,7 +40,7 @@ namespace MedReminder.Services
             sb.AppendLine("<h2>Resident Profile</h2>");
             sb.AppendLine("<table>");
             sb.AppendLine("<tr><th>ResidentId</th><td>" + report.ResidentId + "</td></tr>");
-            sb.AppendLine("<tr><th>Name</th><td>" + Html(resident.FullName) + "</td></tr>");
+            sb.AppendLine("<tr><th>Name</th><td>" + Html(resident.ResidentName) + "</td></tr>");
             sb.AppendLine("<tr><th>DOB</th><td>" + Html(resident.DOB) + "</td></tr>");
             sb.AppendLine("<tr><th>SIN</th><td>" + Html(resident.SIN) + "</td></tr>");
             sb.AppendLine("<tr><th>Doctor</th><td>" + Html(resident.DoctorName) + "</td></tr>");

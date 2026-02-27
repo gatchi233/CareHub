@@ -10,12 +10,14 @@ namespace MedReminder.Pages.Desktop
 {
     [QueryProperty(nameof(ResidentId), "residentId")]
     [QueryProperty(nameof(ResidentName), "residentName")]
+    [QueryProperty(nameof(ReturnTo), "returnTo")]
     public partial class ResidentMedicationsPage : AuthPage
     {
         private readonly IMedicationService _medicationService;
 
         public Guid ResidentId { get; set; }
         public string? ResidentName { get; set; }
+        public string? ReturnTo { get; set; }
 
         public ObservableCollection<Medication> Medications { get; } =
             new ObservableCollection<Medication>();
@@ -49,31 +51,17 @@ namespace MedReminder.Pages.Desktop
                 Medications.Add(med);
         }
 
-        private async void OnViewClicked(object sender, EventArgs e)
-        {
-            if ((sender as BindableObject)?.BindingContext is not Medication med)
-                return;
-
-            var parameters = new Dictionary<string, object?>
-            {
-                ["Item"] = med,
-                ["residentId"] = ResidentId,
-                ["residentName"] = ResidentName
-            };
-
-            await Shell.Current.GoToAsync(nameof(EditMedicationPage), true, parameters);
-        }
-
         private async void OnEditClicked(object sender, EventArgs e)
         {
-            if ((sender as BindableObject)?.BindingContext is not Medication med)
+            if (sender is not BindableObject bindable || bindable.BindingContext is not Medication med)
                 return;
 
             var parameters = new Dictionary<string, object?>
             {
                 ["Item"] = med,
                 ["residentId"] = ResidentId,
-                ["residentName"] = ResidentName
+                ["residentName"] = ResidentName,
+                ["returnTo"] = ReturnTo
             };
 
             await Shell.Current.GoToAsync(nameof(EditMedicationPage), true, parameters);
@@ -81,7 +69,7 @@ namespace MedReminder.Pages.Desktop
 
         private async void OnDeleteClicked(object sender, EventArgs e)
         {
-            if ((sender as BindableObject)?.BindingContext is not Medication med)
+            if (sender is not BindableObject bindable || bindable.BindingContext is not Medication med)
                 return;
 
             bool ok = await DisplayAlert(
@@ -99,7 +87,19 @@ namespace MedReminder.Pages.Desktop
 
         private async void OnCloseClicked(object sender, EventArgs e)
         {
-            await Shell.Current.GoToAsync($"{nameof(EditResidentPage)}?id={ResidentId}");
+            if (!string.IsNullOrWhiteSpace(ReturnTo))
+            {
+                await Shell.Current.GoToAsync(ReturnTo);
+                return;
+            }
+
+            if (ResidentId != Guid.Empty)
+            {
+                await Shell.Current.GoToAsync($"{nameof(ViewResidentPage)}?id={ResidentId}");
+                return;
+            }
+
+            await Shell.Current.GoToAsync("..");
         }
 
         private async void OnAddMedicationClicked(object sender, EventArgs e)
@@ -107,7 +107,8 @@ namespace MedReminder.Pages.Desktop
             var parameters = new Dictionary<string, object?>
             {
                 ["residentId"] = ResidentId,
-                ["residentName"] = ResidentName
+                ["residentName"] = ResidentName,
+                ["returnTo"] = ReturnTo
             };
 
             await Shell.Current.GoToAsync(nameof(EditMedicationPage), true, parameters);

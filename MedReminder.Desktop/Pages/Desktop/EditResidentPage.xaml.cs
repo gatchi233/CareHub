@@ -16,7 +16,15 @@ namespace MedReminder.Pages.Desktop
     {
         private readonly IResidentService _residentService;
 
-        public Guid ResidentId { get; set; }
+        private Guid _residentId = Guid.Empty;
+        public string? ResidentId
+        {
+            get => _residentId == Guid.Empty ? null : _residentId.ToString();
+            set
+            {
+                _residentId = Guid.TryParse(value, out var id) ? id : Guid.Empty;
+            }
+        }
         public string? RoomNumber { get; set; }
         public string? RoomType { get; set; }
         public string? ReturnTo { get; set; }
@@ -46,10 +54,10 @@ namespace MedReminder.Pages.Desktop
                 return;
             }
 
-            if (ResidentId > Guid.Empty)
+            if (_residentId != Guid.Empty)
             {
                 var list = await _residentService.LoadAsync();
-                var existing = list.FirstOrDefault(r => r.Id == Guid.Empty);
+                var existing = list.FirstOrDefault(r => r.Id == _residentId);
 
                 if (existing is null)
                 {
@@ -68,8 +76,8 @@ namespace MedReminder.Pages.Desktop
                         Id = existing.Id,
 
                         // Personal Info
-                        FirstName = existing.FirstName,
-                        LastName = existing.LastName,
+                        ResidentFName = existing.ResidentFName,
+                        ResidentLName = existing.ResidentLName,
                         DOB = existing.DOB,
                         SIN = existing.SIN,
                         Gender = existing.Gender,
@@ -247,10 +255,10 @@ namespace MedReminder.Pages.Desktop
         {
             var errors = new List<string>();
 
-            if (string.IsNullOrWhiteSpace(WorkingCopy.FirstName))
+            if (string.IsNullOrWhiteSpace(WorkingCopy.ResidentFName))
                 errors.Add("First Name");
 
-            if (string.IsNullOrWhiteSpace(WorkingCopy.LastName))
+            if (string.IsNullOrWhiteSpace(WorkingCopy.ResidentLName))
                 errors.Add("Last Name");
 
             if (string.IsNullOrWhiteSpace(WorkingCopy.DOB))
@@ -292,7 +300,7 @@ namespace MedReminder.Pages.Desktop
 
             if (errors.Count > 0)
             {
-                DisplayAlert("Missing Required Fields", "Please fill in:\n• " + string.Join("\n• ", errors), "OK");
+                DisplayAlert("Missing Required Fields", "Please fill in:\nï¿½ " + string.Join("\nï¿½ ", errors), "OK");
                 return false;
             }
 
@@ -306,7 +314,7 @@ namespace MedReminder.Pages.Desktop
                 : ReturnTo;
         }
 
-        private async void OnSaveClicked(object sender, EventArgs e)
+        private async void OnSaveClicked(object sender, TappedEventArgs e)
         {
             // Re-check RBAC at save time (extra safety)
             var auth = MauiProgram.Services.GetService<AuthService>();
@@ -326,7 +334,7 @@ namespace MedReminder.Pages.Desktop
             await Shell.Current.GoToAsync(GetReturnTarget());
         }
 
-        private async void OnSaveAndAddMedClicked(object sender, EventArgs e)
+        private async void OnSaveAndAddMedClicked(object sender, TappedEventArgs e)
         {
             // Re-check RBAC at save time (extra safety)
             var auth = MauiProgram.Services.GetService<AuthService>();
@@ -356,7 +364,7 @@ namespace MedReminder.Pages.Desktop
                 {
                     ["Item"] = null,
                     ["residentId"] = WorkingCopy.Id,
-                    ["residentName"] = WorkingCopy.FullName
+                    ["residentName"] = WorkingCopy.ResidentName
                 };
 
                 await Shell.Current.GoToAsync(nameof(EditMedicationPage), true, parameters);
@@ -367,9 +375,17 @@ namespace MedReminder.Pages.Desktop
             }
         }
 
-        private async void OnCancelClicked(object sender, EventArgs e)
+        private async void OnCancelClicked(object sender, TappedEventArgs e)
         {
             await Shell.Current.GoToAsync(GetReturnTarget());
         }
+
+        private async void OnLogoutClicked(object sender, EventArgs e)
+        {
+            if (Shell.Current is AppShell shell)
+                await shell.LogoutAsync();
+        }
     }
 }
+
+

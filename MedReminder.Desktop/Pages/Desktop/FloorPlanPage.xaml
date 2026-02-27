@@ -20,27 +20,58 @@
           RowSpacing="12">
 
         <!-- ===== Left top: Floor controls ===== -->
-        <HorizontalStackLayout Grid.Row="0" Grid.Column="0" Spacing="12" VerticalOptions="Center">
-            <Button Text="1 / F"
-                    WidthRequest="90"
-                    Clicked="OnFloor1Clicked" />
-            <Button Text="2 / F"
-                    WidthRequest="90"
-                    Clicked="OnFloor2Clicked" />
+        <HorizontalStackLayout Grid.Row="0" Grid.Column="0" Spacing="8" VerticalOptions="Center">
+
+            <!-- 1/F · 2/F segmented toggle -->
+            <Grid ColumnDefinitions="*,*" WidthRequest="112">
+
+                <Border Grid.Column="0" HeightRequest="28" Padding="0" StrokeThickness="0"
+                        BackgroundColor="{StaticResource Button_Cancel}">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="4,0,4,0"/></Border.StrokeShape>
+                    <Border.Triggers>
+                        <DataTrigger TargetType="Border" Binding="{Binding Floor}" Value="1">
+                            <Setter Property="BackgroundColor" Value="{StaticResource Alert_Info}"/>
+                        </DataTrigger>
+                    </Border.Triggers>
+                    <Label Text="1/F" FontSize="11" FontAttributes="Bold"
+                           TextColor="{StaticResource Button_Font_Primary}"
+                           VerticalOptions="Center" HorizontalOptions="Center"/>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnFloor1Clicked"/>
+                    </Border.GestureRecognizers>
+                </Border>
+
+                <Border Grid.Column="1" HeightRequest="28" Padding="0" StrokeThickness="0"
+                        BackgroundColor="{StaticResource Button_Cancel}">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="0,4,0,4"/></Border.StrokeShape>
+                    <Border.Triggers>
+                        <DataTrigger TargetType="Border" Binding="{Binding Floor}" Value="2">
+                            <Setter Property="BackgroundColor" Value="{StaticResource Alert_Info}"/>
+                        </DataTrigger>
+                    </Border.Triggers>
+                    <Label Text="2/F" FontSize="11" FontAttributes="Bold"
+                           TextColor="{StaticResource Button_Font_Primary}"
+                           VerticalOptions="Center" HorizontalOptions="Center"/>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnFloor2Clicked"/>
+                    </Border.GestureRecognizers>
+                </Border>
+
+            </Grid>
 
             <Label Text="{Binding SelectedRoomTitle}"
                    FontAttributes="Bold"
-                   FontSize="16"
+                   FontSize="13"
                    TextColor="{StaticResource Floorplan_Font_Primary}"
                    VerticalOptions="Center"
-                   Margin="12,0,0,0" />
+                   Margin="8,0,0,0" />
         </HorizontalStackLayout>
 
         <!-- ===== Right top: Title ===== -->
         <Label Grid.Row="0" Grid.Column="1"
                Text="Residents in selected room"
                FontAttributes="Bold"
-               FontSize="16"
+               FontSize="13"
                TextColor="{StaticResource Floorplan_Font_Primary}"
                VerticalOptions="Center" />
 
@@ -59,27 +90,51 @@
                     <Border Padding="10"
                             Margin="6"
                             StrokeThickness="1"
-                            Stroke="{StaticResource Border_Light}"
+                            Stroke="{StaticResource Floorplan_Card_Border}"
                             BackgroundColor="{StaticResource Floorplan_Card_Background}"
                             HeightRequest="82">
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsSelected}" Value="True">
+                                <Setter Property="BackgroundColor" Value="{StaticResource Button_View}"/>
+                                <Setter Property="Stroke" Value="{StaticResource Button_View}"/>
+                            </DataTrigger>
+                        </Border.Triggers>
 
                         <Grid RowDefinitions="Auto,*">
                             <HorizontalStackLayout Spacing="8">
                                 <Label Text="{Binding RoomLabel}"
-                                       FontSize="16"
+                                       FontSize="13"
                                        FontAttributes="Bold"
-                                       TextColor="{StaticResource Floorplan_Font_Primary}" />
+                                       TextColor="{StaticResource Floorplan_Font_Primary}">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding IsSelected}" Value="True">
+                                            <Setter Property="TextColor" Value="White"/>
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
                                 <Label Text="{Binding KindShort}"
                                        FontSize="12"
                                        TextColor="{StaticResource Floorplan_Font_Primary}"
-                                       VerticalOptions="Center" />
+                                       VerticalOptions="Center">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding IsSelected}" Value="True">
+                                            <Setter Property="TextColor" Value="White"/>
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
                             </HorizontalStackLayout>
 
                             <Label Grid.Row="1"
                                    Text="{Binding OccupancyText}"
                                    FontSize="12"
                                    TextColor="{StaticResource Floorplan_Font_Primary}"
-                                   LineBreakMode="TailTruncation" />
+                                   LineBreakMode="TailTruncation">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding IsSelected}" Value="True">
+                                        <Setter Property="TextColor" Value="White"/>
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
                         </Grid>
 
                     </Border>
@@ -87,20 +142,21 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
 
-        <!-- ===== Right: Selected residents panel ===== -->
+        <!-- ===== Right: Residents panel ===== -->
         <Border Grid.Row="1" Grid.Column="1"
                 StrokeThickness="1"
-                Stroke="{StaticResource Border_Light}"
+                Stroke="{StaticResource Floorplan_Card_Border}"
                 BackgroundColor="{StaticResource Floorplan_Card_Background}"
                 Padding="12">
 
-            <Grid RowDefinitions="Auto,*" RowSpacing="8">
+            <Grid RowDefinitions="Auto,Auto,*" RowSpacing="6">
                 <Label Text="{Binding SelectedRoomTitle}"
                        FontAttributes="Bold"
-                       FontSize="14"
+                       FontSize="13"
                        TextColor="{StaticResource Floorplan_Font_Primary}" />
+                <BoxView Grid.Row="1" HeightRequest="1" Color="{StaticResource Floorplan_Card_Border}" Margin="0,0,0,4"/>
 
-                <CollectionView Grid.Row="1"
+                <CollectionView Grid.Row="2"
                                 ItemsSource="{Binding SelectedResidents}"
                                 SelectionMode="None">
                     <CollectionView.ItemTemplate>

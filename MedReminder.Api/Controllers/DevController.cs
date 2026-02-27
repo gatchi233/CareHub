@@ -18,8 +18,8 @@ public sealed class DevController : ControllerBase
         if (await _db.Residents.AnyAsync(ct))
             return Ok(new { seeded = false, reason = "Already has data" });
 
-        var r1 = new Resident { FirstName = "Amy", LastName = "Chen", RoomNumber = "101" };
-        var r2 = new Resident { FirstName = "David", LastName = "Wong", RoomNumber = "102" };
+        var r1 = new Resident { ResidentFName = "Amy", ResidentLName = "Chen", RoomNumber = "101" };
+        var r2 = new Resident { ResidentFName = "David", ResidentLName = "Wong", RoomNumber = "102" };
 
         _db.Residents.AddRange(r1, r2);
         _db.Medications.Add(new Medication { ResidentId = r1.Id, MedName = "Amlodipine", Dosage = "5 mg", TimesPerDay = 1 });

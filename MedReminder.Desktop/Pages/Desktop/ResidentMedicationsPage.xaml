@@ -8,68 +8,162 @@
     Title="Medications"
     BackgroundColor="{StaticResource Medication_Main_Background}">
 
-    <Grid Padding="16" RowDefinitions="Auto,*" RowSpacing="12">
+    <pages:AuthPage.ToolbarItems>
+        <ToolbarItem Text="Logout" Clicked="OnLogoutClicked" Priority="1" Order="Primary" />
+    </pages:AuthPage.ToolbarItems>
 
-        <Grid RowDefinitions="Auto" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+    <Grid Padding="16" RowDefinitions="Auto,Auto,*" RowSpacing="12">
+
+        <!-- ── Page header ─────────────────────────────────────────────────── -->
+        <VerticalStackLayout Spacing="2">
+            <Label Text="RESIDENT MEDICATIONS"
+                   FontSize="11" FontAttributes="Bold" CharacterSpacing="1.5"
+                   TextColor="{StaticResource Medication_Font_Secondary}"/>
             <Label x:Name="HeaderLabel"
                    Text="Medications"
-                   FontSize="20"
-                   FontAttributes="Bold"
-                   TextColor="{StaticResource Medication_Font_Primary}"
-                   VerticalOptions="Center"/>
+                   FontSize="20" FontAttributes="Bold"
+                   TextColor="{StaticResource Medication_Font_Primary}"/>
+        </VerticalStackLayout>
 
-            <Button Grid.Column="1"
-                    Text="Add"
-                    BackgroundColor="{StaticResource Button_Add}"
-                    TextColor="{StaticResource Button_Font_Primary}"
-                    Clicked="OnAddMedicationClicked"/>
+        <!-- ── Top action bar ──────────────────────────────────────────────── -->
+        <HorizontalStackLayout Grid.Row="1" Spacing="8">
 
-            <Button Grid.Column="2"
-                    Text="Close"
-                    BackgroundColor="{StaticResource Button_Close}"
-                    TextColor="{StaticResource Button_Font_Primary}"
-                    Clicked="OnCloseClicked"/>
-        </Grid>
-
-        <CollectionView Grid.Row="1"
-                        ItemsSource="{Binding Medications}"
-                        SelectionMode="None">
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="model:Medication">
-                    <Border Padding="12"
-                            Margin="0,0,0,8"
-                            Stroke="{StaticResource Medication_Card_Border}"
-                            StrokeThickness="1"
-                            BackgroundColor="{StaticResource Medication_Card_Background}">
-                        <Border.StrokeShape>
-                            <RoundRectangle CornerRadius="10"/>
-                        </Border.StrokeShape>
-
-                        <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
-                            <VerticalStackLayout>
-                                <Label Text="{Binding MedName}" 
-                                       FontAttributes="Bold"
-                                       TextColor="{StaticResource Medication_Font_Primary}"/>
-                                <Label Text="{Binding Dosage, StringFormat='Dosage: {0}'}"
-                                       FontSize="12" 
-                                       TextColor="{StaticResource Medication_Font_Secondary}"/>
-                            </VerticalStackLayout>
-
-                            <Button Grid.Column="1" 
-                                    Text="Edit" 
-                                    BackgroundColor="{StaticResource Button_Edit}"
-                                    TextColor="{StaticResource Button_Font_Secondary}"
-                                    Clicked="OnEditClicked"/>
-                            <Button Grid.Column="2" 
-                                    Text="Delete" 
-                                    BackgroundColor="{StaticResource Button_Delete}"
-                                    TextColor="{StaticResource Button_Font_Primary}"
-                                    Clicked="OnDeleteClicked"/>
-                        </Grid>
+            <!-- ADD -->
+            <Border StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
+                <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
+                    <Image Grid.Column="0" Source="icons8_add_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Add}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
+                        <Label Text="ADD" TextColor="{StaticResource Button_Font_Primary}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
                     </Border>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+                </Grid>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnAddMedicationClicked"/>
+                </Border.GestureRecognizers>
+            </Border>
+
+            <!-- CLOSE -->
+            <Border StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
+                <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
+                    <Image Grid.Column="0" Source="icons8_close_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Close}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
+                        <Label Text="CLOSE" TextColor="{StaticResource Button_Font_Primary}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
+                    </Border>
+                </Grid>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnCloseClicked"/>
+                </Border.GestureRecognizers>
+            </Border>
+
+        </HorizontalStackLayout>
+
+        <!-- ── Main content card ───────────────────────────────────────────── -->
+        <Border Grid.Row="2"
+                Padding="12,10"
+                BackgroundColor="{StaticResource Medication_Card_Background}"
+                Stroke="{StaticResource Medication_Card_Border}"
+                StrokeThickness="1">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="12"/>
+            </Border.StrokeShape>
+
+            <Grid RowDefinitions="Auto,Auto,*">
+
+                <Label Text="RECORDS"
+                       FontSize="11" FontAttributes="Bold" CharacterSpacing="1.5"
+                       TextColor="{StaticResource Medication_Font_Secondary}"/>
+
+                <BoxView Grid.Row="1" HeightRequest="1" Color="{StaticResource Medication_Card_Border}" Margin="0,6,0,10"/>
+
+                <CollectionView Grid.Row="2"
+                                ItemsSource="{Binding Medications}"
+                                SelectionMode="None">
+
+                    <CollectionView.EmptyView>
+                        <VerticalStackLayout Padding="20" Spacing="6"
+                                             VerticalOptions="Center" HorizontalOptions="Center">
+                            <Label Text="No medications recorded."
+                                   FontAttributes="Bold" FontSize="14"
+                                   TextColor="{StaticResource Medication_Font_Primary}"
+                                   HorizontalOptions="Center"/>
+                            <Label Text="Use ADD to record a new medication."
+                                   FontSize="12" TextColor="{StaticResource Medication_Font_Secondary}"
+                                   HorizontalOptions="Center"/>
+                        </VerticalStackLayout>
+                    </CollectionView.EmptyView>
+
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Vertical" ItemSpacing="8"/>
+                    </CollectionView.ItemsLayout>
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="model:Medication">
+                            <Border Padding="12,10"
+                                    BackgroundColor="{StaticResource Medication_Main_Background}"
+                                    Stroke="{StaticResource Medication_Card_Border}"
+                                    StrokeThickness="1">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="8"/>
+                                </Border.StrokeShape>
+
+                                <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="6">
+
+                                    <!-- Medication info -->
+                                    <VerticalStackLayout Spacing="2" VerticalOptions="Center">
+                                        <Label Text="{Binding MedName}"
+                                               FontSize="13" FontAttributes="Bold"
+                                               TextColor="{StaticResource Medication_Font_Primary}"/>
+                                        <Label Text="{Binding Dosage, StringFormat='Dosage: {0}'}"
+                                               FontSize="11"
+                                               TextColor="{StaticResource Medication_Font_Secondary}"/>
+                                        <Label Text="{Binding Usage, StringFormat='Condition: {0}'}"
+                                               FontSize="11"
+                                               TextColor="{StaticResource Medication_Font_Secondary}"
+                                               IsVisible="{Binding Usage, Converter={StaticResource StringNotEmptyConverter}}"/>
+                                    </VerticalStackLayout>
+
+                                    <!-- EDIT -->
+                                    <Border Grid.Column="1" StrokeThickness="0" HeightRequest="24"
+                                            BackgroundColor="{StaticResource Button_Icon_Background}"
+                                            VerticalOptions="Center">
+                                        <Border.StrokeShape><RoundRectangle CornerRadius="3"/></Border.StrokeShape>
+                                        <Grid ColumnDefinitions="22,Auto" Margin="0" InputTransparent="True">
+                                            <Image Grid.Column="0" Source="icons8_edit_100.png" HeightRequest="12" WidthRequest="12" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                            <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Edit}" Padding="7,0" StrokeThickness="0" InputTransparent="True">
+                                                <Label Text="EDIT" TextColor="{StaticResource Button_Font_Secondary}" FontSize="10" VerticalOptions="Center" FontAttributes="Bold"/>
+                                            </Border>
+                                        </Grid>
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="OnEditClicked"/>
+                                        </Border.GestureRecognizers>
+                                    </Border>
+
+                                    <!-- DELETE -->
+                                    <Border Grid.Column="2" StrokeThickness="0" HeightRequest="24"
+                                            BackgroundColor="{StaticResource Button_Icon_Background}"
+                                            VerticalOptions="Center">
+                                        <Border.StrokeShape><RoundRectangle CornerRadius="3"/></Border.StrokeShape>
+                                        <Grid ColumnDefinitions="22,Auto" Margin="0" InputTransparent="True">
+                                            <Image Grid.Column="0" Source="icons8_delete_100.png" HeightRequest="12" WidthRequest="12" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                            <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Delete}" Padding="7,0" StrokeThickness="0" InputTransparent="True">
+                                                <Label Text="DELETE" TextColor="{StaticResource Button_Font_Primary}" FontSize="10" VerticalOptions="Center" FontAttributes="Bold"/>
+                                            </Border>
+                                        </Grid>
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="OnDeleteClicked"/>
+                                        </Border.GestureRecognizers>
+                                    </Border>
+
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+
+                </CollectionView>
+
+            </Grid>
+        </Border>
 
     </Grid>
 </pages:AuthPage>

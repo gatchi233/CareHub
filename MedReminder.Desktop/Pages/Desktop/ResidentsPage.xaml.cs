@@ -119,7 +119,7 @@ namespace MedReminder.Pages.Desktop
         //    var parameters = new Dictionary<string, object?>
         //    {
         //        ["residentId"] = r.Id,
-        //        ["residentName"] = r.FullName
+        //        ["residentName"] = r.ResidentName
         //    };
 
         //    await Shell.Current.GoToAsync(nameof(ResidentMedicationsPage), true, parameters);
@@ -132,7 +132,7 @@ namespace MedReminder.Pages.Desktop
 
             bool confirm = await DisplayAlert(
                 "Delete resident",
-                $"Are you sure you want to delete {r.FullName}?",
+                $"Are you sure you want to delete {r.ResidentName}?",
                 "Delete", "Cancel");
 
             if (!confirm)

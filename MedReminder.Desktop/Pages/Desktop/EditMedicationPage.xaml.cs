@@ -310,7 +310,7 @@ namespace MedReminder.Pages.Desktop
             }
         }
 
-        private async void OnSave(object sender, EventArgs e)
+        private async void OnSave(object sender, TappedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(WorkingCopy.MedName))
             {
@@ -348,12 +348,12 @@ namespace MedReminder.Pages.Desktop
             await _vm.SaveAsync(WorkingCopy);
         }
 
-        private async void OnCancel(object sender, EventArgs e)
+        private async void OnCancel(object sender, TappedEventArgs e)
         {
             await GoBackAsync();
         }
 
-        private async void OnDelete(object sender, EventArgs e)
+        private async void OnDelete(object sender, TappedEventArgs e)
         {
             if (Item == null)
                 return;
@@ -363,18 +363,40 @@ namespace MedReminder.Pages.Desktop
                 return;
 
             await _vm.DeleteAsync(Item);
-            await Shell.Current.GoToAsync($"//{nameof(ResidentsPage)}");
+            await GoBackAsync();
         }
 
         public string? ReturnTo { get; set; }
 
         private async Task GoBackAsync()
         {
-            var target = string.IsNullOrWhiteSpace(ReturnTo)
-                ? $"//{nameof(HomePage)}"
-                : ReturnTo;
+            if (ResidentId != Guid.Empty)
+            {
+                var parameters = new Dictionary<string, object?>
+                {
+                    ["residentId"] = ResidentId,
+                    ["residentName"] = ResidentName
+                };
 
-            await Shell.Current.GoToAsync(target);
+                if (!string.IsNullOrWhiteSpace(ReturnTo))
+                    parameters["returnTo"] = ReturnTo;
+
+                await Shell.Current.GoToAsync(nameof(ResidentMedicationsPage), true, parameters);
+            }
+            else if (!string.IsNullOrWhiteSpace(ReturnTo))
+            {
+                await Shell.Current.GoToAsync(ReturnTo);
+            }
+            else
+            {
+                await Shell.Current.GoToAsync($"//{nameof(HomePage)}");
+            }
+        }
+
+        private async void OnLogoutClicked(object sender, EventArgs e)
+        {
+            if (Shell.Current is AppShell shell)
+                await shell.LogoutAsync();
         }
 
     }

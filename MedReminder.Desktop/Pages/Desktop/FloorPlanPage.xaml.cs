@@ -21,7 +21,10 @@ namespace MedReminder.Pages.Desktop
         private async void OnResidentTapped(object sender, TappedEventArgs e)
         {
             if ((sender as BindableObject)?.BindingContext is ResidentPreview r)
-                await Shell.Current.GoToAsync($"{nameof(ViewResidentPage)}?id={r.Id}");
+            {
+                var returnTo = Uri.EscapeDataString($"//{nameof(FloorPlanPage)}");
+                await Shell.Current.GoToAsync($"{nameof(ViewResidentPage)}?id={r.Id}&returnTo={returnTo}");
+            }
         }
 
         private void OnFloor1Clicked(object sender, EventArgs e)

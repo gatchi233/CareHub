@@ -28,7 +28,9 @@ namespace MedReminder.ViewModels
         }
 
         public string SelectedRoomTitle =>
-            SelectedRoom == null ? "Select a room" : $"Room {SelectedRoom.RoomLabel}";
+            SelectedRoom == null
+                ? $"Floor {Floor} — All Residents"
+                : $"Room {SelectedRoom.RoomLabel}";
 
         private int _floor = 1;
         public int Floor
@@ -77,16 +79,27 @@ namespace MedReminder.ViewModels
                 i++;
             }
 
-            SelectedRoom = Rooms.FirstOrDefault(r => r.IsOccupied) ?? Rooms.FirstOrDefault();
+            // Start with no room selected — show all floor residents
+            SelectedRoom = null;
+            OnPropertyChanged(nameof(SelectedRoomTitle));
+            LoadSelectedResidents();
         }
 
         private void LoadSelectedResidents()
         {
             SelectedResidents.Clear();
-            if (SelectedRoom == null) return;
-
-            foreach (var r in SelectedRoom.Residents)
-                SelectedResidents.Add(new ResidentPreview(r));
+            if (SelectedRoom == null)
+            {
+                // Show all residents on the current floor
+                foreach (var room in Rooms)
+                    foreach (var r in room.Residents)
+                        SelectedResidents.Add(new ResidentPreview(r));
+            }
+            else
+            {
+                foreach (var r in SelectedRoom.Residents)
+                    SelectedResidents.Add(new ResidentPreview(r));
+            }
         }
 
         private void UpdateSelection()
@@ -109,10 +122,20 @@ namespace MedReminder.ViewModels
         public bool IsOccupied => Residents.Count > 0;
         public string KindShort => IsDouble ? "D" : "S";
         public string OccupancyText => IsOccupied
-            ? string.Join(", ", Residents.Select(r => r.FullName))
+            ? string.Join(", ", Residents.Select(r => r.ResidentName))
             : "Empty";
 
-        public bool IsSelected { get; set; }
+        private bool _isSelected;
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set
+            {
+                if (_isSelected == value) return;
+                _isSelected = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsSelected)));
+            }
+        }
 
         public RoomTile(string roomLabel, bool isDouble, List<Resident> residents)
         {
@@ -134,7 +157,7 @@ namespace MedReminder.ViewModels
         public ResidentPreview(Resident r)
         {
             Id = r.Id;
-            Name = r.FullName;
+            Name = r.ResidentName;
             Gender = string.IsNullOrWhiteSpace(r.Gender) ? "Unknown" : r.Gender;
             AgeText = $"Age: {CalculateAge(r.DOB)}";
         }

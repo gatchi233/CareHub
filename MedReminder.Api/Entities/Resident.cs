@@ -1,11 +1,18 @@
-﻿namespace MedReminder.Api.Entities;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
+
+namespace MedReminder.Api.Entities;
 
 public sealed class Resident
 {
     public Guid Id { get; set; } = Guid.NewGuid();
 
-    public string FirstName { get; set; } = "";
-    public string LastName { get; set; } = "";
+    [Column("FirstName")]
+    [JsonPropertyName("ResidentFName")]
+    public string ResidentFName { get; set; } = "";
+    [Column("LastName")]
+    [JsonPropertyName("ResidentLName")]
+    public string ResidentLName { get; set; } = "";
 
     public DateOnly? DateOfBirth { get; set; }
 

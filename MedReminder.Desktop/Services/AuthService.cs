@@ -15,21 +15,21 @@ namespace MedReminder.Services
             {
                 Username = "admin",
                 Password = "1234",
-                FullName = "System Admin",
+                StaffName = "System Admin",
                 Role = StaffRole.Admin
             },
             new Staff
             {
                 Username = "nurse",
                 Password = "1234",
-                FullName = "Registered Nurse",
+                StaffName = "Registered Nurse",
                 Role = StaffRole.Nurse
             },
             new Staff
             {
                 Username = "care",
                 Password = "1234",
-                FullName = "Care Staff",
+                StaffName = "Care Staff",
                 Role = StaffRole.CareStaff
             }
         };

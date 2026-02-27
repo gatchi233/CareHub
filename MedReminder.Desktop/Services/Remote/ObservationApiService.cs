@@ -1,7 +1,5 @@
 using System.Net;
 using System.Net.Http.Json;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using MedReminder.Models;
 using MedReminder.Services.Abstractions;
 
@@ -10,7 +8,6 @@ namespace MedReminder.Services.Remote;
 public sealed class ObservationApiService : IObservationService
 {
     private readonly HttpClient _http;
-    private static readonly JsonSerializerOptions _jsonOptions = CreateJsonOptions();
 
     public ObservationApiService(HttpClient http)
     {
@@ -38,10 +35,8 @@ public sealed class ObservationApiService : IObservationService
         return UpsertAsync(observation);
     }
 
-    public Task<int> SyncAsync()
-    {
-        return Task.FromResult(0);
-    }
+    // Api service itself doesn't "sync" (wrapper does)
+    public Task<int> SyncAsync() => Task.FromResult(0);
 
     public async Task UpsertAsync(Observation item)
     {
@@ -51,10 +46,9 @@ public sealed class ObservationApiService : IObservationService
         // Create
         if (item.Id == Guid.Empty)
         {
-            var resp = await _http.PostAsJsonAsync("api/Observations", item, _jsonOptions);
+            var resp = await _http.PostAsJsonAsync("api/Observations", item);
             resp.EnsureSuccessStatusCode();
 
-            // If API returns the created entity, update local object
             var created = await resp.Content.ReadFromJsonAsync<Observation>();
             if (created is not null)
             {
@@ -66,7 +60,7 @@ public sealed class ObservationApiService : IObservationService
         }
 
         // Update
-        var putResp = await _http.PutAsJsonAsync($"api/Observations/{item.Id}", item, _jsonOptions);
+        var putResp = await _http.PutAsJsonAsync($"api/Observations/{item.Id}", item);
         putResp.EnsureSuccessStatusCode();
     }
 
@@ -81,52 +75,5 @@ public sealed class ObservationApiService : IObservationService
             return;
 
         resp.EnsureSuccessStatusCode();
-    }
-
-    private static JsonSerializerOptions CreateJsonOptions()
-    {
-        var options = new JsonSerializerOptions(JsonSerializerDefaults.Web);
-        options.Converters.Add(new UtcDateTimeConverter());
-        options.Converters.Add(new UtcNullableDateTimeConverter());
-        return options;
-    }
-
-    private sealed class UtcDateTimeConverter : JsonConverter<DateTime>
-    {
-        public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-        {
-            var value = reader.GetDateTime();
-            return value.Kind == DateTimeKind.Utc ? value : value.ToUniversalTime();
-        }
-
-        public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
-        {
-            var utc = value.Kind == DateTimeKind.Utc ? value : value.ToUniversalTime();
-            writer.WriteStringValue(utc.ToString("O"));
-        }
-    }
-
-    private sealed class UtcNullableDateTimeConverter : JsonConverter<DateTime?>
-    {
-        public override DateTime? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-        {
-            if (reader.TokenType == JsonTokenType.Null)
-                return null;
-
-            var value = reader.GetDateTime();
-            return value.Kind == DateTimeKind.Utc ? value : value.ToUniversalTime();
-        }
-
-        public override void Write(Utf8JsonWriter writer, DateTime? value, JsonSerializerOptions options)
-        {
-            if (value is null)
-            {
-                writer.WriteNullValue();
-                return;
-            }
-
-            var utc = value.Value.Kind == DateTimeKind.Utc ? value.Value : value.Value.ToUniversalTime();
-            writer.WriteStringValue(utc.ToString("O"));
-        }
     }
 }

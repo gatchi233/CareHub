@@ -9,36 +9,33 @@
     Title="Resident"
     BackgroundColor="{StaticResource Resident_Main_Background}">
 
+    <pages:AuthPage.ToolbarItems>
+        <ToolbarItem Text="Logout" Clicked="OnLogoutClicked" Priority="1" Order="Primary" />
+    </pages:AuthPage.ToolbarItems>
+
+    <!--
+        Layout: Row 0 = action buttons (always visible, never scrolled).
+                Row 1 = single outer ScrollView that contains two cards.
+        CollectionView is placed directly inside the outer ScrollView's
+        VerticalStackLayout with a HeightRequest so MAUI can measure it
+        correctly (avoids the "CollectionView inside inner ScrollView" layout
+        bug that breaks hit-testing for elements above it on Windows).
+    -->
     <Grid RowDefinitions="Auto,*" Padding="16" RowSpacing="12">
 
-        <!-- Top action buttons -->
+        <!-- ── Top action bar ─────────────────────────────────────────────── -->
         <HorizontalStackLayout Grid.Row="0" Spacing="8">
 
-            <!-- Edit -->
-            <Border x:Name="EditAction" StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="4"/>
-                </Border.StrokeShape>
-                <Grid ColumnDefinitions="32,Auto" Margin="0">
-                    <Image Grid.Column="0" Source="icons8_edit_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
-                    <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Edit}" Padding="10,0" StrokeThickness="0">
-                        <Label Text="EDIT" TextColor="{StaticResource Button_Font_Secondary}" FontSize="12" VerticalOptions="Center" FontAttributes="Bold"/>
-                    </Border>
-                </Grid>
-                <Border.GestureRecognizers>
-                    <TapGestureRecognizer Tapped="OnEditClicked"/>
-                </Border.GestureRecognizers>
-            </Border>
-
-            <!-- Medications -->
+            <!-- MEDICATIONS -->
             <Border StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="4"/>
-                </Border.StrokeShape>
-                <Grid ColumnDefinitions="32,Auto" Margin="0">
-                    <Image Grid.Column="0" Source="icons8_pill_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
-                    <Border Grid.Column="1" BackgroundColor="{StaticResource Button_View}" Padding="10,0" StrokeThickness="0">
-                        <Label Text="MED" TextColor="{StaticResource Button_Font_Primary}" FontSize="12" VerticalOptions="Center" FontAttributes="Bold"/>
+                <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
+                    <Image Grid.Column="0" Source="icons8_pill_100.png" HeightRequest="16" WidthRequest="16"
+                           HorizontalOptions="Center" VerticalOptions="Center"/>
+                    <Border Grid.Column="1" BackgroundColor="{StaticResource Button_View}"
+                            Padding="10,0" StrokeThickness="0" InputTransparent="True">
+                        <Label Text="MED" TextColor="{StaticResource Button_Font_Primary}"
+                               FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
                     </Border>
                 </Grid>
                 <Border.GestureRecognizers>
@@ -46,15 +43,16 @@
                 </Border.GestureRecognizers>
             </Border>
 
-            <!-- Report -->
+            <!-- OBSERVATIONS -->
             <Border StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="4"/>
-                </Border.StrokeShape>
-                <Grid ColumnDefinitions="32,Auto" Margin="0">
-                    <Image Grid.Column="0" Source="icons8_scan_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
-                    <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Export}" Padding="10,0" StrokeThickness="0">
-                        <Label Text="OBS" TextColor="{StaticResource Button_Font_Primary}" FontSize="12" VerticalOptions="Center" FontAttributes="Bold"/>
+                <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
+                    <Image Grid.Column="0" Source="icons8_scan_100.png" HeightRequest="16" WidthRequest="16"
+                           HorizontalOptions="Center" VerticalOptions="Center"/>
+                    <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Export}"
+                            Padding="10,0" StrokeThickness="0" InputTransparent="True">
+                        <Label Text="OBS" TextColor="{StaticResource Button_Font_Primary}"
+                               FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
                     </Border>
                 </Grid>
                 <Border.GestureRecognizers>
@@ -62,15 +60,34 @@
                 </Border.GestureRecognizers>
             </Border>
 
-            <!-- Close -->
+            <!-- EDIT -->
+            <Border x:Name="EditAction" StrokeThickness="0" HeightRequest="28"
+                    BackgroundColor="{StaticResource Button_Icon_Background}">
+                <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
+                    <Image Grid.Column="0" Source="icons8_edit_100.png" HeightRequest="16" WidthRequest="16"
+                           HorizontalOptions="Center" VerticalOptions="Center"/>
+                    <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Edit}"
+                            Padding="10,0" StrokeThickness="0" InputTransparent="True">
+                        <Label Text="EDIT" TextColor="{StaticResource Button_Font_Secondary}"
+                               FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
+                    </Border>
+                </Grid>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnEditClicked"/>
+                </Border.GestureRecognizers>
+            </Border>
+
+            <!-- CLOSE -->
             <Border StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="4"/>
-                </Border.StrokeShape>
-                <Grid ColumnDefinitions="32,Auto" Margin="0">
-                    <Image Grid.Column="0" Source="icons8_close_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
-                    <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Close}" Padding="10,0" StrokeThickness="0">
-                        <Label Text="CLOSE" TextColor="{StaticResource Button_Font_Primary}" FontSize="12" VerticalOptions="Center" FontAttributes="Bold"/>
+                <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
+                    <Image Grid.Column="0" Source="icons8_close_100.png" HeightRequest="16" WidthRequest="16"
+                           HorizontalOptions="Center" VerticalOptions="Center"/>
+                    <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Close}"
+                            Padding="10,0" StrokeThickness="0" InputTransparent="True">
+                        <Label Text="CLOSE" TextColor="{StaticResource Button_Font_Primary}"
+                               FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
                     </Border>
                 </Grid>
                 <Border.GestureRecognizers>
@@ -80,91 +97,209 @@
 
         </HorizontalStackLayout>
 
-        <!-- Main content -->
+        <!-- ── Single outer ScrollView (Row 1) ────────────────────────────── -->
         <ScrollView Grid.Row="1">
             <VerticalStackLayout Spacing="12">
 
-                <Grid ColumnDefinitions="2*,*" ColumnSpacing="12">
-                    <Label Grid.Column="0"
-                           Text="{Binding FullName}"
-                           FontSize="22"
-                           FontAttributes="Bold"
-                           TextColor="{StaticResource Resident_Font_Primary}"/>
+                <!-- ── Info card ──────────────────────────────────────────── -->
+                <Border Padding="16,14"
+                        BackgroundColor="{StaticResource Resident_Card_Background}"
+                        Stroke="{StaticResource Resident_Card_Border}"
+                        StrokeThickness="1">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="12"/></Border.StrokeShape>
 
-                    <Grid Grid.Column="1"
-                          ColumnDefinitions="Auto,Auto"
-                          ColumnSpacing="8"
-                          HorizontalOptions="End">
-                        <Label Grid.Column="0"
-                               Text="{Binding RoomNumber, StringFormat='Room: {0}'}"
-                               TextColor="{StaticResource Resident_Font_Primary}" />
-                        <Label Grid.Column="1"
-                               Text="{Binding BedLabel, StringFormat='Bed: {0}'}"
-                               TextColor="{StaticResource Resident_Font_Primary}" />
-                    </Grid>
-                </Grid>
+                    <VerticalStackLayout Spacing="0">
 
-                <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
-                    <Label Grid.Column="0"
-                           x:Name="DobAgeLabel"
-                           Text="DOB: "
-                           FontSize="14"
-                           TextColor="{StaticResource Resident_Font_Secondary}"/>
+                        <!-- Card header: name + room -->
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,4">
+                            <Label Text="{Binding ResidentName}"
+                                   FontSize="17" FontAttributes="Bold"
+                                   TextColor="{StaticResource Resident_Font_Primary}"
+                                   VerticalOptions="Center"/>
+                            <HorizontalStackLayout Grid.Column="1" Spacing="10" VerticalOptions="Center">
+                                <Label Text="{Binding RoomNumber, StringFormat='Room {0}'}"
+                                       FontSize="12" TextColor="{StaticResource Resident_Font_Secondary}"
+                                       VerticalOptions="Center"/>
+                                <Label Text="{Binding BedLabel, StringFormat='Bed {0}'}"
+                                       FontSize="12" TextColor="{StaticResource Resident_Font_Secondary}"
+                                       VerticalOptions="Center"/>
+                            </HorizontalStackLayout>
+                        </Grid>
+                        <BoxView HeightRequest="1" Color="{StaticResource Resident_Card_Border}" Margin="0,0,0,12"/>
 
-                    <Label Grid.Column="1"
-                           Text="{Binding Gender, StringFormat='Gender: {0}'}"
-                           FontSize="14"
-                           TextColor="{StaticResource Resident_Font_Secondary}"/>
-                </Grid>
+                        <!-- ─── IDENTITY ──────────────────────────────────── -->
+                        <Label Text="IDENTITY"
+                               FontSize="10" FontAttributes="Bold" CharacterSpacing="1"
+                               TextColor="{StaticResource Resident_Font_Secondary}"/>
+                        <BoxView HeightRequest="1" Color="{StaticResource Resident_Card_Border}" Margin="0,4,0,10"/>
 
-                <Label Text="{Binding DoctorName, StringFormat='Doctor: {0}'}" 
-                       TextColor="{StaticResource Resident_Font_Primary}" />
-                <Label Text="{Binding DoctorContact, StringFormat='Doctor Contact: {0}'}" 
-                       TextColor="{StaticResource Resident_Font_Primary}" />
+                        <Grid ColumnDefinitions="*,*,*" ColumnSpacing="16" Margin="0,0,0,4">
+                            <VerticalStackLayout Spacing="2">
+                                <Label Text="DATE OF BIRTH" FontSize="10"
+                                       TextColor="{StaticResource Resident_Font_Secondary}"/>
+                                <Label x:Name="DobAgeLabel" Text="—" FontSize="13"
+                                       TextColor="{StaticResource Resident_Font_Primary}"/>
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                <Label Text="GENDER" FontSize="10"
+                                       TextColor="{StaticResource Resident_Font_Secondary}"/>
+                                <Label Text="{Binding Gender}" FontSize="13"
+                                       TextColor="{StaticResource Resident_Font_Primary}"/>
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="2" Spacing="2">
+                                <Label Text="ADMISSION" FontSize="10"
+                                       TextColor="{StaticResource Resident_Font_Secondary}"/>
+                                <Label Text="{Binding AdmissionDate}" FontSize="13"
+                                       TextColor="{StaticResource Resident_Font_Primary}"/>
+                            </VerticalStackLayout>
+                        </Grid>
 
-                <Label Text="{Binding EmergencyContactName1, StringFormat='Emergency Contact: {0}'}" 
-                       TextColor="{StaticResource Resident_Font_Primary}" />
-                <Label Text="{Binding EmergencyContactPhone1, StringFormat='Emergency Phone: {0}'}" 
-                       TextColor="{StaticResource Resident_Font_Primary}" />
+                        <!-- ─── EMERGENCY CONTACT ─────────────────────────── -->
+                        <Label Text="EMERGENCY CONTACT"
+                               FontSize="10" FontAttributes="Bold" CharacterSpacing="1"
+                               TextColor="{StaticResource Resident_Font_Secondary}"
+                               Margin="0,16,0,0"/>
+                        <BoxView HeightRequest="1" Color="{StaticResource Resident_Card_Border}" Margin="0,4,0,10"/>
 
-                <!-- Medication schedule -->
-                <Label Text="Medication schedule"
-                       FontAttributes="Bold"
-                       TextColor="{StaticResource Medication_Font_Primary}"
-                       Margin="0,16,0,6" />
-
-                <CollectionView ItemsSource="{Binding Source={x:Reference ThisPage}, Path=MedicationSchedules}">
-                    <CollectionView.EmptyView>
-                        <Label Text="No medications assigned." 
-                               TextColor="{StaticResource Medication_Font_Secondary}" />
-                    </CollectionView.EmptyView>
-
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="model:Medication">
-                            <Border Padding="10" 
-                                    Margin="0,0,0,8" 
-                                    BackgroundColor="{StaticResource Medication_Card_Background}"
-                                    Stroke="{StaticResource Medication_Card_Border}"
-                                    StrokeThickness="1">
-                                <Border.StrokeShape>
-                                    <RoundRectangle CornerRadius="10"/>
-                                </Border.StrokeShape>
-
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="16" Margin="0,0,0,4">
+                            <VerticalStackLayout Spacing="8">
+                                <Label Text="Contact 1" FontSize="11" FontAttributes="Bold"
+                                       TextColor="{StaticResource Resident_Font_Primary}"/>
                                 <VerticalStackLayout Spacing="2">
-                                    <Label Text="{Binding MedName}" 
-                                           FontAttributes="Bold"
-                                           TextColor="{StaticResource Medication_Font_Primary}" />
-                                    <Label Text="{Binding Dosage}" 
-                                           TextColor="{StaticResource Medication_Font_Secondary}" 
-                                           FontSize="12"/>
-                                    <Label Text="{Binding ScheduleSummary}" 
-                                           TextColor="{StaticResource Medication_Font_Secondary}" 
-                                           FontSize="12"/>
+                                    <Label Text="NAME" FontSize="10"
+                                           TextColor="{StaticResource Resident_Font_Secondary}"/>
+                                    <Label Text="{Binding EmergencyContactName1}" FontSize="13"
+                                           TextColor="{StaticResource Resident_Font_Primary}"/>
                                 </VerticalStackLayout>
-                            </Border>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
+                                <VerticalStackLayout Spacing="2">
+                                    <Label Text="PHONE" FontSize="10"
+                                           TextColor="{StaticResource Resident_Font_Secondary}"/>
+                                    <Label Text="{Binding EmergencyContactPhone1}" FontSize="13"
+                                           TextColor="{StaticResource Resident_Font_Primary}"/>
+                                </VerticalStackLayout>
+                                <VerticalStackLayout Spacing="2">
+                                    <Label Text="RELATIONSHIP" FontSize="10"
+                                           TextColor="{StaticResource Resident_Font_Secondary}"/>
+                                    <Label Text="{Binding EmergencyRelationship1}" FontSize="13"
+                                           TextColor="{StaticResource Resident_Font_Primary}"/>
+                                </VerticalStackLayout>
+                            </VerticalStackLayout>
+
+                            <VerticalStackLayout Grid.Column="1" Spacing="8">
+                                <Label Text="Contact 2" FontSize="11" FontAttributes="Bold"
+                                       TextColor="{StaticResource Resident_Font_Primary}"/>
+                                <VerticalStackLayout Spacing="2">
+                                    <Label Text="NAME" FontSize="10"
+                                           TextColor="{StaticResource Resident_Font_Secondary}"/>
+                                    <Label Text="{Binding EmergencyContactName2}" FontSize="13"
+                                           TextColor="{StaticResource Resident_Font_Primary}"/>
+                                </VerticalStackLayout>
+                                <VerticalStackLayout Spacing="2">
+                                    <Label Text="PHONE" FontSize="10"
+                                           TextColor="{StaticResource Resident_Font_Secondary}"/>
+                                    <Label Text="{Binding EmergencyContactPhone2}" FontSize="13"
+                                           TextColor="{StaticResource Resident_Font_Primary}"/>
+                                </VerticalStackLayout>
+                                <VerticalStackLayout Spacing="2">
+                                    <Label Text="RELATIONSHIP" FontSize="10"
+                                           TextColor="{StaticResource Resident_Font_Secondary}"/>
+                                    <Label Text="{Binding EmergencyRelationship2}" FontSize="13"
+                                           TextColor="{StaticResource Resident_Font_Primary}"/>
+                                </VerticalStackLayout>
+                            </VerticalStackLayout>
+                        </Grid>
+
+                        <!-- ─── PRIMARY DOCTOR ────────────────────────────── -->
+                        <Label Text="PRIMARY DOCTOR"
+                               FontSize="10" FontAttributes="Bold" CharacterSpacing="1"
+                               TextColor="{StaticResource Resident_Font_Secondary}"
+                               Margin="0,16,0,0"/>
+                        <BoxView HeightRequest="1" Color="{StaticResource Resident_Card_Border}" Margin="0,4,0,10"/>
+
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="16" Margin="0,0,0,4">
+                            <VerticalStackLayout Spacing="2">
+                                <Label Text="NAME" FontSize="10"
+                                       TextColor="{StaticResource Resident_Font_Secondary}"/>
+                                <Label Text="{Binding DoctorName}" FontSize="13"
+                                       TextColor="{StaticResource Resident_Font_Primary}"/>
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                <Label Text="PHONE" FontSize="10"
+                                       TextColor="{StaticResource Resident_Font_Secondary}"/>
+                                <Label Text="{Binding DoctorContact}" FontSize="13"
+                                       TextColor="{StaticResource Resident_Font_Primary}"/>
+                            </VerticalStackLayout>
+                        </Grid>
+
+                        <!-- ─── ALLERGIES ─────────────────────────────────── -->
+                        <Label Text="ALLERGIES"
+                               FontSize="10" FontAttributes="Bold" CharacterSpacing="1"
+                               TextColor="{StaticResource Resident_Font_Secondary}"
+                               Margin="0,16,0,0"/>
+                        <BoxView HeightRequest="1" Color="{StaticResource Resident_Card_Border}" Margin="0,4,0,6"/>
+
+                        <Label x:Name="AllergySummaryLabel" FontSize="13"
+                               TextColor="{StaticResource Resident_Font_Primary}"
+                               Margin="0,0,0,4"/>
+
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- ── Medication schedule card ──────────────────────────── -->
+                <Border Padding="16,14"
+                        BackgroundColor="{StaticResource Resident_Card_Background}"
+                        Stroke="{StaticResource Resident_Card_Border}"
+                        StrokeThickness="1">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="12"/></Border.StrokeShape>
+
+                    <VerticalStackLayout Spacing="0">
+                        <Label Text="MEDICATION SCHEDULE"
+                               FontSize="11" FontAttributes="Bold" CharacterSpacing="1.5"
+                               TextColor="{StaticResource Resident_Font_Secondary}"
+                               Margin="0,0,0,4"/>
+                        <BoxView HeightRequest="1" Color="{StaticResource Resident_Card_Border}" Margin="0,0,0,10"/>
+
+                        <!--
+                            CollectionView must NOT be inside a ScrollView.
+                            HeightRequest gives MAUI a concrete measure so the
+                            outer ScrollView can scroll correctly on Windows.
+                        -->
+                        <CollectionView ItemsSource="{Binding Source={x:Reference ThisPage}, Path=MedicationSchedules}"
+                                        HeightRequest="220">
+                            <CollectionView.EmptyView>
+                                <Label Text="No medications assigned."
+                                       TextColor="{StaticResource Medication_Font_Secondary}"
+                                       FontSize="13" Margin="0,4,0,0"/>
+                            </CollectionView.EmptyView>
+                            <CollectionView.ItemsLayout>
+                                <LinearItemsLayout Orientation="Vertical" ItemSpacing="6"/>
+                            </CollectionView.ItemsLayout>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="model:Medication">
+                                    <Border Padding="10,8"
+                                            BackgroundColor="{StaticResource Medication_Card_Background}"
+                                            Stroke="{StaticResource Medication_Card_Border}"
+                                            StrokeThickness="1">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="8"/>
+                                        </Border.StrokeShape>
+                                        <VerticalStackLayout Spacing="2">
+                                            <Label Text="{Binding MedName}" FontAttributes="Bold"
+                                                   TextColor="{StaticResource Medication_Font_Primary}"/>
+                                            <Label Text="{Binding Dosage}" FontSize="12"
+                                                   TextColor="{StaticResource Medication_Font_Secondary}"/>
+                                            <Label Text="{Binding ScheduleSummary}" FontSize="12"
+                                                   TextColor="{StaticResource Medication_Font_Secondary}"/>
+                                        </VerticalStackLayout>
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- bottom breathing room -->
+                <BoxView HeightRequest="8" Color="Transparent"/>
 
             </VerticalStackLayout>
         </ScrollView>

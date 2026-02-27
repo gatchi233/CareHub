@@ -9,13 +9,17 @@ public partial class ActionPopup : Popup
     public enum PopupMode
     {
         List,
-        Form
+        Form,
+        Adjust,
+        Order,
+        Sort
     }
 
     public record PopupResult(
         string? SelectedKey = null,
         string? Field1 = null,
-        string? Field2 = null
+        string? Field2 = null,
+        int? AdjustDelta = null
     );
 
     private PopupMode _mode;
@@ -23,12 +27,36 @@ public partial class ActionPopup : Popup
     // For Form mode validation (optional)
     private Func<string?, string?, (bool ok, string? error)>? _validator;
 
+    // For Adjust mode
+    private int _currentStock;
+
     public ActionPopup()
     {
         InitializeComponent();
     }
 
-    // Sort
+    // Sort (grid layout: 1 featured + 3 paired rows)
+    public void ConfigureSort()
+    {
+        _mode = PopupMode.Sort;
+        TitleLabel.Text = "SORT INVENTORY";
+
+        ListContainer.IsVisible = false;
+        FormContainer.IsVisible = false;
+        AdjustContainer.IsVisible = false;
+        OrderContainer.IsVisible = false;
+        SortContainer.IsVisible = true;
+
+        Size = new Size(420, 380);
+    }
+
+    private void OnSortOptionTapped(object sender, TappedEventArgs e)
+    {
+        var key = e.Parameter as string;
+        Close(new PopupResult(SelectedKey: key));
+    }
+
+    // List (flat vertical list, kept for potential reuse)
     public void ConfigureList(string title, IEnumerable<(string key, string text)> items)
     {
         _mode = PopupMode.List;
@@ -37,6 +65,9 @@ public partial class ActionPopup : Popup
 
         ListContainer.IsVisible = true;
         FormContainer.IsVisible = false;
+        AdjustContainer.IsVisible = false;
+        OrderContainer.IsVisible = false;
+        SortContainer.IsVisible = false;
 
         ListStack.Children.Clear();
 
@@ -56,8 +87,7 @@ foreach (var (key, text) in items)
         Content = new Label
         {
             Text = text,
-            FontSize = 16,
-            FontAttributes = FontAttributes.Bold,
+            FontSize = 13,
             TextColor = fontPrimary,
             VerticalOptions = LayoutOptions.Center
         }
@@ -85,6 +115,9 @@ foreach (var (key, text) in items)
 
         ListContainer.IsVisible = false;
         FormContainer.IsVisible = true;
+        AdjustContainer.IsVisible = false;
+        OrderContainer.IsVisible = false;
+        SortContainer.IsVisible = false;
 
         _validator = validator;
 
@@ -98,7 +131,7 @@ foreach (var (key, text) in items)
             MessageLabel.IsVisible = false;
         }
 
-        PrimaryButton.Text = primaryText;
+        PrimaryButtonLabel.Text = primaryText;
 
         // Field1
         if (field1.HasValue)
@@ -127,6 +160,202 @@ foreach (var (key, text) in items)
             Field2Container.IsVisible = false;
             Field2Entry.Text = string.Empty;
         }
+    }
+
+    // Adjust Stock
+    public void ConfigureAdjust(string title, string medName, int currentStock, int reorderLevel)
+    {
+        _mode = PopupMode.Adjust;
+        _currentStock = currentStock;
+
+        TitleLabel.Text = title;
+        ListContainer.IsVisible = false;
+        FormContainer.IsVisible = false;
+        AdjustContainer.IsVisible = true;
+        OrderContainer.IsVisible = false;
+        SortContainer.IsVisible = false;
+
+        AdjustMedNameLabel.Text = medName;
+        AdjustEntry.Text = string.Empty;
+
+        var isLow = currentStock <= reorderLevel;
+        CurrentStockLabel.Text = currentStock.ToString();
+        CurrentStockLabel.TextColor = isLow
+            ? (Color)Application.Current!.Resources["Alert_Warning"]
+            : (Color)Application.Current!.Resources["Popup_Font_Primary"];
+
+        // Build quick-adjust buttons
+        QuickButtonsRow.Children.Clear();
+        var negColor = (Color)Application.Current!.Resources["Button_Delete"];
+        var posColor = (Color)Application.Current!.Resources["Button_Create"];
+
+        foreach (var delta in new[] { -25, -10, -5, 5, 10, 25 })
+        {
+            var d = delta;
+            var btn = new Border
+            {
+                StrokeThickness = 0,
+                HeightRequest = 30,
+                MinimumWidthRequest = 46,
+                Padding = new Thickness(10, 0),
+                BackgroundColor = d < 0 ? negColor : posColor,
+                StrokeShape = new RoundRectangle { CornerRadius = 6 },
+                Content = new Label
+                {
+                    Text = d < 0 ? d.ToString() : $"+{d}",
+                    FontSize = 12,
+                    FontAttributes = FontAttributes.Bold,
+                    TextColor = Colors.White,
+                    VerticalOptions = LayoutOptions.Center,
+                    HorizontalOptions = LayoutOptions.Center
+                }
+            };
+
+            var tap = new TapGestureRecognizer();
+            tap.Tapped += (_, _) =>
+            {
+                AdjustEntry.Text = d.ToString();
+                UpdateAdjustPreview();
+            };
+            btn.GestureRecognizers.Add(tap);
+            QuickButtonsRow.Children.Add(btn);
+        }
+
+        // Size the popup to fit the richer content
+        Size = new Size(420, 520);
+
+        UpdateAdjustPreview();
+    }
+
+    private void OnAdjustEntryChanged(object sender, TextChangedEventArgs e)
+        => UpdateAdjustPreview();
+
+    private void UpdateAdjustPreview()
+    {
+        var text = AdjustEntry?.Text?.Trim();
+
+        if (string.IsNullOrEmpty(text) || !int.TryParse(text, out var delta) || delta == 0)
+        {
+            NewStockLabel.Text = "—";
+            NewStockLabel.TextColor = (Color)Application.Current!.Resources["Popup_Font_Primary"];
+            NewStockWarningLabel.IsVisible = false;
+            return;
+        }
+
+        var newStock = _currentStock + delta;
+
+        if (newStock < 0)
+        {
+            NewStockLabel.Text = "0  (capped)";
+            NewStockLabel.TextColor = (Color)Application.Current!.Resources["Alert_Error"];
+            NewStockWarningLabel.Text = $"⚠  Would result in {newStock}. Stock will be set to 0.";
+            NewStockWarningLabel.IsVisible = true;
+        }
+        else
+        {
+            NewStockLabel.Text = newStock.ToString();
+            NewStockLabel.TextColor = delta > 0
+                ? (Color)Application.Current!.Resources["Alert_Success"]
+                : (Color)Application.Current!.Resources["Alert_Warning"];
+            NewStockWarningLabel.IsVisible = false;
+        }
+    }
+
+    private void OnAdjustCancelTapped(object sender, EventArgs e) => Close(null);
+
+    private void OnAdjustApplyTapped(object sender, EventArgs e)
+    {
+        var text = AdjustEntry?.Text?.Trim();
+
+        if (string.IsNullOrEmpty(text) || !int.TryParse(text, out var delta) || delta == 0)
+            return;
+
+        // Cap so stock never goes below zero
+        var clampedDelta = Math.Max(delta, -_currentStock);
+        Close(new PopupResult(AdjustDelta: clampedDelta));
+    }
+
+    // Create Order
+    public void ConfigureOrder(string title, string medName, int currentStock, int reorderLevel)
+    {
+        _mode = PopupMode.Order;
+
+        TitleLabel.Text = title;
+        ListContainer.IsVisible = false;
+        FormContainer.IsVisible = false;
+        AdjustContainer.IsVisible = false;
+        OrderContainer.IsVisible = true;
+        SortContainer.IsVisible = false;
+
+        OrderMedNameLabel.Text = medName;
+        OrderQtyEntry.Text = string.Empty;
+        OrderNotesEntry.Text = string.Empty;
+
+        var isLow = currentStock <= reorderLevel;
+        OrderLowBadge.IsVisible = isLow;
+        OrderStockLabel.Text = $"Stock: {currentStock}";
+        OrderStockLabel.TextColor = isLow
+            ? (Color)Application.Current!.Resources["Alert_Warning"]
+            : (Color)Application.Current!.Resources["Popup_Font_Primary"];
+        OrderReorderLabel.Text = $"Reorder: {reorderLevel}";
+
+        // Quick quantity buttons (positive only — ordering always adds)
+        QuickOrderButtonsRow.Children.Clear();
+        var posColor = (Color)Application.Current!.Resources["Button_Create"];
+
+        foreach (var qty in new[] { 10, 25, 50, 100, 200 })
+        {
+            var q = qty;
+            var btn = new Border
+            {
+                StrokeThickness = 0,
+                HeightRequest = 30,
+                MinimumWidthRequest = 46,
+                Padding = new Thickness(10, 0),
+                BackgroundColor = posColor,
+                StrokeShape = new RoundRectangle { CornerRadius = 6 },
+                Content = new Label
+                {
+                    Text = $"+{q}",
+                    FontSize = 12,
+                    FontAttributes = FontAttributes.Bold,
+                    TextColor = Colors.White,
+                    VerticalOptions = LayoutOptions.Center,
+                    HorizontalOptions = LayoutOptions.Center
+                }
+            };
+
+            var tap = new TapGestureRecognizer();
+            tap.Tapped += (_, _) => OrderQtyEntry.Text = q.ToString();
+            btn.GestureRecognizers.Add(tap);
+            QuickOrderButtonsRow.Children.Add(btn);
+        }
+
+        Size = new Size(420, 490);
+    }
+
+    private void OnOrderCancelTapped(object sender, EventArgs e) => Close(null);
+
+    private async void OnOrderCreateTapped(object sender, EventArgs e)
+    {
+        var qtyText = OrderQtyEntry.Text?.Trim();
+        var notes   = OrderNotesEntry.Text?.Trim();
+
+        if (string.IsNullOrWhiteSpace(qtyText))
+        {
+            await Application.Current!.MainPage!.DisplayAlert("Required", "Please enter a quantity.", "OK");
+            return;
+        }
+
+        if (!int.TryParse(qtyText, out var qty) || qty <= 0)
+        {
+            await Application.Current!.MainPage!.DisplayAlert("Invalid", "Please enter a positive number.", "OK");
+            return;
+        }
+
+        Close(new PopupResult(
+            Field1: qtyText,
+            Field2: string.IsNullOrWhiteSpace(notes) ? null : notes));
     }
 
     private void OnCloseTapped(object sender, EventArgs e) => Close(null);

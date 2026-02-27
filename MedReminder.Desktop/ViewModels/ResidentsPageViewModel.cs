@@ -79,8 +79,8 @@ namespace MedReminder.ViewModels
 
                 query = query.Where(r =>
                 {
-                    var first = (r.FirstName ?? "").Trim();
-                    var last = (r.LastName ?? "").Trim();
+                    var first = (r.ResidentFName ?? "").Trim();
+                    var last = (r.ResidentLName ?? "").Trim();
 
                     var full1 = $"{first} {last}".Trim();
                     var full2 = $"{last} {first}".Trim();
@@ -94,7 +94,7 @@ namespace MedReminder.ViewModels
 
             query = query
                 .OrderBy(r => DateTime.TryParse(r.DOB, out var d) ? d : DateTime.MinValue)
-                .ThenBy(r => r.FullName);
+                .ThenBy(r => r.ResidentName);
 
             Residents.Clear();
             foreach (var r in query)

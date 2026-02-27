@@ -147,12 +147,14 @@ namespace MedReminder.Pages.Desktop
                 if (med.ResidentId.HasValue)
                     resident = _allResidents.FirstOrDefault(r => r.Id == med.ResidentId);
 
-                // IMPORTANT: Resident.Name no longer exists
-                med.ResidentName = resident?.FullName;
+                // Prefer linked resident; fall back to any existing name or a placeholder.
+                med.ResidentName = resident?.ResidentName
+                    ?? med.ResidentName
+                    ?? "Unassigned";
 
                 if (hasResidentFilter)
                 {
-                    var fullName = resident?.FullName ?? string.Empty;
+                    var fullName = resident?.ResidentName ?? string.Empty;
                     if (resident == null ||
                         !fullName.Contains(residentQuery, StringComparison.OrdinalIgnoreCase))
                         continue;

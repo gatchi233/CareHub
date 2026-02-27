@@ -1,11 +1,15 @@
+using CommunityToolkit.Maui.Views;
+using MedReminder.Pages.UI.Popups;
 using MedReminder.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MedReminder.Pages.Desktop
 {
+    [QueryProperty(nameof(ReturnTo), "returnTo")]
     public partial class MedicationOrdersPage : AuthPage
     {
         private MedicationOrdersViewModel VM => (MedicationOrdersViewModel)BindingContext;
+        public string? ReturnTo { get; set; }
 
         public MedicationOrdersPage()
         {
@@ -23,23 +27,22 @@ namespace MedReminder.Pages.Desktop
             await VM.LoadAsync();
         }
 
-        // Hook this up in XAML: <Button Text="New Order" Clicked="OnNewOrderClicked" />
-        private async void OnNewOrderClicked(object sender, EventArgs e)
+        private async void OnNewOrderClicked(object sender, TappedEventArgs e)
         {
-            // Ensure latest inventory list
             await VM.LoadAsync();
 
-            var choice = await DisplayActionSheet(
-                "New Order",
-                "Cancel",
-                null,
-                "Order Existing (Inventory)",
-                "Order New Medication (Not in Inventory)");
+            // Step 1 — pick order type
+            var typePopup = new ActionPopup();
+            typePopup.ConfigureList("NEW ORDER", new[]
+            {
+                ("existing", "Order Existing (Inventory)"),
+                ("new",      "Order New Medication")
+            });
 
-            if (choice == null || choice == "Cancel")
-                return;
+            var typeResult = await this.ShowPopupAsync(typePopup) as ActionPopup.PopupResult;
+            if (typeResult?.SelectedKey == null) return;
 
-            if (choice == "Order Existing (Inventory)")
+            if (typeResult.SelectedKey == "existing")
             {
                 if (!VM.InventoryMedications.Any())
                 {
@@ -47,132 +50,111 @@ namespace MedReminder.Pages.Desktop
                     return;
                 }
 
-                var labels = VM.InventoryMedications
-                    .Select(m => m.MedName)
-                    .Where(x => !string.IsNullOrWhiteSpace(x))
-                    .ToArray();
+                // Step 2a — pick from inventory
+                var medItems = VM.InventoryMedications
+                    .Where(m => !string.IsNullOrWhiteSpace(m.MedName))
+                    .Select(m => (m.Id.ToString(), m.MedName!));
 
-                var pickedName = await DisplayActionSheet(
-                    "Select medication to order",
-                    "Cancel",
-                    null,
-                    labels);
+                var medPopup = new ActionPopup();
+                medPopup.ConfigureList("SELECT MEDICATION", medItems);
 
-                if (pickedName == null || pickedName == "Cancel")
-                    return;
+                var medResult = await this.ShowPopupAsync(medPopup) as ActionPopup.PopupResult;
+                if (medResult?.SelectedKey == null) return;
 
-                var picked = VM.InventoryMedications.FirstOrDefault(m => m.MedName == pickedName);
-                if (picked == null)
-                    return;
+                var picked = VM.InventoryMedications.FirstOrDefault(m => m.Id.ToString() == medResult.SelectedKey);
+                if (picked == null) return;
 
-                await CreateOrderForMedicationAsync(picked.Id, picked.MedName);
-                return;
+                await CreateOrderForMedicationAsync(picked.Id, picked.MedName ?? "");
             }
-
-            // Order New Medication (not in inventory)
-            var newName = await DisplayPromptAsync(
-                "New Medication",
-                "Enter medication name (e.g., Amoxicillin 500mg):",
-                accept: "Next",
-                cancel: "Cancel",
-                placeholder: "Medication name");
-
-            if (string.IsNullOrWhiteSpace(newName))
-                return;
-
-            newName = newName.Trim();
-
-            // Optional: reorder level
-            var reorderText = await DisplayPromptAsync(
-                "Reorder Level (optional)",
-                "Enter reorder level (number) or Skip:",
-                accept: "Next",
-                cancel: "Skip",
-                placeholder: "e.g., 20",
-                keyboard: Keyboard.Numeric);
-
-            int reorderLevel = 0;
-            if (!string.IsNullOrWhiteSpace(reorderText))
+            else
             {
-                if (!int.TryParse(reorderText, out reorderLevel) || reorderLevel < 0)
-                {
-                    await DisplayAlert("Invalid", "Reorder level must be 0 or a positive number.", "OK");
-                    return;
-                }
+                // Step 2b — create new medication
+                var newMedPopup = new ActionPopup();
+                newMedPopup.ConfigureForm(
+                    title: "NEW MEDICATION",
+                    message: null,
+                    primaryText: "NEXT",
+                    field1: ("Medication Name", "e.g., Amoxicillin 500mg", Keyboard.Default),
+                    field2: ("Reorder Level (optional)", "e.g., 20", Keyboard.Numeric),
+                    validator: (name, level) =>
+                    {
+                        if (string.IsNullOrWhiteSpace(name))
+                            return (false, "Medication name is required.");
+                        if (!string.IsNullOrWhiteSpace(level) && (!int.TryParse(level, out var l) || l < 0))
+                            return (false, "Reorder level must be a positive number.");
+                        return (true, null);
+                    });
+
+                var newMedResult = await this.ShowPopupAsync(newMedPopup) as ActionPopup.PopupResult;
+                if (newMedResult?.Field1 == null) return;
+
+                int reorderLevel = 0;
+                if (!string.IsNullOrWhiteSpace(newMedResult.Field2))
+                    int.TryParse(newMedResult.Field2, out reorderLevel);
+
+                var createdId = await VM.CreateInventoryMedicationAsync(newMedResult.Field1, reorderLevel);
+                await CreateOrderForMedicationAsync(createdId, newMedResult.Field1);
             }
-
-            // Create global inventory medication item, then create order
-            var createdId = await VM.CreateInventoryMedicationAsync(
-                medName: newName,
-                reorderLevel: reorderLevel);
-
-            await CreateOrderForMedicationAsync(createdId, newName);
         }
 
         private async Task CreateOrderForMedicationAsync(Guid medicationId, string medName)
         {
-            var qtyText = await DisplayPromptAsync(
-                "Quantity",
-                $"Enter quantity to order for {medName}:",
-                accept: "Next",
-                cancel: "Cancel",
-                placeholder: "e.g., 30",
-                keyboard: Keyboard.Numeric);
+            var orderPopup = new ActionPopup();
+            orderPopup.ConfigureForm(
+                title: "CREATE ORDER",
+                message: $"Medication: {medName}",
+                primaryText: "CREATE",
+                field1: ("Quantity", "e.g., 30", Keyboard.Numeric),
+                field2: ("Notes (optional)", "e.g., urgent / call pharmacy", Keyboard.Default),
+                validator: (qty, _) =>
+                {
+                    if (string.IsNullOrWhiteSpace(qty))
+                        return (false, "Quantity is required.");
+                    if (!int.TryParse(qty, out var q) || q <= 0)
+                        return (false, "Please enter a positive number.");
+                    return (true, null);
+                });
 
-            if (string.IsNullOrWhiteSpace(qtyText))
-                return;
+            var result = await this.ShowPopupAsync(orderPopup) as ActionPopup.PopupResult;
+            if (result?.Field1 == null) return;
 
-            if (!int.TryParse(qtyText, out var qty) || qty <= 0)
+            int.TryParse(result.Field1, out var quantity);
+            await VM.CreateOrderAsync(
+                medicationId,
+                quantity,
+                "Staff",
+                string.IsNullOrWhiteSpace(result.Field2) ? null : result.Field2);
+        }
+
+        private async void OnCloseClicked(object sender, TappedEventArgs e) => await NavigateOutAsync();
+
+        private async Task NavigateOutAsync()
+        {
+            if (!string.IsNullOrWhiteSpace(ReturnTo))
             {
-                await DisplayAlert("Invalid", "Please enter a positive number.", "OK");
+                await Shell.Current.GoToAsync(ReturnTo);
                 return;
             }
 
-            var notes = await DisplayPromptAsync(
-                "Notes (optional)",
-                "Add notes for this order (optional):",
-                accept: "Create",
-                cancel: "Skip",
-                placeholder: "e.g., urgent / pharmacy call");
-
-            // TODO: later replace "Staff" with real logged-in user name + role checks
-            await VM.CreateOrderAsync(
-                medicationId,
-                qty,
-                "Staff",
-                string.IsNullOrWhiteSpace(notes) ? null : notes);
-        }
-
-        private async void OnBackClicked(object sender, EventArgs e)
-        {
-            await Shell.Current.GoToAsync("..");
-        }
-
-        private async void OnCloseClicked(object sender, EventArgs e)
-        {
-            await NavigateOutAsync();
-        }
-
-        private static async Task NavigateOutAsync()
-        {
-            // modal first
             if (Shell.Current?.Navigation?.ModalStack?.Count > 0)
             {
                 await Shell.Current.Navigation.PopModalAsync();
                 return;
             }
 
-            // normal stack
             if (Shell.Current?.Navigation?.NavigationStack?.Count > 1)
             {
                 await Shell.Current.Navigation.PopAsync();
                 return;
             }
 
-            // shell root fallback (previous logical place)
             await Shell.Current.GoToAsync(nameof(MedicationInventoryPage));
         }
 
-
+        private async void OnLogoutClicked(object sender, EventArgs e)
+        {
+            if (Shell.Current is AppShell shell)
+                await shell.LogoutAsync();
+        }
     }
 }

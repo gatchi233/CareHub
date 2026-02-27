@@ -30,11 +30,7 @@
             Title="Residents"
             ContentTemplate="{DataTemplate desktop:ResidentsPage}" Icon="icons8_elderly_100.png" />
 
-        <ShellContent
-        Route="resident-observations"
-        ContentTemplate="{DataTemplate desktop:ResidentObservationsPage}" Icon="icon8_scan_100.png"/>
-
-        <ShellContent
+<ShellContent
             Route="MedicationInventoryPage"
             Title="Inventory"
             ContentTemplate="{DataTemplate desktop:MedicationInventoryPage}" Icon="icons8_handcart_100.png" />

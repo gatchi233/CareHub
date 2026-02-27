@@ -24,13 +24,37 @@
 
             <HorizontalStackLayout Grid.Column="1" Spacing="8">
 
+                <!-- Orders -->
+                <Border StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="4"/>
+                    </Border.StrokeShape>
+
+                    <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
+                        <Image Grid.Column="0" Source="icons8_basketadd_100.png"
+                               HeightRequest="16" WidthRequest="16"
+                               HorizontalOptions="Center" VerticalOptions="Center"/>
+
+                        <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Create}"
+                                Padding="10,0" StrokeThickness="0">
+                            <Label Text="ORDERS"
+                                   TextColor="{StaticResource Button_Font_Primary}" FontSize="11"
+                                   VerticalOptions="Center" FontAttributes="Bold"/>
+                        </Border>
+                    </Grid>
+
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnOrdersClicked" />
+                    </Border.GestureRecognizers>
+                </Border>
+
                 <!-- Sort -->
                 <Border StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="4"/>
                     </Border.StrokeShape>
 
-                    <Grid ColumnDefinitions="32,Auto" Margin="0">
+                    <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
                         <Image Grid.Column="0"
                                Source="icons8_sort_100.png"
                                HeightRequest="16"
@@ -42,9 +66,9 @@
                                 BackgroundColor="{StaticResource Button_View}"
                                 Padding="10,0"
                                 StrokeThickness="0">
-                            <Label Text=" SORT "
+                            <Label Text="SORT"
                                    TextColor="{StaticResource Button_Font_Primary}"
-                                   FontSize="12"
+                                   FontSize="11"
                                    VerticalOptions="Center"
                                    FontAttributes="Bold"/>
                         </Border>
@@ -52,30 +76,6 @@
 
                     <Border.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnSortClicked" />
-                    </Border.GestureRecognizers>
-                </Border>
-
-                <!-- Orders -->
-                <Border StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="4"/>
-                    </Border.StrokeShape>
-
-                    <Grid ColumnDefinitions="32,Auto" Margin="0">
-                        <Image Grid.Column="0" Source="icons8_basketadd_100.png"
-                               HeightRequest="16" WidthRequest="16"
-                               HorizontalOptions="Center" VerticalOptions="Center"/>
-
-                        <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Create}"
-                                Padding="10,0" StrokeThickness="0">
-                            <Label Text=" ORDERS "
-                                   TextColor="{StaticResource Button_Font_Primary}" FontSize="12"
-                                   VerticalOptions="Center" FontAttributes="Bold"/>
-                        </Border>
-                    </Grid>
-
-                    <Border.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="OnOrdersClicked" />
                     </Border.GestureRecognizers>
                 </Border>
 
@@ -146,10 +146,10 @@
                                     <Border.StrokeShape>
                                         <RoundRectangle CornerRadius="4"/>
                                     </Border.StrokeShape>
-                                    <Grid ColumnDefinitions="32,Auto" Margin="0">
-                                        <Image Grid.Column="0" Source="icons8_edit_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
-                                        <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Edit}" Padding="10,0" StrokeThickness="0">
-                                            <Label Text="ADJUST" TextColor="{StaticResource Button_Font_Primary}" FontSize="12" VerticalOptions="Center" FontAttributes="Bold"/>
+                                    <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
+                                        <Image Grid.Column="0" Source="icons8_adjust_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                        <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Edit}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
+                                            <Label Text="ADJUST" TextColor="{StaticResource Button_Font_Primary}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
                                         </Border>
                                     </Grid>
                                     <Border.GestureRecognizers>
@@ -162,10 +162,10 @@
                                     <Border.StrokeShape>
                                         <RoundRectangle CornerRadius="4"/>
                                     </Border.StrokeShape>
-                                    <Grid ColumnDefinitions="32,Auto" Margin="0">
+                                    <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
                                         <Image Grid.Column="0" Source="icons8_basketadd_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
-                                        <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Create}" Padding="10,0" StrokeThickness="0">
-                                            <Label Text="ORDERS" TextColor="{StaticResource Button_Font_Primary}" FontSize="12" VerticalOptions="Center" FontAttributes="Bold"/>
+                                        <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Create}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
+                                            <Label Text="ORDERS" TextColor="{StaticResource Button_Font_Primary}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
                                         </Border>
                                     </Grid>
                                     <Border.GestureRecognizers>

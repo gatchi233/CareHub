@@ -1,25 +1,96 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage
+    x:Name="ThisPage"
     x:Class="MedReminder.Pages.Desktop.StaffManagementPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:model="clr-namespace:MedReminder.Models"
     Title="Staff Management"
     BackgroundColor="{StaticResource Staff_Main_Background}">
-
     <ContentPage.ToolbarItems>
-        <ToolbarItem Text="New" Command="{Binding NewCommand}" />
-        <ToolbarItem Text="Refresh" Command="{Binding RefreshCommand}" />
-        <ToolbarItem Text="Save" Command="{Binding SaveCommand}" />
+        <ToolbarItem Text="Logout" Clicked="OnLogoutClicked" Priority="1" Order="Primary" />
     </ContentPage.ToolbarItems>
 
-    <Grid Padding="16" ColumnDefinitions="2*,3*" RowDefinitions="Auto,*">
-        <Label Text="Staff list (select to edit)."
-               TextColor="{StaticResource Staff_Font_Secondary}" />
+    <Grid Padding="16" RowDefinitions="Auto,*" RowSpacing="12">
 
+        <!-- ── Top action bar ─────────────────────────────────────────────── -->
+        <HorizontalStackLayout Spacing="8">
+
+            <!-- NEW -->
+            <Border StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
+                <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
+                    <Image Grid.Column="0" Source="icons8_add_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Add}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
+                        <Label Text="NEW" TextColor="{StaticResource Button_Font_Primary}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
+                    </Border>
+                </Grid>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding NewCommand}"/>
+                </Border.GestureRecognizers>
+            </Border>
+
+            <!-- EDIT — active only when a record is selected and not already editing -->
+            <Border StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}"
+                    InputTransparent="{Binding CannotEdit}">
+                <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                <Border.Triggers>
+                    <DataTrigger TargetType="Border" Binding="{Binding CanEdit}" Value="False">
+                        <Setter Property="Opacity" Value="0.35"/>
+                    </DataTrigger>
+                </Border.Triggers>
+                <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
+                    <Image Grid.Column="0" Source="icons8_edit_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Edit}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
+                        <Label Text="EDIT" TextColor="{StaticResource Button_Font_Secondary}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
+                    </Border>
+                </Grid>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding EditCommand}"/>
+                </Border.GestureRecognizers>
+            </Border>
+
+            <!-- SAVE — dimmed and non-interactive in view mode -->
+            <Border StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}"
+                    InputTransparent="{Binding IsNotEditing}">
+                <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                <Border.Triggers>
+                    <DataTrigger TargetType="Border" Binding="{Binding IsEditing}" Value="False">
+                        <Setter Property="Opacity" Value="0.35"/>
+                    </DataTrigger>
+                </Border.Triggers>
+                <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
+                    <Image Grid.Column="0" Source="icons8_save_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Save}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
+                        <Label Text="SAVE" TextColor="{StaticResource Button_Font_Primary}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
+                    </Border>
+                </Grid>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding SaveCommand}"/>
+                </Border.GestureRecognizers>
+            </Border>
+
+            <!-- REFRESH -->
+            <Border StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
+                <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
+                    <Image Grid.Column="0" Source="icons8_updates_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Logout}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
+                        <Label Text="REFRESH" TextColor="{StaticResource Button_Font_Primary}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
+                    </Border>
+                </Grid>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding RefreshCommand}"/>
+                </Border.GestureRecognizers>
+            </Border>
+
+        </HorizontalStackLayout>
+
+        <!-- ── Two-panel layout ───────────────────────────────────────────── -->
         <Grid Grid.Row="1" ColumnDefinitions="2*,3*" ColumnSpacing="16">
 
-            <!-- Left: List -->
-            <Border Padding="12" 
+            <!-- ── LEFT: Staff list ──────────────────────────────────────── -->
+            <Border Padding="12"
                     BackgroundColor="{StaticResource Staff_Card_Background}"
                     Stroke="{StaticResource Staff_Card_Border}"
                     StrokeThickness="1">
@@ -27,39 +98,101 @@
                     <RoundRectangle CornerRadius="12"/>
                 </Border.StrokeShape>
 
-                <CollectionView ItemsSource="{Binding Staff}"
-                                SelectionMode="Single"
-                                SelectedItem="{Binding Selected, Mode=TwoWay}">
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate>
-                            <Border Padding="10" 
-                                    Margin="0,0,0,10" 
-                                    BackgroundColor="{StaticResource Card_Background_Light}"
-                                    Stroke="{StaticResource Staff_Card_Border}"
-                                    StrokeThickness="1">
-                                <Border.StrokeShape>
-                                    <RoundRectangle CornerRadius="10"/>
-                                </Border.StrokeShape>
-                                <VerticalStackLayout Spacing="2">
-                                    <Label Text="{Binding EmployeeId}" 
-                                           FontSize="14" 
-                                           TextColor="{StaticResource Staff_Font_Secondary}" />
-                                    <Label Text="{Binding FullName}" 
-                                           FontSize="16" 
-                                           TextColor="{StaticResource Staff_Font_Primary}" />
-                                    <Label Text="{Binding Role}" 
-                                           FontSize="12" 
-                                           TextColor="{StaticResource Staff_Font_Secondary}" />
-                                </VerticalStackLayout>
-                            </Border>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
+                <Grid RowDefinitions="Auto,Auto,*">
+
+                    <Label Text="STAFF"
+                           FontSize="11" FontAttributes="Bold" CharacterSpacing="1.5"
+                           TextColor="{StaticResource Staff_Font_Secondary}"/>
+
+                    <BoxView Grid.Row="1" HeightRequest="1" Color="{StaticResource Staff_Card_Border}" Margin="0,6,0,10"/>
+
+                    <CollectionView Grid.Row="2"
+                                    ItemsSource="{Binding Staff}"
+                                    SelectionMode="Single"
+                                    SelectedItem="{Binding Selected, Mode=TwoWay}">
+                        <CollectionView.EmptyView>
+                            <Label Text="No staff records."
+                                   TextColor="{StaticResource Staff_Font_Secondary}" FontSize="13"/>
+                        </CollectionView.EmptyView>
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout Orientation="Vertical" ItemSpacing="6"/>
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="model:StaffRecord">
+                                <Border Padding="10,8"
+                                        BackgroundColor="{StaticResource Staff_Main_Background}"
+                                        Stroke="{StaticResource Staff_Card_Border}"
+                                        StrokeThickness="1">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="8"/>
+                                    </Border.StrokeShape>
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsEnabled}" Value="False">
+                                            <Setter Property="Opacity" Value="0.45"/>
+                                        </DataTrigger>
+                                    </Border.Triggers>
+
+                                    <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="3">
+
+                                        <!-- EmployeeId + Role badge -->
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <Label Text="{Binding EmployeeId}"
+                                                   FontSize="11" TextColor="{StaticResource Staff_Font_Secondary}"
+                                                   VerticalOptions="Center"/>
+                                            <Border Grid.Column="1" Padding="6,2"
+                                                    BackgroundColor="{StaticResource Staff_Card_Border}"
+                                                    StrokeThickness="0">
+                                                <Border.StrokeShape>
+                                                    <RoundRectangle CornerRadius="3"/>
+                                                </Border.StrokeShape>
+                                                <Border.Triggers>
+                                                    <DataTrigger TargetType="Border" Binding="{Binding Role}" Value="Admin">
+                                                        <Setter Property="BackgroundColor" Value="{StaticResource Role_Admin}"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger TargetType="Border" Binding="{Binding Role}" Value="Care">
+                                                        <Setter Property="BackgroundColor" Value="{StaticResource Role_Care}"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger TargetType="Border" Binding="{Binding Role}" Value="Kitchen">
+                                                        <Setter Property="BackgroundColor" Value="{StaticResource Role_Kitchen}"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger TargetType="Border" Binding="{Binding Role}" Value="Facilities">
+                                                        <Setter Property="BackgroundColor" Value="{StaticResource Role_Facilities}"/>
+                                                    </DataTrigger>
+                                                </Border.Triggers>
+                                                <Label Text="{Binding Role}"
+                                                       FontSize="10" FontAttributes="Bold"
+                                                       TextColor="{StaticResource Button_Font_Primary}"/>
+                                            </Border>
+                                        </Grid>
+
+                                        <!-- Staff name -->
+                                        <Label Grid.Row="1" Text="{Binding StaffName}"
+                                               FontSize="15" FontAttributes="Bold"
+                                               TextColor="{StaticResource Staff_Font_Primary}"/>
+
+                                        <!-- Department • Job title -->
+                                        <Label Grid.Row="2" FontSize="11" TextColor="{StaticResource Staff_Font_Secondary}">
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span Text="{Binding Department}"/>
+                                                    <Span Text=" • "/>
+                                                    <Span Text="{Binding JobTitle}"/>
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                </Grid>
             </Border>
 
-            <!-- Right: Editor -->
-            <Border Grid.Column="1" 
-                    Padding="12" 
+            <!-- ── RIGHT: Detail / Editor panel ─────────────────────────── -->
+            <Border Grid.Column="1"
+                    Padding="16,14"
                     BackgroundColor="{StaticResource Staff_Card_Background}"
                     Stroke="{StaticResource Staff_Card_Border}"
                     StrokeThickness="1">
@@ -68,108 +201,214 @@
                 </Border.StrokeShape>
 
                 <ScrollView>
-                    <VerticalStackLayout Spacing="10">
+                    <VerticalStackLayout Spacing="0">
 
-                        <Label Text="{Binding Error}" TextColor="{StaticResource Text_Error}" />
+                        <!-- Panel mode label -->
+                        <Label Text="{Binding PanelTitle}"
+                               FontSize="11" FontAttributes="Bold" CharacterSpacing="1.5"
+                               TextColor="{StaticResource Staff_Font_Secondary}"
+                               Margin="0,0,0,4"/>
 
-                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
-                            <VerticalStackLayout>
-                                <Label Text="EmployeeId" TextColor="{StaticResource Staff_Font_Primary}" />
-                                <Entry Text="{Binding EmployeeId, Mode=TwoWay}" 
-                                       Placeholder="EMP-001" 
+                        <!-- Error -->
+                        <Label Text="{Binding Error}"
+                               TextColor="{StaticResource Alert_Error}"
+                               FontSize="12" Margin="0,6,0,6"/>
+
+                        <!-- ─── IDENTITY ──────────────────────────────────── -->
+                        <Label Text="IDENTITY"
+                               FontSize="10" FontAttributes="Bold" CharacterSpacing="1"
+                               TextColor="{StaticResource Staff_Font_Secondary}"
+                               Margin="0,10,0,0"/>
+                        <BoxView HeightRequest="1" Color="{StaticResource Staff_Card_Border}" Margin="0,4,0,10"/>
+
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="12" Margin="0,0,0,10">
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="Employee ID" FontSize="11" TextColor="{StaticResource Staff_Font_Secondary}"/>
+                                <Entry Text="{Binding EmployeeId, Mode=TwoWay}"
+                                       Placeholder="EMP-001"
                                        PlaceholderColor="{StaticResource Placeholder_Font_Primary}"
-                                       TextColor="{StaticResource Staff_Font_Primary}" />
+                                       TextColor="{StaticResource Staff_Font_Primary}"
+                                       IsEnabled="{Binding IsEditing}"/>
                             </VerticalStackLayout>
-
-                            <VerticalStackLayout Grid.Column="1">
-                                <Label Text="Role" TextColor="{StaticResource Staff_Font_Primary}" />
+                            <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                <Label Text="Role" FontSize="11" TextColor="{StaticResource Staff_Font_Secondary}"/>
                                 <Picker ItemsSource="{Binding Roles}"
                                         SelectedItem="{Binding Role, Mode=TwoWay}"
-                                        TextColor="{StaticResource Staff_Font_Primary}" />
+                                        TextColor="{StaticResource Staff_Font_Primary}"
+                                        IsEnabled="{Binding IsEditing}"/>
                             </VerticalStackLayout>
                         </Grid>
 
-                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
-                            <VerticalStackLayout>
-                                <Label Text="First Name" TextColor="{StaticResource Staff_Font_Primary}" />
-                                <Entry Text="{Binding FirstName, Mode=TwoWay}" 
-                                       TextColor="{StaticResource Staff_Font_Primary}" />
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="12" Margin="0,0,0,4">
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="First Name" FontSize="11" TextColor="{StaticResource Staff_Font_Secondary}"/>
+                                <Entry Text="{Binding StaffFName, Mode=TwoWay}"
+                                       TextColor="{StaticResource Staff_Font_Primary}"
+                                       IsEnabled="{Binding IsEditing}"/>
                             </VerticalStackLayout>
-
-                            <VerticalStackLayout Grid.Column="1">
-                                <Label Text="Last Name" TextColor="{StaticResource Staff_Font_Primary}" />
-                                <Entry Text="{Binding LastName, Mode=TwoWay}" 
-                                       TextColor="{StaticResource Staff_Font_Primary}" />
+                            <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                <Label Text="Last Name" FontSize="11" TextColor="{StaticResource Staff_Font_Secondary}"/>
+                                <Entry Text="{Binding StaffLName, Mode=TwoWay}"
+                                       TextColor="{StaticResource Staff_Font_Primary}"
+                                       IsEnabled="{Binding IsEditing}"/>
                             </VerticalStackLayout>
                         </Grid>
 
-                        <Label Text="Job Title" TextColor="{StaticResource Staff_Font_Primary}" />
-                        <Entry Text="{Binding JobTitle, Mode=TwoWay}" 
-                               TextColor="{StaticResource Staff_Font_Primary}" />
+                        <!-- ─── EMPLOYMENT ────────────────────────────────── -->
+                        <Label Text="EMPLOYMENT"
+                               FontSize="10" FontAttributes="Bold" CharacterSpacing="1"
+                               TextColor="{StaticResource Staff_Font_Secondary}"
+                               Margin="0,16,0,0"/>
+                        <BoxView HeightRequest="1" Color="{StaticResource Staff_Card_Border}" Margin="0,4,0,10"/>
 
-                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
-                            <VerticalStackLayout>
-                                <Label Text="Department" TextColor="{StaticResource Staff_Font_Primary}" />
-                                <Entry Text="{Binding Department, Mode=TwoWay}" 
-                                       TextColor="{StaticResource Staff_Font_Primary}" />
+                        <VerticalStackLayout Spacing="4" Margin="0,0,0,10">
+                            <Label Text="Job Title" FontSize="11" TextColor="{StaticResource Staff_Font_Secondary}"/>
+                            <Entry Text="{Binding JobTitle, Mode=TwoWay}"
+                                   TextColor="{StaticResource Staff_Font_Primary}"
+                                   IsEnabled="{Binding IsEditing}"/>
+                        </VerticalStackLayout>
+
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="12" Margin="0,0,0,10">
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="Department" FontSize="11" TextColor="{StaticResource Staff_Font_Secondary}"/>
+                                <Entry Text="{Binding Department, Mode=TwoWay}"
+                                       TextColor="{StaticResource Staff_Font_Primary}"
+                                       IsEnabled="{Binding IsEditing}"/>
                             </VerticalStackLayout>
-
-                            <VerticalStackLayout Grid.Column="1">
-                                <Label Text="Employment Status" TextColor="{StaticResource Staff_Font_Primary}" />
-                                <Entry Text="{Binding EmploymentStatus, Mode=TwoWay}" 
-                                       Placeholder="Full-time" 
+                            <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                <Label Text="Status" FontSize="11" TextColor="{StaticResource Staff_Font_Secondary}"/>
+                                <Entry Text="{Binding EmploymentStatus, Mode=TwoWay}"
+                                       Placeholder="Full-time"
                                        PlaceholderColor="{StaticResource Placeholder_Font_Primary}"
-                                       TextColor="{StaticResource Staff_Font_Primary}" />
+                                       TextColor="{StaticResource Staff_Font_Primary}"
+                                       IsEnabled="{Binding IsEditing}"/>
                             </VerticalStackLayout>
                         </Grid>
 
-                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
-                            <VerticalStackLayout>
-                                <Label Text="Hourly Wage" TextColor="{StaticResource Staff_Font_Primary}" />
-                                <Entry Text="{Binding HourlyWage, Mode=TwoWay}" 
-                                       Keyboard="Numeric" 
-                                       TextColor="{StaticResource Staff_Font_Primary}" />
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="12" Margin="0,0,0,4">
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="Hourly Wage" FontSize="11" TextColor="{StaticResource Staff_Font_Secondary}"/>
+                                <Entry Text="{Binding HourlyWage, Mode=TwoWay}"
+                                       Keyboard="Numeric"
+                                       TextColor="{StaticResource Staff_Font_Primary}"
+                                       IsEnabled="{Binding IsEditing}"/>
                             </VerticalStackLayout>
-
-                            <VerticalStackLayout Grid.Column="1">
-                                <Label Text="Shift Preference" TextColor="{StaticResource Staff_Font_Primary}" />
-                                <Entry Text="{Binding ShiftPreference, Mode=TwoWay}" 
-                                       Placeholder="Day / Evening / Night / Any" 
+                            <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                <Label Text="Shift Preference" FontSize="11" TextColor="{StaticResource Staff_Font_Secondary}"/>
+                                <Entry Text="{Binding ShiftPreference, Mode=TwoWay}"
+                                       Placeholder="Day / Evening / Night / Any"
                                        PlaceholderColor="{StaticResource Placeholder_Font_Primary}"
-                                       TextColor="{StaticResource Staff_Font_Primary}" />
+                                       TextColor="{StaticResource Staff_Font_Primary}"
+                                       IsEnabled="{Binding IsEditing}"/>
                             </VerticalStackLayout>
                         </Grid>
 
-                        <Label Text="Compliance" 
-                               FontAttributes="Bold" 
-                               TextColor="{StaticResource Staff_Font_Primary}" />
+                        <!-- ─── COMPLIANCE ────────────────────────────────── -->
+                        <Label Text="COMPLIANCE"
+                               FontSize="10" FontAttributes="Bold" CharacterSpacing="1"
+                               TextColor="{StaticResource Staff_Font_Secondary}"
+                               Margin="0,16,0,0"/>
+                        <BoxView HeightRequest="1" Color="{StaticResource Staff_Card_Border}" Margin="0,4,0,10"/>
 
-                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
-                            <VerticalStackLayout>
-                                <Label Text="First Aid Expiry" TextColor="{StaticResource Staff_Font_Primary}" />
-                                <Entry Text="{Binding FirstAidExpiry, Mode=TwoWay}" 
-                                       Placeholder="YYYY-MM-DD" 
-                                       PlaceholderColor="{StaticResource Placeholder_Font_Primary}"
-                                       TextColor="{StaticResource Staff_Font_Primary}" />
-                            </VerticalStackLayout>
+                        <!-- Row 1: [checkbox] First Aid Certificate  YYYY-MM-DD -->
+                        <HorizontalStackLayout Spacing="0" Margin="0,0,0,8">
+                            <CheckBox IsChecked="{Binding HasFirstAid, Mode=TwoWay}"
+                                      IsEnabled="{Binding IsEditing}"
+                                      VerticalOptions="Center"/>
+                            <Label Text="First Aid Certificate"
+                                   VerticalOptions="Center"
+                                   TextColor="{StaticResource Staff_Font_Primary}" FontSize="13"
+                                   Margin="4,0,10,0"/>
+                            <Entry Text="{Binding FirstAidExpiry, Mode=TwoWay}"
+                                   WidthRequest="140"
+                                   Placeholder="YYYY-MM-DD"
+                                   PlaceholderColor="{StaticResource Placeholder_Font_Primary}"
+                                   TextColor="{StaticResource Staff_Font_Primary}"
+                                   IsEnabled="{Binding CanEditFirstAidExpiry}">
+                                <Entry.Triggers>
+                                    <DataTrigger TargetType="Entry" Binding="{Binding HasFirstAid}" Value="False">
+                                        <Setter Property="Opacity" Value="0.35"/>
+                                    </DataTrigger>
+                                </Entry.Triggers>
+                            </Entry>
+                        </HorizontalStackLayout>
 
-                            <VerticalStackLayout Grid.Column="1">
-                                <Label Text="FoodSafe Certified" TextColor="{StaticResource Staff_Font_Primary}" />
-                                <Switch IsToggled="{Binding FoodSafeCertified, Mode=TwoWay}" />
-                            </VerticalStackLayout>
-                        </Grid>
+                        <!-- Row 2: [checkbox] FoodSafe Certified  YYYY-MM-DD -->
+                        <HorizontalStackLayout Spacing="0" Margin="0,0,0,4">
+                            <CheckBox IsChecked="{Binding FoodSafeCertified, Mode=TwoWay}"
+                                      IsEnabled="{Binding IsEditing}"
+                                      VerticalOptions="Center"/>
+                            <Label Text="FoodSafe Certified"
+                                   VerticalOptions="Center"
+                                   TextColor="{StaticResource Staff_Font_Primary}" FontSize="13"
+                                   Margin="4,0,10,0"/>
+                            <Entry Text="{Binding FoodSafeExpiry, Mode=TwoWay}"
+                                   WidthRequest="140"
+                                   Placeholder="YYYY-MM-DD"
+                                   PlaceholderColor="{StaticResource Placeholder_Font_Primary}"
+                                   TextColor="{StaticResource Staff_Font_Primary}"
+                                   IsEnabled="{Binding CanEditFoodSafeExpiry}">
+                                <Entry.Triggers>
+                                    <DataTrigger TargetType="Entry" Binding="{Binding FoodSafeCertified}" Value="False">
+                                        <Setter Property="Opacity" Value="0.35"/>
+                                    </DataTrigger>
+                                </Entry.Triggers>
+                            </Entry>
+                        </HorizontalStackLayout>
 
-                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,10,0,0">
-                            <Button Text="{Binding ToggleEnabledText}"
-                                    Command="{Binding ToggleEnabledCommand}" />
+                        <!-- ─── ACCOUNT ───────────────────────────────────── -->
+                        <Label Text="ACCOUNT"
+                               FontSize="10" FontAttributes="Bold" CharacterSpacing="1"
+                               TextColor="{StaticResource Staff_Font_Secondary}"
+                               Margin="0,16,0,0"/>
+                        <BoxView HeightRequest="1" Color="{StaticResource Staff_Card_Border}" Margin="0,4,0,10"/>
 
-                            <HorizontalStackLayout Grid.Column="1" Spacing="10">
-                                <Label Text="Enabled" 
-                                       VerticalOptions="Center" 
-                                       TextColor="{StaticResource Staff_Font_Primary}" />
-                                <Switch IsToggled="{Binding IsEnabled, Mode=TwoWay}" />
-                            </HorizontalStackLayout>
-                        </Grid>
+                        <!-- ACTIVE | INACTIVE toggle buttons -->
+                        <HorizontalStackLayout Spacing="0" InputTransparent="{Binding IsNotEditing}">
+                            <HorizontalStackLayout.Triggers>
+                                <DataTrigger TargetType="HorizontalStackLayout" Binding="{Binding IsEditing}" Value="False">
+                                    <Setter Property="Opacity" Value="0.6"/>
+                                </DataTrigger>
+                            </HorizontalStackLayout.Triggers>
+
+                            <!-- ACTIVE: green when active, grey when inactive -->
+                            <Grid ColumnDefinitions="*,*" WidthRequest="175">
+                                <Border Grid.Column="0" HeightRequest="34" Padding="18,0" StrokeThickness="0"
+                                        BackgroundColor="{StaticResource Alert_Success}">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="4,0,4,0"/>
+                                    </Border.StrokeShape>
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsEnabled}" Value="False">
+                                            <Setter Property="BackgroundColor" Value="{StaticResource Button_Cancel}"/>
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Label Text="ACTIVE" FontSize="11" FontAttributes="Bold"
+                                           TextColor="White" VerticalOptions="Center" HorizontalOptions="Center"/>
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding SetActiveCommand}"/>
+                                    </Border.GestureRecognizers>
+                                </Border>
+
+                                <!-- INACTIVE: grey when active, red when inactive -->
+                                <Border Grid.Column="1" HeightRequest="34" Padding="18,0" StrokeThickness="0"
+                                        BackgroundColor="{StaticResource Button_Cancel}">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="0,4,0,4"/>
+                                    </Border.StrokeShape>
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsEnabled}" Value="False">
+                                            <Setter Property="BackgroundColor" Value="{StaticResource Alert_Error}"/>
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Label Text="INACTIVE" FontSize="11" FontAttributes="Bold"
+                                           TextColor="White" VerticalOptions="Center" HorizontalOptions="Center"/>
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding SetInactiveCommand}"/>
+                                    </Border.GestureRecognizers>
+                                </Border>
+                            </Grid>
+                        </HorizontalStackLayout>
 
                     </VerticalStackLayout>
                 </ScrollView>

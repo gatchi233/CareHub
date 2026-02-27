@@ -31,6 +31,10 @@ namespace MedReminder.Services.Remote
         {
             if (item == null) throw new ArgumentNullException(nameof(item));
 
+            // Normalize empty Guid to null to avoid FK violations in API DB.
+            if (item.ResidentId.HasValue && item.ResidentId.Value == Guid.Empty)
+                item.ResidentId = null;
+
             if (item.Id == Guid.Empty)
             {
                 var resp = await _http.PostAsJsonAsync("api/medications", item);

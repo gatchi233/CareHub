@@ -78,7 +78,7 @@ namespace MedReminder.ViewModels
             var report = new ResidentReport
             {
                 ResidentId = resident.Id,
-                ResidentName = resident.FullName,
+                ResidentName = resident.ResidentName,
                 GeneratedAt = DateTime.Now,
                 GeneratedByStaff = generatedBy,
 

@@ -65,8 +65,8 @@ namespace MedReminder.ViewModels
         {
             Residents.Clear();
 
-            // "All Residents" special item (FullName is computed from FirstName + LastName)
-            Residents.Add(new Resident { Id = Guid.Empty, FirstName = "All", LastName = "residents" });
+            // "All Residents" special item (ResidentName is computed from ResidentFName + ResidentLName)
+            Residents.Add(new Resident { Id = Guid.Empty, ResidentFName = "All", ResidentLName = "residents" });
 
             var items = await _residentService.LoadAsync();
             foreach (var r in items)
@@ -95,7 +95,7 @@ namespace MedReminder.ViewModels
                     if (m.ResidentId.HasValue &&
                         residentLookup.TryGetValue(m.ResidentId.Value, out var r))
                     {
-                        m.ResidentName = r.FullName;
+                        m.ResidentName = r.ResidentName;
                     }
                     else
                     {

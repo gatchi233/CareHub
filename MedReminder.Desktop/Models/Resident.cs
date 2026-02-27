@@ -8,42 +8,42 @@ namespace MedReminder.Models
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        string _firstName = string.Empty;
-        string _lastName = string.Empty;
+        string _residentFName = string.Empty;
+        string _residentLName = string.Empty;
 
         public Guid Id { get; set; }
 
-        public string FirstName
+        public string ResidentFName
         {
-            get => _firstName;
+            get => _residentFName;
             set
             {
-                if (_firstName == value) return;
-                _firstName = value ?? string.Empty;
+                if (_residentFName == value) return;
+                _residentFName = value ?? string.Empty;
                 OnPropertyChanged();
-                OnPropertyChanged(nameof(FullName));
+                OnPropertyChanged(nameof(ResidentName));
             }
         }
 
-        public string LastName
+        public string ResidentLName
         {
-            get => _lastName;
+            get => _residentLName;
             set
             {
-                if (_lastName == value) return;
-                _lastName = value ?? string.Empty;
+                if (_residentLName == value) return;
+                _residentLName = value ?? string.Empty;
                 OnPropertyChanged();
-                OnPropertyChanged(nameof(FullName));
+                OnPropertyChanged(nameof(ResidentName));
             }
         }
 
         [JsonIgnore] // avoid writing it into JSON (it’s derived)
-        public string FullName
+        public string ResidentName
         {
             get
             {
-                var fn = (FirstName ?? "").Trim();
-                var ln = (LastName ?? "").Trim();
+                var fn = (ResidentFName ?? "").Trim();
+                var ln = (ResidentLName ?? "").Trim();
                 return string.Join(" ", new[] { fn, ln }.Where(s => !string.IsNullOrWhiteSpace(s)));
             }
         }

@@ -26,10 +26,10 @@
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="4"/>
                     </Border.StrokeShape>
-                    <Grid ColumnDefinitions="32,Auto" Margin="0">
+                    <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
                         <Image Grid.Column="0" Source="icons8_add_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
-                        <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Add}" Padding="10,0" StrokeThickness="0">
-                            <Label Text=" ADD " TextColor="{StaticResource Button_Font_Primary}" FontSize="12" VerticalOptions="Center" FontAttributes="Bold"/>
+                        <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Add}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
+                            <Label Text="ADD" TextColor="{StaticResource Button_Font_Primary}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
                         </Border>
                     </Grid>
                     <Border.GestureRecognizers>
@@ -61,7 +61,7 @@
                             <!-- Left side: Name, Gender, Room info -->
                             <HorizontalStackLayout Spacing="12" VerticalOptions="Center">
                                 <!-- Resident Name -->
-                                <Label Text="{Binding FullName}" FontAttributes="Bold" FontSize="20" TextColor="{StaticResource Resident_Font_Primary}" VerticalOptions="Center"/>
+                                <Label Text="{Binding ResidentName}" FontAttributes="Bold" FontSize="20" TextColor="{StaticResource Resident_Font_Primary}" VerticalOptions="Center"/>
                                 <BoxView WidthRequest="1" HeightRequest="20" Color="{StaticResource Resident_Font_Secondary}" VerticalOptions="Center"/>
 
                                 <!-- Gender -->
@@ -89,10 +89,10 @@
                                     <Border.StrokeShape>
                                         <RoundRectangle CornerRadius="4"/>
                                     </Border.StrokeShape>
-                                    <Grid ColumnDefinitions="32,Auto" Margin="0">
+                                    <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
                                         <Image Grid.Column="0" Source="icons8_view_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
-                                        <Border Grid.Column="1" BackgroundColor="{StaticResource Button_View}" Padding="10,0" StrokeThickness="0">
-                                            <Label Text="VIEW" TextColor="{StaticResource Button_Font_Primary}" FontSize="12" VerticalOptions="Center" FontAttributes="Bold"/>
+                                        <Border Grid.Column="1" BackgroundColor="{StaticResource Button_View}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
+                                            <Label Text="VIEW" TextColor="{StaticResource Button_Font_Primary}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
                                         </Border>
                                     </Grid>
                                     <Border.GestureRecognizers>
@@ -105,10 +105,10 @@
                                     <Border.StrokeShape>
                                         <RoundRectangle CornerRadius="4"/>
                                     </Border.StrokeShape>
-                                    <Grid ColumnDefinitions="32,Auto" Margin="0">
+                                    <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
                                         <Image Grid.Column="0" Source="icons8_edit_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
-                                        <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Edit}" Padding="10,0" StrokeThickness="0">
-                                            <Label Text="EDIT" TextColor="{StaticResource Button_Font_Secondary}" FontSize="12" VerticalOptions="Center" FontAttributes="Bold"/>
+                                        <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Edit}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
+                                            <Label Text="EDIT" TextColor="{StaticResource Button_Font_Secondary}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
                                         </Border>
                                     </Grid>
                                     <Border.GestureRecognizers>
@@ -121,10 +121,10 @@
                                     <Border.StrokeShape>
                                         <RoundRectangle CornerRadius="4"/>
                                     </Border.StrokeShape>
-                                    <Grid ColumnDefinitions="32,Auto" Margin="0">
+                                    <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
                                         <Image Grid.Column="0" Source="icons8_delete_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
-                                        <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Delete}" Padding="10,0" StrokeThickness="0">
-                                            <Label Text="DELETE" TextColor="{StaticResource Button_Font_Primary}" FontSize="12" VerticalOptions="Center" FontAttributes="Bold"/>
+                                        <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Delete}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
+                                            <Label Text="DELETE" TextColor="{StaticResource Button_Font_Primary}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
                                         </Border>
                                     </Grid>
                                     <Border.GestureRecognizers>

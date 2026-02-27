@@ -1,6 +1,6 @@
 [
   {
-    "Id": 1001,
+    "Id": "00000000-0000-0000-0000-000000001001",
     "MedName": "Aproval 150mg",
     "Usage": "Hypertension",
     "StockQuantity": 500,
@@ -9,7 +9,7 @@
     "ExpiryDate": "2026-06-06T00:00:00-07:00"
   },
   {
-    "Id": 1002,
+    "Id": "00000000-0000-0000-0000-000000001002",
     "MedName": "Dilatrend 25mg",
     "Usage": "Heart failure",
     "StockQuantity": 300,
@@ -18,7 +18,7 @@
     "ExpiryDate": "2026-05-20T00:00:00-07:00"
   },
   {
-    "Id": 1003,
+    "Id": "00000000-0000-0000-0000-000000001003",
     "MedName": "Samsca",
     "Usage": "Hyponatremia",
     "StockQuantity": 90,
@@ -27,7 +27,7 @@
     "ExpiryDate": "2026-04-15T00:00:00-07:00"
   },
   {
-    "Id": 1004,
+    "Id": "00000000-0000-0000-0000-000000001004",
     "MedName": "Stilnox 10mg",
     "Usage": "Insomnia",
     "StockQuantity": 200,
@@ -36,7 +36,7 @@
     "ExpiryDate": "2026-08-01T00:00:00-07:00"
   },
   {
-    "Id": 1005,
+    "Id": "00000000-0000-0000-0000-000000001005",
     "MedName": "Metformin 500mg",
     "Usage": "Type 2 Diabetes",
     "StockQuantity": 600,
@@ -45,7 +45,7 @@
     "ExpiryDate": "2026-07-12T00:00:00-07:00"
   },
   {
-    "Id": 1006,
+    "Id": "00000000-0000-0000-0000-000000001006",
     "MedName": "Atorvastatin 20mg",
     "Usage": "High cholesterol",
     "StockQuantity": 500,
@@ -54,7 +54,7 @@
     "ExpiryDate": "2026-09-01T00:00:00-07:00"
   },
   {
-    "Id": 1007,
+    "Id": "00000000-0000-0000-0000-000000001007",
     "MedName": "Amlodipine 5mg",
     "Usage": "Blood pressure",
     "StockQuantity": 450,
@@ -63,16 +63,16 @@
     "ExpiryDate": "2026-03-28T00:00:00-07:00"
   },
   {
-    "Id": 1008,
+    "Id": "00000000-0000-0000-0000-000000001008",
     "MedName": "Lasix 40mg",
     "Usage": "Fluid retention",
     "StockQuantity": 400,
     "ReorderLevel": 150,
     "Unit": "tablet",
-    "ExpiryDate": "2026-11-05T00:00:00-07:00"
+    "ExpiryDate": "2026-11-04T23:00:00-08:00"
   },
   {
-    "Id": 1009,
+    "Id": "00000000-0000-0000-0000-000000001009",
     "MedName": "Levothyroxine 50mcg",
     "Usage": "Hypothyroidism",
     "StockQuantity": 300,
@@ -81,25 +81,25 @@
     "ExpiryDate": "2026-10-10T00:00:00-07:00"
   },
   {
-    "Id": 1010,
+    "Id": "00000000-0000-0000-0000-000000001010",
     "MedName": "Warfarin 5mg",
     "Usage": "Blood thinner",
     "StockQuantity": 400,
     "ReorderLevel": 150,
     "Unit": "tablet",
-    "ExpiryDate": "2026-02-18T00:00:00-07:00"
+    "ExpiryDate": "2026-02-17T23:00:00-08:00"
   },
   {
-    "Id": 1011,
+    "Id": "00000000-0000-0000-0000-000000001011",
     "MedName": "Omeprazole 20mg",
     "Usage": "Acid reflux",
     "StockQuantity": 450,
     "ReorderLevel": 150,
     "Unit": "capsule",
-    "ExpiryDate": "2026-12-01T00:00:00-07:00"
+    "ExpiryDate": "2026-11-30T23:00:00-08:00"
   },
   {
-    "Id": 1012,
+    "Id": "00000000-0000-0000-0000-000000001012",
     "MedName": "Gabapentin 300mg",
     "Usage": "Neuropathic pain",
     "StockQuantity": 350,
@@ -108,7 +108,7 @@
     "ExpiryDate": "2026-06-30T00:00:00-07:00"
   },
   {
-    "Id": 1013,
+    "Id": "00000000-0000-0000-0000-000000001013",
     "MedName": "Lisinopril 10mg",
     "Usage": "Hypertension",
     "StockQuantity": 500,
@@ -117,7 +117,7 @@
     "ExpiryDate": "2026-08-15T00:00:00-07:00"
   },
   {
-    "Id": 1014,
+    "Id": "00000000-0000-0000-0000-000000001014",
     "MedName": "Metoprolol 50mg",
     "Usage": "Blood pressure",
     "StockQuantity": 450,
@@ -126,7 +126,7 @@
     "ExpiryDate": "2026-07-20T00:00:00-07:00"
   },
   {
-    "Id": 1015,
+    "Id": "00000000-0000-0000-0000-000000001015",
     "MedName": "Simvastatin 20mg",
     "Usage": "High cholesterol",
     "StockQuantity": 450,
@@ -135,16 +135,16 @@
     "ExpiryDate": "2026-09-10T00:00:00-07:00"
   },
   {
-    "Id": 1016,
+    "Id": "00000000-0000-0000-0000-000000001016",
     "MedName": "Acetaminophen 500mg",
     "Usage": "Pain and fever",
     "StockQuantity": 800,
     "ReorderLevel": 250,
     "Unit": "tablet",
-    "ExpiryDate": "2026-12-15T00:00:00-07:00"
+    "ExpiryDate": "2026-12-14T23:00:00-08:00"
   },
   {
-    "Id": 1017,
+    "Id": "00000000-0000-0000-0000-000000001017",
     "MedName": "Ibuprofen 200mg",
     "Usage": "Pain and inflammation",
     "StockQuantity": 400,
@@ -153,16 +153,16 @@
     "ExpiryDate": "2026-10-20T00:00:00-07:00"
   },
   {
-    "Id": 1018,
+    "Id": "00000000-0000-0000-0000-000000001018",
     "MedName": "Donepezil 5mg",
     "Usage": "Alzheimer's disease",
     "StockQuantity": 250,
     "ReorderLevel": 90,
     "Unit": "tablet",
-    "ExpiryDate": "2026-11-30T00:00:00-07:00"
+    "ExpiryDate": "2026-11-29T23:00:00-08:00"
   },
   {
-    "Id": 1019,
+    "Id": "00000000-0000-0000-0000-000000001019",
     "MedName": "Eliquis 5mg",
     "Usage": "Blood thinner",
     "StockQuantity": 400,
@@ -171,16 +171,16 @@
     "ExpiryDate": "2026-08-25T00:00:00-07:00"
   },
   {
-    "Id": 1020,
+    "Id": "00000000-0000-0000-0000-000000001020",
     "MedName": "Aspirin 81mg",
     "Usage": "Blood thinner",
     "StockQuantity": 600,
     "ReorderLevel": 200,
     "Unit": "tablet",
-    "ExpiryDate": "2027-01-15T00:00:00-07:00"
+    "ExpiryDate": "2027-01-14T23:00:00-08:00"
   },
   {
-    "Id": 1021,
+    "Id": "00000000-0000-0000-0000-000000001021",
     "MedName": "Benadryl 25mg",
     "Usage": "Allergies",
     "StockQuantity": 200,
@@ -189,7 +189,7 @@
     "ExpiryDate": "2026-09-30T00:00:00-07:00"
   },
   {
-    "Id": 1022,
+    "Id": "00000000-0000-0000-0000-000000001022",
     "MedName": "Sudafed 30mg",
     "Usage": "Nasal congestion",
     "StockQuantity": 150,
@@ -198,7 +198,7 @@
     "ExpiryDate": "2026-07-15T00:00:00-07:00"
   },
   {
-    "Id": 1023,
+    "Id": "00000000-0000-0000-0000-000000001023",
     "MedName": "Naproxen 250mg",
     "Usage": "Pain and inflammation",
     "StockQuantity": 300,
@@ -207,7 +207,7 @@
     "ExpiryDate": "2026-10-05T00:00:00-07:00"
   },
   {
-    "Id": 1024,
+    "Id": "00000000-0000-0000-0000-000000001024",
     "MedName": "Dextromethorphan 15mg",
     "Usage": "Cough suppressant",
     "StockQuantity": 150,
@@ -216,7 +216,7 @@
     "ExpiryDate": "2026-06-20T00:00:00-07:00"
   },
   {
-    "Id": 1025,
+    "Id": "00000000-0000-0000-0000-000000001025",
     "MedName": "Guaifenesin 400mg",
     "Usage": "Expectorant",
     "StockQuantity": 200,
@@ -225,7 +225,7 @@
     "ExpiryDate": "2026-08-10T00:00:00-07:00"
   },
   {
-    "Id": 1026,
+    "Id": "00000000-0000-0000-0000-000000001026",
     "MedName": "Oseltamivir 75mg",
     "Usage": "Antiviral",
     "StockQuantity": 100,
@@ -234,25 +234,25 @@
     "ExpiryDate": "2026-05-30T00:00:00-07:00"
   },
   {
-    "Id": 1027,
+    "Id": "00000000-0000-0000-0000-000000001027",
     "MedName": "Saline Nasal Spray",
     "Usage": "Nasal care",
     "StockQuantity": 50,
     "ReorderLevel": 20,
     "Unit": "bottle",
-    "ExpiryDate": "2027-03-01T00:00:00-07:00"
+    "ExpiryDate": "2027-02-28T23:00:00-08:00"
   },
   {
-    "Id": 1028,
+    "Id": "00000000-0000-0000-0000-000000001028",
     "MedName": "Hydrocortisone Cream 1%",
     "Usage": "Anti-inflammatory",
     "StockQuantity": 40,
     "ReorderLevel": 15,
     "Unit": "tube",
-    "ExpiryDate": "2026-11-15T00:00:00-07:00"
+    "ExpiryDate": "2026-11-14T23:00:00-08:00"
   },
   {
-    "Id": 1029,
+    "Id": "00000000-0000-0000-0000-000000001029",
     "MedName": "Betamethasone Cream 0.1%",
     "Usage": "Anti-inflammatory",
     "StockQuantity": 30,
@@ -261,7 +261,7 @@
     "ExpiryDate": "2026-09-20T00:00:00-07:00"
   },
   {
-    "Id": 1030,
+    "Id": "00000000-0000-0000-0000-000000001030",
     "MedName": "Triamcinolone Cream 0.1%",
     "Usage": "Anti-inflammatory",
     "StockQuantity": 30,
@@ -270,25 +270,25 @@
     "ExpiryDate": "2026-10-25T00:00:00-07:00"
   },
   {
-    "Id": 1031,
+    "Id": "00000000-0000-0000-0000-000000001031",
     "MedName": "Clotrimazole Cream 1%",
     "Usage": "Antifungal",
     "StockQuantity": 35,
     "ReorderLevel": 15,
     "Unit": "tube",
-    "ExpiryDate": "2026-12-10T00:00:00-07:00"
+    "ExpiryDate": "2026-12-09T23:00:00-08:00"
   },
   {
-    "Id": 1032,
+    "Id": "00000000-0000-0000-0000-000000001032",
     "MedName": "Terbinafine Cream 1%",
     "Usage": "Antifungal",
     "StockQuantity": 30,
     "ReorderLevel": 12,
     "Unit": "tube",
-    "ExpiryDate": "2026-11-20T00:00:00-07:00"
+    "ExpiryDate": "2026-11-19T23:00:00-08:00"
   },
   {
-    "Id": 1033,
+    "Id": "00000000-0000-0000-0000-000000001033",
     "MedName": "Bacitracin Ointment",
     "Usage": "Antibiotic",
     "StockQuantity": 45,
@@ -297,7 +297,7 @@
     "ExpiryDate": "2026-08-30T00:00:00-07:00"
   },
   {
-    "Id": 1034,
+    "Id": "00000000-0000-0000-0000-000000001034",
     "MedName": "Polysporin Ointment",
     "Usage": "Antibiotic",
     "StockQuantity": 45,
@@ -306,25 +306,25 @@
     "ExpiryDate": "2026-09-15T00:00:00-07:00"
   },
   {
-    "Id": 1035,
+    "Id": "00000000-0000-0000-0000-000000001035",
     "MedName": "Zinc Oxide Cream",
     "Usage": "Barrier cream",
     "StockQuantity": 50,
     "ReorderLevel": 20,
     "Unit": "tube",
-    "ExpiryDate": "2027-02-15T00:00:00-07:00"
+    "ExpiryDate": "2027-02-14T23:00:00-08:00"
   },
   {
-    "Id": 1036,
+    "Id": "00000000-0000-0000-0000-000000001036",
     "MedName": "Aquaphor Healing Ointment",
     "Usage": "Barrier cream",
     "StockQuantity": 50,
     "ReorderLevel": 20,
     "Unit": "tube",
-    "ExpiryDate": "2027-01-20T00:00:00-07:00"
+    "ExpiryDate": "2027-01-19T23:00:00-08:00"
   },
   {
-    "Id": 1037,
+    "Id": "00000000-0000-0000-0000-000000001037",
     "MedName": "Calamine Lotion",
     "Usage": "Anti-itch",
     "StockQuantity": 35,
@@ -333,34 +333,34 @@
     "ExpiryDate": "2026-10-30T00:00:00-07:00"
   },
   {
-    "Id": 1038,
+    "Id": "00000000-0000-0000-0000-000000001038",
     "MedName": "Miralax Powder",
     "Usage": "Laxative",
     "StockQuantity": 40,
     "ReorderLevel": 15,
     "Unit": "bottle",
-    "ExpiryDate": "2026-12-20T00:00:00-07:00"
+    "ExpiryDate": "2026-12-19T23:00:00-08:00"
   },
   {
-    "Id": 1039,
+    "Id": "00000000-0000-0000-0000-000000001039",
     "MedName": "Docusate Sodium 100mg",
     "Usage": "Stool softener",
     "StockQuantity": 400,
     "ReorderLevel": 150,
     "Unit": "capsule",
-    "ExpiryDate": "2026-11-10T00:00:00-07:00"
+    "ExpiryDate": "2026-11-09T23:00:00-08:00"
   },
   {
-    "Id": 1040,
+    "Id": "00000000-0000-0000-0000-000000001040",
     "MedName": "Tums 500mg",
     "Usage": "Antacid",
     "StockQuantity": 500,
     "ReorderLevel": 150,
     "Unit": "tablet",
-    "ExpiryDate": "2027-02-28T00:00:00-07:00"
+    "ExpiryDate": "2027-02-27T23:00:00-08:00"
   },
   {
-    "Id": 1041,
+    "Id": "00000000-0000-0000-0000-000000001041",
     "MedName": "Vitamin D3 1000IU",
     "Usage": "Vitamin supplement",
     "StockQuantity": 700,
@@ -369,7 +369,7 @@
     "ExpiryDate": "2027-06-15T00:00:00-07:00"
   },
   {
-    "Id": 1042,
+    "Id": "00000000-0000-0000-0000-000000001042",
     "MedName": "Calcium Carbonate 600mg",
     "Usage": "Mineral supplement",
     "StockQuantity": 700,
@@ -378,7 +378,7 @@
     "ExpiryDate": "2027-05-20T00:00:00-07:00"
   },
   {
-    "Id": 1043,
+    "Id": "00000000-0000-0000-0000-000000001043",
     "MedName": "Sertraline 50mg",
     "Usage": "Antidepressant",
     "StockQuantity": 300,
@@ -387,7 +387,7 @@
     "ExpiryDate": "2026-09-25T00:00:00-07:00"
   },
   {
-    "Id": 1044,
+    "Id": "00000000-0000-0000-0000-000000001044",
     "MedName": "Artificial Tears (Systane)",
     "Usage": "Dry eyes",
     "StockQuantity": 60,
@@ -396,7 +396,7 @@
     "ExpiryDate": "2026-08-15T00:00:00-07:00"
   },
   {
-    "Id": 1045,
+    "Id": "00000000-0000-0000-0000-000000001045",
     "MedName": "Refresh Optive Eye Drops",
     "Usage": "Dry eyes",
     "StockQuantity": 50,
@@ -405,7 +405,7 @@
     "ExpiryDate": "2026-09-20T00:00:00-07:00"
   },
   {
-    "Id": 1046,
+    "Id": "00000000-0000-0000-0000-000000001046",
     "MedName": "Prednisolone Eye Drops 1%",
     "Usage": "Eye inflammation",
     "StockQuantity": 25,
@@ -414,7 +414,7 @@
     "ExpiryDate": "2026-06-10T00:00:00-07:00"
   },
   {
-    "Id": 1047,
+    "Id": "00000000-0000-0000-0000-000000001047",
     "MedName": "Latanoprost Eye Drops 0.005%",
     "Usage": "Glaucoma",
     "StockQuantity": 40,
@@ -423,7 +423,7 @@
     "ExpiryDate": "2026-07-25T00:00:00-07:00"
   },
   {
-    "Id": 1048,
+    "Id": "00000000-0000-0000-0000-000000001048",
     "MedName": "Timolol Eye Drops 0.5%",
     "Usage": "Glaucoma",
     "StockQuantity": 35,
@@ -432,7 +432,7 @@
     "ExpiryDate": "2026-08-30T00:00:00-07:00"
   },
   {
-    "Id": 1049,
+    "Id": "00000000-0000-0000-0000-000000001049",
     "MedName": "Amoxicillin 500mg",
     "Usage": "Antibiotic",
     "StockQuantity": 300,
@@ -441,7 +441,7 @@
     "ExpiryDate": "2026-05-15T00:00:00-07:00"
   },
   {
-    "Id": 1050,
+    "Id": "00000000-0000-0000-0000-000000001050",
     "MedName": "Azithromycin 250mg",
     "Usage": "Antibiotic",
     "StockQuantity": 200,
@@ -450,7 +450,7 @@
     "ExpiryDate": "2026-07-20T00:00:00-07:00"
   },
   {
-    "Id": 1051,
+    "Id": "00000000-0000-0000-0000-000000001051",
     "MedName": "Ciprofloxacin 500mg",
     "Usage": "Antibiotic",
     "StockQuantity": 200,
@@ -459,7 +459,7 @@
     "ExpiryDate": "2026-09-10T00:00:00-07:00"
   },
   {
-    "Id": 1052,
+    "Id": "00000000-0000-0000-0000-000000001052",
     "MedName": "Cephalexin 500mg",
     "Usage": "Antibiotic",
     "StockQuantity": 250,
@@ -468,7 +468,7 @@
     "ExpiryDate": "2026-06-25T00:00:00-07:00"
   },
   {
-    "Id": 1053,
+    "Id": "00000000-0000-0000-0000-000000001053",
     "MedName": "Metronidazole 500mg",
     "Usage": "Antibiotic",
     "StockQuantity": 150,
@@ -477,25 +477,25 @@
     "ExpiryDate": "2026-08-05T00:00:00-07:00"
   },
   {
-    "Id": 1054,
+    "Id": "00000000-0000-0000-0000-000000001054",
     "MedName": "Probiotic (Culturelle)",
     "Usage": "Digestive health",
     "StockQuantity": 300,
     "ReorderLevel": 100,
     "Unit": "capsule",
-    "ExpiryDate": "2026-12-30T00:00:00-07:00"
+    "ExpiryDate": "2026-12-29T23:00:00-08:00"
   },
   {
-    "Id": 1055,
+    "Id": "00000000-0000-0000-0000-000000001055",
     "MedName": "Probiotic (Florastor)",
     "Usage": "Digestive health",
     "StockQuantity": 250,
     "ReorderLevel": 90,
     "Unit": "capsule",
-    "ExpiryDate": "2027-01-15T00:00:00-07:00"
+    "ExpiryDate": "2027-01-14T23:00:00-08:00"
   },
   {
-    "Id": 1056,
+    "Id": "00000000-0000-0000-0000-000000001056",
     "MedName": "Cough Drops (Halls Menthol)",
     "Usage": "Sore throat",
     "StockQuantity": 400,
@@ -504,25 +504,25 @@
     "ExpiryDate": "2027-03-20T00:00:00-07:00"
   },
   {
-    "Id": 1057,
+    "Id": "00000000-0000-0000-0000-000000001057",
     "MedName": "Cough Drops (Ricola Honey)",
     "Usage": "Sore throat",
     "StockQuantity": 350,
     "ReorderLevel": 120,
     "Unit": "lozenge",
-    "ExpiryDate": "2027-02-28T00:00:00-07:00"
+    "ExpiryDate": "2027-02-27T23:00:00-08:00"
   },
   {
-    "Id": 1058,
+    "Id": "00000000-0000-0000-0000-000000001058",
     "MedName": "Chloraseptic Spray",
     "Usage": "Sore throat",
     "StockQuantity": 40,
     "ReorderLevel": 15,
     "Unit": "bottle",
-    "ExpiryDate": "2026-11-10T00:00:00-07:00"
+    "ExpiryDate": "2026-11-09T23:00:00-08:00"
   },
   {
-    "Id": 1059,
+    "Id": "00000000-0000-0000-0000-000000001059",
     "MedName": "Ferrous Sulfate 325mg",
     "Usage": "Iron supplement",
     "StockQuantity": 300,
@@ -531,7 +531,7 @@
     "ExpiryDate": "2027-04-15T00:00:00-07:00"
   },
   {
-    "Id": 1060,
+    "Id": "00000000-0000-0000-0000-000000001060",
     "MedName": "Vitamin B12 1000mcg",
     "Usage": "Vitamin supplement",
     "StockQuantity": 400,

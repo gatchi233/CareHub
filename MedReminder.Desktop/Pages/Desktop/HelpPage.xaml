@@ -6,230 +6,256 @@
     xmlns:pages="clr-namespace:MedReminder.Pages"
     Title="Help"
     BackgroundColor="{StaticResource Medication_Main_Background}">
+    <pages:AuthPage.ToolbarItems>
+        <ToolbarItem Text="Logout" Clicked="OnLogoutClicked" Priority="1" Order="Primary" />
+    </pages:AuthPage.ToolbarItems>
 
-    <ScrollView>
-        <VerticalStackLayout Padding="16" Spacing="14">
+    <Grid Padding="16" RowDefinitions="Auto,*" RowSpacing="12">
 
-            <Label Text="How to use MedReminder Pro (DATS CareHub)"
-                   FontSize="22"
-                   FontAttributes="Bold"
-                   TextColor="#222" />
-
-            <Label Text="Quick guide for each page. Use this tab anytime you’re unsure what to do next."
-                   FontSize="13"
-                   TextColor="#555" />
-
-            <!-- HOME -->
-            <Border Padding="14" BackgroundColor="White">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="12"/>
-                </Border.StrokeShape>
-                <Border.Stroke>
-                    <SolidColorBrush Color="#78290F"/>
-                </Border.Stroke>
-
-                <VerticalStackLayout Spacing="8">
-                    <Label Text="Home"
-                           FontSize="16"
-                           FontAttributes="Bold"
-                           TextColor="#78290F" />
-
-                    <Label Text="Purpose"
-                           FontAttributes="Bold"
-                           FontSize="13"
-                           TextColor="#333" />
-                    <Label Text="Search meds by resident, or by day/time, and mark meds as completed."
-                           FontSize="13"
-                           TextColor="#444" />
-
-                    <Label Text="How to use"
-                           FontAttributes="Bold"
-                           FontSize="13"
-                           TextColor="#333" />
-                    <Label Text="• Search by resident name → shows that resident’s meds.
-• Search by day &amp; time → shows meds scheduled at that time (with resident names).
-• Use both filters → shows that resident’s meds at that time.
-• Tap Completed after giving the medication."
-                           FontSize="13"
-                           TextColor="#444" />
-                </VerticalStackLayout>
-            </Border>
-
-            <!-- FLOOR PLAN -->
-            <Border Padding="14" BackgroundColor="White">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="12"/>
-                </Border.StrokeShape>
-                <Border.Stroke>
-                    <SolidColorBrush Color="#78290F"/>
-                </Border.Stroke>
-
-                <VerticalStackLayout Spacing="8">
-                    <Label Text="Floor Plan"
-                           FontSize="16"
-                           FontAttributes="Bold"
-                           TextColor="#78290F" />
-
-                    <Label Text="Purpose"
-                           FontAttributes="Bold"
-                           FontSize="13"
-                           TextColor="#333" />
-                    <Label Text="Visual layout of rooms. Tap a room to quickly see who lives there and open resident details."
-                           FontSize="13"
-                           TextColor="#444" />
-
-                    <Label Text="How to use"
-                           FontAttributes="Bold"
-                           FontSize="13"
-                           TextColor="#333" />
-                    <Label Text="• Click a room tile → shows resident summary on the side.
-• Click the resident card/name → opens the resident detail page.
-• Use the floor sections (1/F, 2/F) if your design supports both floors."
-                           FontSize="13"
-                           TextColor="#444" />
-                </VerticalStackLayout>
-            </Border>
-
-            <!-- RESIDENTS -->
-            <Border Padding="14" BackgroundColor="White">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="12"/>
-                </Border.StrokeShape>
-                <Border.Stroke>
-                    <SolidColorBrush Color="#78290F"/>
-                </Border.Stroke>
-
-                <VerticalStackLayout Spacing="8">
-                    <Label Text="Residents"
-                           FontSize="16"
-                           FontAttributes="Bold"
-                           TextColor="#78290F" />
-
-                    <Label Text="Purpose"
-                           FontAttributes="Bold"
-                           FontSize="13"
-                           TextColor="#333" />
-                    <Label Text="Manage resident profiles: add, edit, view details, and open reports/medications."
-                           FontSize="13"
-                           TextColor="#444" />
-
-                    <Label Text="How to use"
-                           FontAttributes="Bold"
-                           FontSize="13"
-                           TextColor="#333" />
-                    <Label Text="• Search by name to find residents quickly.
-• Add Resident to create a new profile.
-• Open a resident to view details, medications, observations, and report."
-                           FontSize="13"
-                           TextColor="#444" />
-                </VerticalStackLayout>
-            </Border>
-
-            <!-- INVENTORY -->
-            <Border Padding="14" BackgroundColor="White">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="12"/>
-                </Border.StrokeShape>
-                <Border.Stroke>
-                    <SolidColorBrush Color="#78290F"/>
-                </Border.Stroke>
-
-                <VerticalStackLayout Spacing="8">
-                    <Label Text="Inventory"
-                           FontSize="16"
-                           FontAttributes="Bold"
-                           TextColor="#78290F" />
-
-                    <Label Text="Purpose"
-                           FontAttributes="Bold"
-                           FontSize="13"
-                           TextColor="#333" />
-                    <Label Text="Track medication stock, reorder levels, and create orders when quantity is low."
-                           FontSize="13"
-                           TextColor="#444" />
-
-                    <Label Text="How to use"
-                           FontAttributes="Bold"
-                           FontSize="13"
-                           TextColor="#333" />
-                    <Label Text="• Review Qty / Reorder level.
-• Use Direct Order to create a purchase order.
-• Open Orders page to review pending/received orders (if available in your app flow)."
-                           FontSize="13"
-                           TextColor="#444" />
-                </VerticalStackLayout>
-            </Border>
-
-            <!-- STAFF -->
-            <Border Padding="14" BackgroundColor="White">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="12"/>
-                </Border.StrokeShape>
-                <Border.Stroke>
-                    <SolidColorBrush Color="#78290F"/>
-                </Border.Stroke>
-
-                <VerticalStackLayout Spacing="8">
-                    <Label Text="Staff"
-                           FontSize="16"
-                           FontAttributes="Bold"
-                           TextColor="#78290F" />
-
-                    <Label Text="Purpose"
-                           FontAttributes="Bold"
-                           FontSize="13"
-                           TextColor="#333" />
-                    <Label Text="Manage staff accounts (add/edit/enable/disable) for demo/admin use."
-                           FontSize="13"
-                           TextColor="#444" />
-
-                    <Label Text="How to use"
-                           FontAttributes="Bold"
-                           FontSize="13"
-                           TextColor="#333" />
-                    <Label Text="• Add a staff account for new users.
-• Edit staff info if needed.
-• Disable an account to prevent login (for demo)."
-                           FontSize="13"
-                           TextColor="#444" />
-                </VerticalStackLayout>
-            </Border>
-
-            <!-- OPTIONAL: ORDERS (even if not a tab) -->
-            <Border Padding="14" BackgroundColor="White">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="12"/>
-                </Border.StrokeShape>
-                <Border.Stroke>
-                    <SolidColorBrush Color="#78290F"/>
-                </Border.Stroke>
-
-                <VerticalStackLayout Spacing="8">
-                    <Label Text="Orders"
-                           FontSize="16"
-                           FontAttributes="Bold"
-                           TextColor="#78290F" />
-
-                    <Label Text="Purpose"
-                           FontAttributes="Bold"
-                           FontSize="13"
-                           TextColor="#333" />
-                    <Label Text="Review created orders, update status, and mark deliveries received."
-                           FontSize="13"
-                           TextColor="#444" />
-
-                    <Label Text="How to use"
-                           FontAttributes="Bold"
-                           FontSize="13"
-                           TextColor="#333" />
-                    <Label Text="• Refresh to reload latest orders.
-• Create a new order (or from Inventory direct order).
-• Approve/Receive/Void depending on your workflow."
-                           FontSize="13"
-                           TextColor="#444" />
-                </VerticalStackLayout>
-            </Border>
-
+        <!-- ── Page header ─────────────────────────────────────────────────── -->
+        <VerticalStackLayout Spacing="2">
+            <Label Text="HELP &amp; QUICK REFERENCE"
+                   FontSize="11" FontAttributes="Bold" CharacterSpacing="1.5"
+                   TextColor="{StaticResource Medication_Font_Secondary}"/>
+            <Label Text="DATS CareHub — Staff User Guide"
+                   FontSize="15" FontAttributes="Bold"
+                   TextColor="{StaticResource Medication_Font_Primary}"/>
         </VerticalStackLayout>
-    </ScrollView>
+
+        <!-- ── Main content card ───────────────────────────────────────────── -->
+        <Border Grid.Row="1"
+                Padding="16,14"
+                BackgroundColor="{StaticResource Medication_Card_Background}"
+                Stroke="{StaticResource Medication_Card_Border}"
+                StrokeThickness="1">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="12"/>
+            </Border.StrokeShape>
+
+            <ScrollView>
+                <VerticalStackLayout Spacing="0">
+
+                    <!-- ─── HOME ─────────────────────────────────────────── -->
+                    <Label Text="HOME"
+                           FontSize="10" FontAttributes="Bold" CharacterSpacing="1"
+                           TextColor="{StaticResource Medication_Font_Secondary}"/>
+                    <BoxView HeightRequest="1" Color="{StaticResource Medication_Card_Border}" Margin="0,4,0,10"/>
+
+                    <Label Text="Medication administration dispatch view for daily shift work."
+                           FontSize="13" TextColor="{StaticResource Medication_Font_Primary}"
+                           Margin="0,0,0,8"/>
+
+                    <Grid ColumnDefinitions="12,*" ColumnSpacing="8" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="5" Margin="0,0,0,4">
+                        <Label Grid.Row="0" Grid.Column="0" Text="•" FontSize="13" TextColor="{StaticResource Medication_Font_Secondary}" VerticalOptions="Start"/>
+                        <Label Grid.Row="0" Grid.Column="1" FontSize="13" TextColor="{StaticResource Medication_Font_Primary}">
+                            <Label.FormattedText><FormattedString>
+                                <Span Text="Filter by resident name " FontAttributes="Bold"/>
+                                <Span Text="to display that resident's full scheduled medication list."/>
+                            </FormattedString></Label.FormattedText>
+                        </Label>
+                        <Label Grid.Row="1" Grid.Column="0" Text="•" FontSize="13" TextColor="{StaticResource Medication_Font_Secondary}" VerticalOptions="Start"/>
+                        <Label Grid.Row="1" Grid.Column="1" FontSize="13" TextColor="{StaticResource Medication_Font_Primary}">
+                            <Label.FormattedText><FormattedString>
+                                <Span Text="Filter by day and time " FontAttributes="Bold"/>
+                                <Span Text="to see all medications due at a specific slot across all residents."/>
+                            </FormattedString></Label.FormattedText>
+                        </Label>
+                        <Label Grid.Row="2" Grid.Column="0" Text="•" FontSize="13" TextColor="{StaticResource Medication_Font_Secondary}" VerticalOptions="Start"/>
+                        <Label Grid.Row="2" Grid.Column="1" Text="Combine both filters for a precise resident-and-time lookup." FontSize="13" TextColor="{StaticResource Medication_Font_Primary}"/>
+                        <Label Grid.Row="3" Grid.Column="0" Text="•" FontSize="13" TextColor="{StaticResource Medication_Font_Secondary}" VerticalOptions="Start"/>
+                        <Label Grid.Row="3" Grid.Column="1" FontSize="13" TextColor="{StaticResource Medication_Font_Primary}">
+                            <Label.FormattedText><FormattedString>
+                                <Span Text="Tap COMPLETED " FontAttributes="Bold"/>
+                                <Span Text="after administering a dose to record it for the shift log."/>
+                            </FormattedString></Label.FormattedText>
+                        </Label>
+                    </Grid>
+
+                    <!-- ─── FLOOR PLAN ───────────────────────────────────── -->
+                    <Label Text="FLOOR PLAN"
+                           FontSize="10" FontAttributes="Bold" CharacterSpacing="1"
+                           TextColor="{StaticResource Medication_Font_Secondary}"
+                           Margin="0,20,0,0"/>
+                    <BoxView HeightRequest="1" Color="{StaticResource Medication_Card_Border}" Margin="0,4,0,10"/>
+
+                    <Label Text="Visual room-by-room layout of the facility for fast resident lookup."
+                           FontSize="13" TextColor="{StaticResource Medication_Font_Primary}"
+                           Margin="0,0,0,8"/>
+
+                    <Grid ColumnDefinitions="12,*" ColumnSpacing="8" RowDefinitions="Auto,Auto,Auto" RowSpacing="5" Margin="0,0,0,4">
+                        <Label Grid.Row="0" Grid.Column="0" Text="•" FontSize="13" TextColor="{StaticResource Medication_Font_Secondary}" VerticalOptions="Start"/>
+                        <Label Grid.Row="0" Grid.Column="1" FontSize="13" TextColor="{StaticResource Medication_Font_Primary}">
+                            <Label.FormattedText><FormattedString>
+                                <Span Text="Click a room tile " FontAttributes="Bold"/>
+                                <Span Text="to display the resident summary in the side panel."/>
+                            </FormattedString></Label.FormattedText>
+                        </Label>
+                        <Label Grid.Row="1" Grid.Column="0" Text="•" FontSize="13" TextColor="{StaticResource Medication_Font_Secondary}" VerticalOptions="Start"/>
+                        <Label Grid.Row="1" Grid.Column="1" FontSize="13" TextColor="{StaticResource Medication_Font_Primary}">
+                            <Label.FormattedText><FormattedString>
+                                <Span Text="Click the resident name " FontAttributes="Bold"/>
+                                <Span Text="in the panel to open the full resident profile."/>
+                            </FormattedString></Label.FormattedText>
+                        </Label>
+                        <Label Grid.Row="2" Grid.Column="0" Text="•" FontSize="13" TextColor="{StaticResource Medication_Font_Secondary}" VerticalOptions="Start"/>
+                        <Label Grid.Row="2" Grid.Column="1" Text="Switch between floors using the floor selector if multiple floors are configured." FontSize="13" TextColor="{StaticResource Medication_Font_Primary}"/>
+                    </Grid>
+
+                    <!-- ─── RESIDENTS ────────────────────────────────────── -->
+                    <Label Text="RESIDENTS"
+                           FontSize="10" FontAttributes="Bold" CharacterSpacing="1"
+                           TextColor="{StaticResource Medication_Font_Secondary}"
+                           Margin="0,20,0,0"/>
+                    <BoxView HeightRequest="1" Color="{StaticResource Medication_Card_Border}" Margin="0,4,0,10"/>
+
+                    <Label Text="Central registry for all resident profiles, records, and clinical data."
+                           FontSize="13" TextColor="{StaticResource Medication_Font_Primary}"
+                           Margin="0,0,0,8"/>
+
+                    <Grid ColumnDefinitions="12,*" ColumnSpacing="8" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="5" Margin="0,0,0,4">
+                        <Label Grid.Row="0" Grid.Column="0" Text="•" FontSize="13" TextColor="{StaticResource Medication_Font_Secondary}" VerticalOptions="Start"/>
+                        <Label Grid.Row="0" Grid.Column="1" FontSize="13" TextColor="{StaticResource Medication_Font_Primary}">
+                            <Label.FormattedText><FormattedString>
+                                <Span Text="Use the search bar " FontAttributes="Bold"/>
+                                <Span Text="to quickly locate a resident by name."/>
+                            </FormattedString></Label.FormattedText>
+                        </Label>
+                        <Label Grid.Row="1" Grid.Column="0" Text="•" FontSize="13" TextColor="{StaticResource Medication_Font_Secondary}" VerticalOptions="Start"/>
+                        <Label Grid.Row="1" Grid.Column="1" FontSize="13" TextColor="{StaticResource Medication_Font_Primary}">
+                            <Label.FormattedText><FormattedString>
+                                <Span Text="Click NEW " FontAttributes="Bold"/>
+                                <Span Text="to create and register a new resident profile."/>
+                            </FormattedString></Label.FormattedText>
+                        </Label>
+                        <Label Grid.Row="2" Grid.Column="0" Text="•" FontSize="13" TextColor="{StaticResource Medication_Font_Secondary}" VerticalOptions="Start"/>
+                        <Label Grid.Row="2" Grid.Column="1" FontSize="13" TextColor="{StaticResource Medication_Font_Primary}">
+                            <Label.FormattedText><FormattedString>
+                                <Span Text="Open a resident record " FontAttributes="Bold"/>
+                                <Span Text="to view or edit personal details, room assignment, and allergies."/>
+                            </FormattedString></Label.FormattedText>
+                        </Label>
+                        <Label Grid.Row="3" Grid.Column="0" Text="•" FontSize="13" TextColor="{StaticResource Medication_Font_Secondary}" VerticalOptions="Start"/>
+                        <Label Grid.Row="3" Grid.Column="1" Text="From the resident profile, navigate to Medications, Observations, or generate a PDF Report." FontSize="13" TextColor="{StaticResource Medication_Font_Primary}"/>
+                    </Grid>
+
+                    <!-- ─── MEDICATIONS ──────────────────────────────────── -->
+                    <Label Text="MEDICATIONS"
+                           FontSize="10" FontAttributes="Bold" CharacterSpacing="1"
+                           TextColor="{StaticResource Medication_Font_Secondary}"
+                           Margin="0,20,0,0"/>
+                    <BoxView HeightRequest="1" Color="{StaticResource Medication_Card_Border}" Margin="0,4,0,10"/>
+
+                    <Label Text="Per-resident medication records defining drug, dosage, condition, and daily reminder schedule."
+                           FontSize="13" TextColor="{StaticResource Medication_Font_Primary}"
+                           Margin="0,0,0,8"/>
+
+                    <Grid ColumnDefinitions="12,*" ColumnSpacing="8" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="5" Margin="0,0,0,4">
+                        <Label Grid.Row="0" Grid.Column="0" Text="•" FontSize="13" TextColor="{StaticResource Medication_Font_Secondary}" VerticalOptions="Start"/>
+                        <Label Grid.Row="0" Grid.Column="1" FontSize="13" TextColor="{StaticResource Medication_Font_Primary}">
+                            <Label.FormattedText><FormattedString>
+                                <Span Text="Click ADD MEDICATION " FontAttributes="Bold"/>
+                                <Span Text="from the resident's medication list to create a new entry."/>
+                            </FormattedString></Label.FormattedText>
+                        </Label>
+                        <Label Grid.Row="1" Grid.Column="0" Text="•" FontSize="13" TextColor="{StaticResource Medication_Font_Secondary}" VerticalOptions="Start"/>
+                        <Label Grid.Row="1" Grid.Column="1" Text="Tick the day checkboxes to activate that day, then set HH / MM reminder times using the pickers." FontSize="13" TextColor="{StaticResource Medication_Font_Primary}"/>
+                        <Label Grid.Row="2" Grid.Column="0" Text="•" FontSize="13" TextColor="{StaticResource Medication_Font_Secondary}" VerticalOptions="Start"/>
+                        <Label Grid.Row="2" Grid.Column="1" FontSize="13" TextColor="{StaticResource Medication_Font_Primary}">
+                            <Label.FormattedText><FormattedString>
+                                <Span Text="Select 1, 2, or 3 times per day " FontAttributes="Bold"/>
+                                <Span Text="using the frequency radio buttons to enable the corresponding time columns."/>
+                            </FormattedString></Label.FormattedText>
+                        </Label>
+                        <Label Grid.Row="3" Grid.Column="0" Text="•" FontSize="13" TextColor="{StaticResource Medication_Font_Secondary}" VerticalOptions="Start"/>
+                        <Label Grid.Row="3" Grid.Column="1" FontSize="13" TextColor="{StaticResource Medication_Font_Primary}">
+                            <Label.FormattedText><FormattedString>
+                                <Span Text="Click SAVE " FontAttributes="Bold"/>
+                                <Span Text="to persist changes, or DELETE to permanently remove the medication record."/>
+                            </FormattedString></Label.FormattedText>
+                        </Label>
+                    </Grid>
+
+                    <!-- ─── INVENTORY ────────────────────────────────────── -->
+                    <Label Text="INVENTORY"
+                           FontSize="10" FontAttributes="Bold" CharacterSpacing="1"
+                           TextColor="{StaticResource Medication_Font_Secondary}"
+                           Margin="0,20,0,0"/>
+                    <BoxView HeightRequest="1" Color="{StaticResource Medication_Card_Border}" Margin="0,4,0,10"/>
+
+                    <Label Text="Facility-wide medication stock monitor with reorder tracking and purchase order management."
+                           FontSize="13" TextColor="{StaticResource Medication_Font_Primary}"
+                           Margin="0,0,0,8"/>
+
+                    <Grid ColumnDefinitions="12,*" ColumnSpacing="8" RowDefinitions="Auto,Auto,Auto" RowSpacing="5" Margin="0,0,0,4">
+                        <Label Grid.Row="0" Grid.Column="0" Text="•" FontSize="13" TextColor="{StaticResource Medication_Font_Secondary}" VerticalOptions="Start"/>
+                        <Label Grid.Row="0" Grid.Column="1" FontSize="13" TextColor="{StaticResource Medication_Font_Primary}">
+                            <Label.FormattedText><FormattedString>
+                                <Span Text="Review Quantity and Reorder Level " FontAttributes="Bold"/>
+                                <Span Text="for each item to identify low-stock medications."/>
+                            </FormattedString></Label.FormattedText>
+                        </Label>
+                        <Label Grid.Row="1" Grid.Column="0" Text="•" FontSize="13" TextColor="{StaticResource Medication_Font_Secondary}" VerticalOptions="Start"/>
+                        <Label Grid.Row="1" Grid.Column="1" FontSize="13" TextColor="{StaticResource Medication_Font_Primary}">
+                            <Label.FormattedText><FormattedString>
+                                <Span Text="Use DIRECT ORDER " FontAttributes="Bold"/>
+                                <Span Text="to raise an immediate purchase order for a specific medication."/>
+                            </FormattedString></Label.FormattedText>
+                        </Label>
+                        <Label Grid.Row="2" Grid.Column="0" Text="•" FontSize="13" TextColor="{StaticResource Medication_Font_Secondary}" VerticalOptions="Start"/>
+                        <Label Grid.Row="2" Grid.Column="1" Text="Navigate to the Orders view to approve, receive, or void pending purchase orders." FontSize="13" TextColor="{StaticResource Medication_Font_Primary}"/>
+                    </Grid>
+
+                    <!-- ─── STAFF ─────────────────────────────────────────── -->
+                    <Label Text="STAFF"
+                           FontSize="10" FontAttributes="Bold" CharacterSpacing="1"
+                           TextColor="{StaticResource Medication_Font_Secondary}"
+                           Margin="0,20,0,0"/>
+                    <BoxView HeightRequest="1" Color="{StaticResource Medication_Card_Border}" Margin="0,4,0,10"/>
+
+                    <Label Text="Staff account and employment record management. Admin access required for most actions."
+                           FontSize="13" TextColor="{StaticResource Medication_Font_Primary}"
+                           Margin="0,0,0,8"/>
+
+                    <Grid ColumnDefinitions="12,*" ColumnSpacing="8" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="5" Margin="0,0,0,4">
+                        <Label Grid.Row="0" Grid.Column="0" Text="•" FontSize="13" TextColor="{StaticResource Medication_Font_Secondary}" VerticalOptions="Start"/>
+                        <Label Grid.Row="0" Grid.Column="1" FontSize="13" TextColor="{StaticResource Medication_Font_Primary}">
+                            <Label.FormattedText><FormattedString>
+                                <Span Text="Click NEW " FontAttributes="Bold"/>
+                                <Span Text="to create a staff record and provision a login account."/>
+                            </FormattedString></Label.FormattedText>
+                        </Label>
+                        <Label Grid.Row="1" Grid.Column="0" Text="•" FontSize="13" TextColor="{StaticResource Medication_Font_Secondary}" VerticalOptions="Start"/>
+                        <Label Grid.Row="1" Grid.Column="1" FontSize="13" TextColor="{StaticResource Medication_Font_Primary}">
+                            <Label.FormattedText><FormattedString>
+                                <Span Text="Select a record then click EDIT " FontAttributes="Bold"/>
+                                <Span Text="to update employment details, role, or compliance information."/>
+                            </FormattedString></Label.FormattedText>
+                        </Label>
+                        <Label Grid.Row="2" Grid.Column="0" Text="•" FontSize="13" TextColor="{StaticResource Medication_Font_Secondary}" VerticalOptions="Start"/>
+                        <Label Grid.Row="2" Grid.Column="1" FontSize="13" TextColor="{StaticResource Medication_Font_Primary}">
+                            <Label.FormattedText><FormattedString>
+                                <Span Text="Use ACTIVE / INACTIVE " FontAttributes="Bold"/>
+                                <Span Text="to enable or disable a staff member's system access."/>
+                            </FormattedString></Label.FormattedText>
+                        </Label>
+                        <Label Grid.Row="3" Grid.Column="0" Text="•" FontSize="13" TextColor="{StaticResource Medication_Font_Secondary}" VerticalOptions="Start"/>
+                        <Label Grid.Row="3" Grid.Column="1" Text="Keep First Aid and FoodSafe certification expiry dates current to maintain compliance records." FontSize="13" TextColor="{StaticResource Medication_Font_Primary}"/>
+                    </Grid>
+
+                    <!-- ─── SUPPORT ───────────────────────────────────────── -->
+                    <Label Text="SUPPORT"
+                           FontSize="10" FontAttributes="Bold" CharacterSpacing="1"
+                           TextColor="{StaticResource Medication_Font_Secondary}"
+                           Margin="0,20,0,0"/>
+                    <BoxView HeightRequest="1" Color="{StaticResource Medication_Card_Border}" Margin="0,4,0,10"/>
+
+                    <Label Text="For technical assistance or to report an issue, contact your facility administrator or the system support team. Ensure you have your employee ID and a description of the issue ready when reaching out."
+                           FontSize="13" TextColor="{StaticResource Medication_Font_Primary}"
+                           Margin="0,0,0,4"/>
+
+                </VerticalStackLayout>
+            </ScrollView>
+        </Border>
+
+    </Grid>
 </pages:AuthPage>
