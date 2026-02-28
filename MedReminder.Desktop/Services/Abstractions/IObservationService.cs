@@ -15,5 +15,6 @@ namespace MedReminder.Services.Abstractions
         Task<int> SyncAsync();
         Task UpsertAsync(Observation item);
         Task DeleteAsync(Observation item);
+        Task ReplaceAllAsync(List<Observation> items);
     }
 }

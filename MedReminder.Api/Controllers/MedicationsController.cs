@@ -44,9 +44,10 @@ public sealed class MedicationsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Medication>> Create([FromBody] Medication med, CancellationToken ct)
     {
-        // Ensure new Guid if client sends empty
         if (med.Id == Guid.Empty)
             med.Id = Guid.NewGuid();
+
+        NormalizeExpiryDate(med);
 
         _db.Medications.Add(med);
         await _db.SaveChangesAsync(ct);
@@ -54,20 +55,34 @@ public sealed class MedicationsController : ControllerBase
         return Ok(med);
     }
 
-    // PUT api/medications/{id}
+    // PUT api/medications/{id}  — upsert (create if not found)
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(Guid id, [FromBody] Medication med, CancellationToken ct)
     {
         if (id != med.Id)
             return BadRequest("Route id does not match med.Id");
 
+        NormalizeExpiryDate(med);
+
         var exists = await _db.Medications.AnyAsync(m => m.Id == id, ct);
-        if (!exists) return NotFound();
+        if (exists)
+        {
+            _db.Entry(med).State = EntityState.Modified;
+        }
+        else
+        {
+            _db.Medications.Add(med);
+        }
 
-        _db.Entry(med).State = EntityState.Modified;
         await _db.SaveChangesAsync(ct);
-
         return NoContent();
+    }
+
+    // Npgsql requires UTC offset for timestamp with time zone columns
+    private static void NormalizeExpiryDate(Medication med)
+    {
+        if (med.ExpiryDate.Offset != TimeSpan.Zero)
+            med.ExpiryDate = med.ExpiryDate.ToUniversalTime();
     }
 
     // DELETE api/medications/{id}

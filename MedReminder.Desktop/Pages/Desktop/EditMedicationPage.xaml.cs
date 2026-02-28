@@ -1,6 +1,11 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using CommunityToolkit.Maui.Views;
 using Microsoft.Maui.Controls;
 using MedReminder.Models;
+using MedReminder.Pages.UI.Popups;
+using MedReminder.Services.Abstractions;
 using MedReminder.ViewModels;
 
 namespace MedReminder.Pages.Desktop
@@ -10,9 +15,30 @@ namespace MedReminder.Pages.Desktop
     [QueryProperty(nameof(ResidentName), "residentName")]
     [QueryProperty(nameof(ReturnTo), "returnTo")]
 
-    public partial class EditMedicationPage : ContentPage
+    public partial class EditMedicationPage : ContentPage, Pages.IUnsavedChangesPage
     {
         private readonly MedicationViewModel _vm;
+        private readonly IMedicationService _medService;
+        private bool _isDirty;
+
+        public bool HasUnsavedChanges => _isDirty;
+
+        public async Task SaveAsync()
+        {
+            if (string.IsNullOrWhiteSpace(WorkingCopy.MedName))
+                return;
+
+            if (WorkingCopy.ExpiryDate == default)
+                WorkingCopy.ExpiryDate = new DateTimeOffset(DateTime.UtcNow.Date.AddMonths(6), TimeSpan.Zero);
+
+            if (Radio1Time.IsChecked) WorkingCopy.TimesPerDay = 1;
+            else if (Radio2Times.IsChecked) WorkingCopy.TimesPerDay = 2;
+            else WorkingCopy.TimesPerDay = 3;
+
+            SaveTimePickersToModel();
+            await _vm.SaveDataAsync(WorkingCopy);
+            _isDirty = false;
+        }
 
         public Medication? Item { get; set; }
         public Guid ResidentId { get; set; }
@@ -25,10 +51,14 @@ namespace MedReminder.Pages.Desktop
         private Label[] _time2Labels = null!;
         private Label[] _time3Labels = null!;
 
-        public EditMedicationPage(MedicationViewModel vm)
+        private List<Medication> _inventoryMeds = new();
+        private bool _suppressSuggestion;
+
+        public EditMedicationPage(MedicationViewModel vm, IMedicationService medService)
         {
             InitializeComponent();
             _vm = vm;
+            _medService = medService;
         }
 
         protected override void OnAppearing()
@@ -40,6 +70,17 @@ namespace MedReminder.Pages.Desktop
             _time3Pickers = new[] { SunHH3, SunMM3, MonHH3, MonMM3, TueHH3, TueMM3, WedHH3, WedMM3, ThuHH3, ThuMM3, FriHH3, FriMM3, SatHH3, SatMM3 };
             _time2Labels = new[] { LblHH2, LblMM2 };
             _time3Labels = new[] { LblHH3, LblMM3 };
+
+            // Wire up schedule time changed for Mon–Sat (Sun is wired in XAML)
+            foreach (var p in new[] { MonHH1, MonMM1, TueHH1, TueMM1, WedHH1, WedMM1,
+                                      ThuHH1, ThuMM1, FriHH1, FriMM1, SatHH1, SatMM1,
+                                      MonHH2, MonMM2, TueHH2, TueMM2, WedHH2, WedMM2,
+                                      ThuHH2, ThuMM2, FriHH2, FriMM2, SatHH2, SatMM2,
+                                      MonHH3, MonMM3, TueHH3, TueMM3, WedHH3, WedMM3,
+                                      ThuHH3, ThuMM3, FriHH3, FriMM3, SatHH3, SatMM3 })
+            {
+                p.SelectedIndexChanged += OnScheduleTimeChanged;
+            }
 
             if (string.IsNullOrWhiteSpace(ResidentName))
                 ResidentHeaderLabel.Text = "Medication for";
@@ -103,10 +144,193 @@ namespace MedReminder.Pages.Desktop
 
             BindingContext = WorkingCopy;
 
-            InitialiseConditionControls();
             InitialiseUnitPicker();
             LoadTimePickersFromModel();
             InitialiseTimeFrequency();
+            _ = LoadInventoryNamesAsync();
+
+            // Track dirty state — any user edit marks the form as changed
+            _isDirty = false;
+            MedNameEntry.TextChanged += (_, _) => { if (!_suppressSuggestion) _isDirty = true; };
+            UpdateIndicationBadges();
+            UnitPicker.SelectedIndexChanged += (_, _) => { _isDirty = true; UpdateQtyForUnit(); };
+            UpdateQtyForUnit();
+        }
+
+        private void UpdateQtyForUnit()
+        {
+            var unit = UnitPicker.SelectedItem as string;
+            bool isThinLayer = string.Equals(unit, "thin layer", StringComparison.OrdinalIgnoreCase);
+
+            QtyEntry.IsEnabled = !isThinLayer;
+
+            if (isThinLayer)
+            {
+                WorkingCopy.Quantity = 0;
+                QtyEntry.Text = "0";
+                QtyEntry.Opacity = 0.4;
+            }
+            else
+            {
+                QtyEntry.Opacity = 1.0;
+            }
+        }
+
+        private async Task LoadInventoryNamesAsync()
+        {
+            try
+            {
+                var all = await _medService.LoadAsync();
+                _inventoryMeds = all
+                    .Where(m => (m.ResidentId == null || m.ResidentId == Guid.Empty)
+                                && !string.IsNullOrWhiteSpace(m.MedName))
+                    .GroupBy(m => m.MedName, StringComparer.OrdinalIgnoreCase)
+                    .Select(g => g.First())
+                    .OrderBy(m => m.MedName)
+                    .ToList();
+            }
+            catch
+            {
+                _inventoryMeds = new List<Medication>();
+            }
+        }
+
+        private void OnMedNameTextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (_suppressSuggestion)
+                return;
+
+            var text = (e.NewTextValue ?? "").Trim();
+            if (text.Length < 1)
+            {
+                SuggestionList.IsVisible = false;
+                SuggestionList.ItemsSource = null;
+                return;
+            }
+
+            var matches = _inventoryMeds
+                .Where(m => m.MedName.Contains(text, StringComparison.OrdinalIgnoreCase))
+                .Take(8)
+                .ToList();
+
+            if (matches.Count == 0 || (matches.Count == 1 && string.Equals(matches[0].MedName, text, StringComparison.OrdinalIgnoreCase)))
+            {
+                SuggestionList.IsVisible = false;
+                SuggestionList.ItemsSource = null;
+                return;
+            }
+
+            SuggestionList.ItemsSource = matches;
+            SuggestionList.IsVisible = true;
+        }
+
+        private void OnSuggestionSelected(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.CurrentSelection.FirstOrDefault() is Medication selected)
+            {
+                _suppressSuggestion = true;
+
+                WorkingCopy.MedName = selected.MedName;
+                MedNameEntry.Text = selected.MedName;
+
+                // Auto-fill unit type from inventory
+                if (!string.IsNullOrWhiteSpace(selected.QuantityUnit))
+                {
+                    WorkingCopy.QuantityUnit = selected.QuantityUnit;
+                    InitialiseUnitPicker();
+                }
+
+                // Auto-fill indication from inventory
+                if (!string.IsNullOrWhiteSpace(selected.Usage))
+                {
+                    WorkingCopy.Usage = selected.Usage;
+                }
+
+                UpdateIndicationBadges();
+
+                SuggestionList.IsVisible = false;
+                SuggestionList.ItemsSource = null;
+                SuggestionList.SelectedItem = null;
+                _suppressSuggestion = false;
+            }
+        }
+
+        private void OnMedNameCompleted(object sender, EventArgs e)
+        {
+            if (SuggestionList.IsVisible && SuggestionList.ItemsSource is IList<Medication> items && items.Count > 0)
+            {
+                var first = items[0];
+                _suppressSuggestion = true;
+
+                WorkingCopy.MedName = first.MedName;
+                MedNameEntry.Text = first.MedName;
+
+                if (!string.IsNullOrWhiteSpace(first.QuantityUnit))
+                {
+                    WorkingCopy.QuantityUnit = first.QuantityUnit;
+                    InitialiseUnitPicker();
+                }
+
+                if (!string.IsNullOrWhiteSpace(first.Usage))
+                {
+                    WorkingCopy.Usage = first.Usage;
+                }
+
+                UpdateIndicationBadges();
+
+                SuggestionList.IsVisible = false;
+                SuggestionList.ItemsSource = null;
+                SuggestionList.SelectedItem = null;
+                _suppressSuggestion = false;
+            }
+        }
+
+        private void UpdateIndicationBadges()
+        {
+            IndicationBadges.Children.Clear();
+
+            var usage = WorkingCopy?.Usage;
+            if (string.IsNullOrWhiteSpace(usage))
+            {
+                IndicationSection.IsVisible = false;
+                return;
+            }
+
+            var tokens = usage.Split(new[] { '&', ',', '/' }, StringSplitOptions.RemoveEmptyEntries)
+                              .Select(t => t.Trim())
+                              .Where(t => t.Length > 0)
+                              .ToList();
+
+            if (tokens.Count == 0)
+            {
+                IndicationSection.IsVisible = false;
+                return;
+            }
+
+            foreach (var token in tokens)
+            {
+                var label = new Label
+                {
+                    Text = token,
+                    TextColor = Colors.White,
+                    FontSize = 11,
+                    FontAttributes = FontAttributes.Bold
+                };
+
+                var badge = new Border
+                {
+                    BackgroundColor = Color.FromArgb("#A5A58D"),
+                    Padding = new Thickness(8, 4),
+                    Margin = new Thickness(0, 0, 6, 6),
+                    StrokeThickness = 0,
+                    StrokeShape = new Microsoft.Maui.Controls.Shapes.RoundRectangle { CornerRadius = 10 },
+                    Content = label
+                };
+
+                IndicationBadges.Children.Add(badge);
+            }
+
+            IndicationSection.IsVisible = true;
         }
 
         private void InitialiseTimeFrequency()
@@ -136,17 +360,22 @@ namespace MedReminder.Pages.Desktop
 
         private void UpdateTimePickersEnabled(int times)
         {
+            var enabledColor = Color.FromArgb("#6B6B5D");
+            var disabledColor = Colors.LightGray;
+
             bool enable2 = times >= 2;
             foreach (var picker in _time2Pickers)
                 picker.IsEnabled = enable2;
             foreach (var label in _time2Labels)
-                label.TextColor = enable2 ? Colors.Black : Colors.LightGray;
+                label.TextColor = enable2 ? enabledColor : disabledColor;
+            LblTime2.TextColor = enable2 ? Color.FromArgb("#3D3D35") : disabledColor;
 
             bool enable3 = times >= 3;
             foreach (var picker in _time3Pickers)
                 picker.IsEnabled = enable3;
             foreach (var label in _time3Labels)
-                label.TextColor = enable3 ? Colors.Black : Colors.LightGray;
+                label.TextColor = enable3 ? enabledColor : disabledColor;
+            LblTime3.TextColor = enable3 ? Color.FromArgb("#3D3D35") : disabledColor;
         }
 
         private void LoadTimePickersFromModel()
@@ -227,42 +456,6 @@ namespace MedReminder.Pages.Desktop
             WorkingCopy.SatTime3 = GetTimeFromPicker(SatHH3, SatMM3);
         }
 
-        private void InitialiseConditionControls()
-        {
-            var usage = WorkingCopy.Usage;
-
-            if (string.IsNullOrWhiteSpace(usage))
-            {
-                ConditionPicker.SelectedIndex = 0;
-                ConditionOtherEntry.Text = string.Empty;
-                ConditionOtherEntry.IsEnabled = false;
-                return;
-            }
-
-            var idx = -1;
-            for (int i = 1; i < ConditionPicker.Items.Count - 1; i++)
-            {
-                if (string.Equals(ConditionPicker.Items[i], usage, StringComparison.OrdinalIgnoreCase))
-                {
-                    idx = i;
-                    break;
-                }
-            }
-
-            if (idx > 0)
-            {
-                ConditionPicker.SelectedIndex = idx;
-                ConditionOtherEntry.Text = string.Empty;
-                ConditionOtherEntry.IsEnabled = false;
-            }
-            else
-            {
-                ConditionPicker.SelectedIndex = ConditionPicker.Items.Count - 1;
-                ConditionOtherEntry.Text = usage;
-                ConditionOtherEntry.IsEnabled = true;
-            }
-        }
-
         private void InitialiseUnitPicker()
         {
             var unit = WorkingCopy.QuantityUnit;
@@ -285,28 +478,55 @@ namespace MedReminder.Pages.Desktop
             UnitPicker.SelectedIndex = idx >= 0 ? idx : 0;
         }
 
-        private void OnConditionPickerChanged(object sender, EventArgs e)
+        private bool _propagating;
+
+        private void OnScheduleTimeChanged(object sender, EventArgs e)
         {
-            if (ConditionPicker.SelectedIndex < 0)
+            if (_propagating || WorkingCopy == null)
                 return;
 
-            var selected = ConditionPicker.Items[ConditionPicker.SelectedIndex];
+            // Build ordered list of day rows: Sun, Mon, Tue, Wed, Thu, Fri, Sat
+            var dayRows = new[]
+            {
+                (Active: WorkingCopy.ReminderSun, HH1: SunHH1, MM1: SunMM1, HH2: SunHH2, MM2: SunMM2, HH3: SunHH3, MM3: SunMM3),
+                (Active: WorkingCopy.ReminderMon, HH1: MonHH1, MM1: MonMM1, HH2: MonHH2, MM2: MonMM2, HH3: MonHH3, MM3: MonMM3),
+                (Active: WorkingCopy.ReminderTue, HH1: TueHH1, MM1: TueMM1, HH2: TueHH2, MM2: TueMM2, HH3: TueHH3, MM3: TueMM3),
+                (Active: WorkingCopy.ReminderWed, HH1: WedHH1, MM1: WedMM1, HH2: WedHH2, MM2: WedMM2, HH3: WedHH3, MM3: WedMM3),
+                (Active: WorkingCopy.ReminderThu, HH1: ThuHH1, MM1: ThuMM1, HH2: ThuHH2, MM2: ThuMM2, HH3: ThuHH3, MM3: ThuMM3),
+                (Active: WorkingCopy.ReminderFri, HH1: FriHH1, MM1: FriMM1, HH2: FriHH2, MM2: FriMM2, HH3: FriHH3, MM3: FriMM3),
+                (Active: WorkingCopy.ReminderSat, HH1: SatHH1, MM1: SatMM1, HH2: SatHH2, MM2: SatMM2, HH3: SatHH3, MM3: SatMM3),
+            };
 
-            if (selected == "Select condition")
+            // Find the first active day row
+            var firstActive = dayRows.FirstOrDefault(d => d.Active);
+            if (firstActive.HH1 == null)
+                return;
+
+            // Only propagate if the changed picker belongs to the first active row
+            var changedPicker = sender as Picker;
+            var firstPickers = new Picker[] { firstActive.HH1, firstActive.MM1, firstActive.HH2, firstActive.MM2, firstActive.HH3, firstActive.MM3 };
+            if (changedPicker == null || !firstPickers.Contains(changedPicker))
+                return;
+
+            _propagating = true;
+            try
             {
-                ConditionOtherEntry.Text = string.Empty;
-                ConditionOtherEntry.IsEnabled = false;
-                WorkingCopy.Usage = null;
+                foreach (var row in dayRows)
+                {
+                    if (!row.Active || row.HH1 == firstActive.HH1)
+                        continue;
+
+                    row.HH1.SelectedIndex = firstActive.HH1.SelectedIndex;
+                    row.MM1.SelectedIndex = firstActive.MM1.SelectedIndex;
+                    row.HH2.SelectedIndex = firstActive.HH2.SelectedIndex;
+                    row.MM2.SelectedIndex = firstActive.MM2.SelectedIndex;
+                    row.HH3.SelectedIndex = firstActive.HH3.SelectedIndex;
+                    row.MM3.SelectedIndex = firstActive.MM3.SelectedIndex;
+                }
             }
-            else if (selected == "Other")
+            finally
             {
-                ConditionOtherEntry.IsEnabled = true;
-            }
-            else
-            {
-                ConditionOtherEntry.Text = string.Empty;
-                ConditionOtherEntry.IsEnabled = false;
-                WorkingCopy.Usage = selected;
+                _propagating = false;
             }
         }
 
@@ -318,22 +538,13 @@ namespace MedReminder.Pages.Desktop
                 return;
             }
 
-            if (ConditionPicker.SelectedIndex >= 0)
-            {
-                var selected = ConditionPicker.Items[ConditionPicker.SelectedIndex];
+            var selectedUnit = UnitPicker.SelectedItem as string;
+            bool isThinLayer = string.Equals(selectedUnit, "thin layer", StringComparison.OrdinalIgnoreCase);
 
-                if (selected == "Other")
-                {
-                    WorkingCopy.Usage = ConditionOtherEntry.Text;
-                }
-                else if (selected == "Select condition")
-                {
-                    WorkingCopy.Usage = ConditionOtherEntry.Text;
-                }
-                else
-                {
-                    WorkingCopy.Usage = selected;
-                }
+            if (!isThinLayer && WorkingCopy.Quantity < 1)
+            {
+                await DisplayAlert("Invalid quantity", "Qty per dose must be at least 1.", "OK");
+                return;
             }
 
             if (WorkingCopy.ExpiryDate == default)
@@ -345,7 +556,66 @@ namespace MedReminder.Pages.Desktop
 
             SaveTimePickersToModel();
 
-            await _vm.SaveAsync(WorkingCopy);
+            var saved = await _vm.SaveDataAsync(WorkingCopy);
+            if (!saved) return;
+            _isDirty = false;
+
+            // Check if this medication exists in inventory
+            var medName = WorkingCopy.MedName?.Trim();
+            if (!string.IsNullOrWhiteSpace(medName))
+            {
+                var inInventory = _inventoryMeds.Any(m =>
+                    string.Equals(m.MedName, medName, StringComparison.OrdinalIgnoreCase));
+
+                if (!inInventory)
+                {
+                    bool addToInventory = await DisplayAlert(
+                        "New Medication",
+                        $"\"{medName}\" is not in inventory. Would you like to add it?",
+                        "Yes", "No");
+
+                    if (addToInventory)
+                    {
+                        var popup = new ActionPopup();
+                        popup.ConfigureNewMedOrder("ADD TO INVENTORY", medName);
+
+                        var result = await this.ShowPopupAsync(popup) as ActionPopup.PopupResult;
+                        if (result?.Field1 != null)
+                        {
+                            var unit = result.Field2;
+                            var indication = result.Field3;
+                            int qty = 0;
+                            if (!string.IsNullOrWhiteSpace(result.Field4))
+                                int.TryParse(result.Field4, out qty);
+                            int reorderLevel = 0;
+                            if (!string.IsNullOrWhiteSpace(result.Field5))
+                                int.TryParse(result.Field5, out reorderLevel);
+
+                            var inventoryItem = new Medication
+                            {
+                                ResidentId = null,
+                                MedName = result.Field1.Trim(),
+                                StockQuantity = qty,
+                                ReorderLevel = reorderLevel,
+                                QuantityUnit = unit ?? "",
+                                Usage = indication
+                            };
+
+                            try
+                            {
+                                await _medService.UpsertAsync(inventoryItem);
+                            }
+                            catch
+                            {
+                                // Queued offline
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Navigate back after save + inventory check
+            await Shell.Current.GoToAsync("..");
         }
 
         private async void OnCancel(object sender, TappedEventArgs e)
@@ -391,12 +661,6 @@ namespace MedReminder.Pages.Desktop
             {
                 await Shell.Current.GoToAsync($"//{nameof(HomePage)}");
             }
-        }
-
-        private async void OnLogoutClicked(object sender, EventArgs e)
-        {
-            if (Shell.Current is AppShell shell)
-                await shell.LogoutAsync();
         }
 
     }

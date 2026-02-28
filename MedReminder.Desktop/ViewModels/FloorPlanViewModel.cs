@@ -56,7 +56,15 @@ namespace MedReminder.ViewModels
             SelectedResidents.Clear();
             SelectedRoom = null;
 
-            var residents = await _residentService.LoadAsync();
+            List<Resident> residents;
+            try
+            {
+                residents = await _residentService.LoadAsync();
+            }
+            catch
+            {
+                residents = new List<Resident>();
+            }
 
             // 12 rooms per floor
             var roomNumbers = Floor == 1
@@ -121,8 +129,12 @@ namespace MedReminder.ViewModels
 
         public bool IsOccupied => Residents.Count > 0;
         public string KindShort => IsDouble ? "D" : "S";
+        public string KindIcon => IsDouble ? "icons8_two_100.png" : "icons8_one_100.png";
         public string OccupancyText => IsOccupied
-            ? string.Join(", ", Residents.Select(r => r.ResidentName))
+            ? string.Join(", ", Residents.Select(r =>
+                string.IsNullOrWhiteSpace(r.BedLabel) || r.BedLabel == "None"
+                    ? r.ResidentName
+                    : $"{r.BedLabel} - {r.ResidentName}"))
             : "Empty";
 
         private bool _isSelected;
@@ -157,9 +169,11 @@ namespace MedReminder.ViewModels
         public ResidentPreview(Resident r)
         {
             Id = r.Id;
-            Name = r.ResidentName;
+            Name = string.IsNullOrWhiteSpace(r.BedLabel) || r.BedLabel == "None"
+                ? r.ResidentName
+                : $"{r.BedLabel} - {r.ResidentName}";
             Gender = string.IsNullOrWhiteSpace(r.Gender) ? "Unknown" : r.Gender;
-            AgeText = $"Age: {CalculateAge(r.DOB)}";
+            AgeText = $"Age: {CalculateAge(r.DateOfBirth)}";
         }
 
         private static string CalculateAge(string dob)

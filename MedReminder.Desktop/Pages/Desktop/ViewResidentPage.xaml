@@ -9,10 +9,6 @@
     Title="Resident"
     BackgroundColor="{StaticResource Resident_Main_Background}">
 
-    <pages:AuthPage.ToolbarItems>
-        <ToolbarItem Text="Logout" Clicked="OnLogoutClicked" Priority="1" Order="Primary" />
-    </pages:AuthPage.ToolbarItems>
-
     <!--
         Layout: Row 0 = action buttons (always visible, never scrolled).
                 Row 1 = single outer ScrollView that contains two cards.
@@ -109,6 +105,12 @@
                     <Border.StrokeShape><RoundRectangle CornerRadius="12"/></Border.StrokeShape>
 
                     <VerticalStackLayout Spacing="0">
+
+                        <Label Text="RESIDENT DETAILS"
+                               FontSize="11" FontAttributes="Bold" CharacterSpacing="1.5"
+                               TextColor="{StaticResource Resident_Font_Secondary}"
+                               Margin="0,0,0,4"/>
+                        <BoxView HeightRequest="1" Color="{StaticResource Resident_Card_Border}" Margin="0,0,0,12"/>
 
                         <!-- Card header: name + room -->
                         <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,4">
@@ -238,9 +240,9 @@
                                Margin="0,16,0,0"/>
                         <BoxView HeightRequest="1" Color="{StaticResource Resident_Card_Border}" Margin="0,4,0,6"/>
 
-                        <Label x:Name="AllergySummaryLabel" FontSize="13"
-                               TextColor="{StaticResource Resident_Font_Primary}"
-                               Margin="0,0,0,4"/>
+                        <FlexLayout x:Name="AllergyBadgesLayout" Wrap="Wrap"
+                                    Direction="Row" AlignItems="Start"
+                                    Margin="0,0,0,4"/>
 
                     </VerticalStackLayout>
                 </Border>
@@ -286,7 +288,18 @@
                                         <VerticalStackLayout Spacing="2">
                                             <Label Text="{Binding MedName}" FontAttributes="Bold"
                                                    TextColor="{StaticResource Medication_Font_Primary}"/>
-                                            <Label Text="{Binding Dosage}" FontSize="12"
+                                            <Label FontSize="12"
+                                                   TextColor="{StaticResource Medication_Font_Secondary}">
+                                                <Label.FormattedText>
+                                                    <FormattedString>
+                                                        <Span Text="Qty: " />
+                                                        <Span Text="{Binding Quantity}" />
+                                                        <Span Text=" " />
+                                                        <Span Text="{Binding QuantityUnit}" />
+                                                    </FormattedString>
+                                                </Label.FormattedText>
+                                            </Label>
+                                            <Label Text="{Binding Usage, StringFormat='For: {0}'}" FontSize="12"
                                                    TextColor="{StaticResource Medication_Font_Secondary}"/>
                                             <Label Text="{Binding ScheduleSummary}" FontSize="12"
                                                    TextColor="{StaticResource Medication_Font_Secondary}"/>

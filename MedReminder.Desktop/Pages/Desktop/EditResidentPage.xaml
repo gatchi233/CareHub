@@ -8,10 +8,6 @@
     Title="Resident"
     BackgroundColor="{StaticResource Resident_Main_Background}">
 
-    <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Logout" Clicked="OnLogoutClicked" Priority="0" Order="Primary" />
-    </ContentPage.ToolbarItems>
-
     <Grid Padding="16" RowDefinitions="Auto,*" RowSpacing="12">
 
         <!-- ── Top action bar ─────────────────────────────────────────────── -->
@@ -20,10 +16,10 @@
             <!-- SAVE -->
             <Border StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
                 <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
-                <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
-                    <Image Grid.Column="0" Source="icons8_save_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
+                <Grid ColumnDefinitions="32,Auto" Margin="0">
+                    <Image Grid.Column="0" Source="icons8_save_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center" InputTransparent="True"/>
                     <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Save}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
-                        <Label Text="SAVE" TextColor="{StaticResource Button_Font_Primary}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
+                        <Label Text="SAVE" TextColor="{StaticResource Button_Font_Primary}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold" InputTransparent="True"/>
                     </Border>
                 </Grid>
                 <Border.GestureRecognizers>
@@ -31,13 +27,27 @@
                 </Border.GestureRecognizers>
             </Border>
 
+            <!-- DELETE (hidden for new residents) -->
+            <Border x:Name="DeleteAction" StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}" IsVisible="False">
+                <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
+                    <Image Grid.Column="0" Source="icons8_delete_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Delete}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
+                        <Label Text="DELETE" TextColor="{StaticResource Button_Font_Primary}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
+                    </Border>
+                </Grid>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnDeleteClicked"/>
+                </Border.GestureRecognizers>
+            </Border>
+
             <!-- CLOSE -->
             <Border StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
                 <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
-                <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
-                    <Image Grid.Column="0" Source="icons8_close_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
+                <Grid ColumnDefinitions="32,Auto" Margin="0">
+                    <Image Grid.Column="0" Source="icons8_close_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center" InputTransparent="True"/>
                     <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Close}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
-                        <Label Text="CLOSE" TextColor="{StaticResource Button_Font_Primary}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
+                        <Label Text="CLOSE" TextColor="{StaticResource Button_Font_Primary}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold" InputTransparent="True"/>
                     </Border>
                 </Grid>
                 <Border.GestureRecognizers>
@@ -101,7 +111,7 @@
                         </VerticalStackLayout>
                         <VerticalStackLayout Grid.Column="1" Spacing="4">
                             <Label Text="Date of Birth *" FontSize="11" TextColor="{StaticResource Resident_Font_Secondary}"/>
-                            <Entry Text="{Binding DOB}" Placeholder="YYYY-MM-DD"
+                            <Entry Text="{Binding DateOfBirth}" Placeholder="YYYY-MM-DD"
                                    PlaceholderColor="{StaticResource Placeholder_Font_Primary}"
                                    TextColor="{StaticResource Resident_Font_Primary}">
                                 <Entry.Behaviors>
@@ -314,154 +324,154 @@
                         <!-- Row 0 -->
                         <HorizontalStackLayout Grid.Row="0" Grid.Column="0" Spacing="0">
                             <CheckBox x:Name="NoneCheck" IsChecked="{Binding AllergyNone}"
-                                      CheckedChanged="OnNoneCheckedChanged" Margin="0,0,-80,0"/>
+                                      CheckedChanged="OnNoneCheckedChanged" Margin="0,0,-10,0"/>
                             <Label Text="No Known Allergy" VerticalTextAlignment="Center"
-                                   TextColor="{StaticResource Resident_Font_Primary}"/>
+                                   TextColor="{StaticResource Resident_Font_Primary}" Margin="-70,0,0,0"/>
                         </HorizontalStackLayout>
 
                         <HorizontalStackLayout Grid.Row="0" Grid.Column="1" Spacing="0">
                             <CheckBox IsChecked="{Binding AllergyPeanuts}"
-                                      CheckedChanged="OnSpecificAllergyCheckedChanged" Margin="0,0,-80,0">
+                                      CheckedChanged="OnSpecificAllergyCheckedChanged" Margin="0,0,-10,0">
                                 <CheckBox.IsEnabled>
                                     <Binding Source="{x:Reference NoneCheck}" Path="IsChecked"
                                              Converter="{StaticResource InverseBoolConverter}"/>
                                 </CheckBox.IsEnabled>
                             </CheckBox>
                             <Label Text="Peanuts" VerticalTextAlignment="Center"
-                                   TextColor="{StaticResource Resident_Font_Primary}" Margin="0,0,50,0"/>
+                                   TextColor="{StaticResource Resident_Font_Primary}" Margin="-70,0,0,0"/>
                         </HorizontalStackLayout>
 
                         <HorizontalStackLayout Grid.Row="0" Grid.Column="2" Spacing="0">
                             <CheckBox IsChecked="{Binding AllergyTreeNuts}"
-                                      CheckedChanged="OnSpecificAllergyCheckedChanged" Margin="0,0,-80,0">
+                                      CheckedChanged="OnSpecificAllergyCheckedChanged" Margin="0,0,-10,0">
                                 <CheckBox.IsEnabled>
                                     <Binding Source="{x:Reference NoneCheck}" Path="IsChecked"
                                              Converter="{StaticResource InverseBoolConverter}"/>
                                 </CheckBox.IsEnabled>
                             </CheckBox>
                             <Label Text="Tree nuts" VerticalTextAlignment="Center"
-                                   TextColor="{StaticResource Resident_Font_Primary}" Margin="0,0,50,0"/>
+                                   TextColor="{StaticResource Resident_Font_Primary}" Margin="-70,0,0,0"/>
                         </HorizontalStackLayout>
 
                         <HorizontalStackLayout Grid.Row="0" Grid.Column="3" Spacing="0">
                             <CheckBox IsChecked="{Binding AllergyMilk}"
-                                      CheckedChanged="OnSpecificAllergyCheckedChanged" Margin="0,0,-80,0">
+                                      CheckedChanged="OnSpecificAllergyCheckedChanged" Margin="0,0,-10,0">
                                 <CheckBox.IsEnabled>
                                     <Binding Source="{x:Reference NoneCheck}" Path="IsChecked"
                                              Converter="{StaticResource InverseBoolConverter}"/>
                                 </CheckBox.IsEnabled>
                             </CheckBox>
                             <Label Text="Milk" VerticalTextAlignment="Center"
-                                   TextColor="{StaticResource Resident_Font_Primary}" Margin="0,0,50,0"/>
+                                   TextColor="{StaticResource Resident_Font_Primary}" Margin="-70,0,0,0"/>
                         </HorizontalStackLayout>
 
                         <HorizontalStackLayout Grid.Row="0" Grid.Column="4" Spacing="0">
                             <CheckBox IsChecked="{Binding AllergyEggs}"
-                                      CheckedChanged="OnSpecificAllergyCheckedChanged" Margin="0,0,-80,0">
+                                      CheckedChanged="OnSpecificAllergyCheckedChanged" Margin="0,0,-10,0">
                                 <CheckBox.IsEnabled>
                                     <Binding Source="{x:Reference NoneCheck}" Path="IsChecked"
                                              Converter="{StaticResource InverseBoolConverter}"/>
                                 </CheckBox.IsEnabled>
                             </CheckBox>
                             <Label Text="Eggs" VerticalTextAlignment="Center"
-                                   TextColor="{StaticResource Resident_Font_Primary}" Margin="0,0,50,0"/>
+                                   TextColor="{StaticResource Resident_Font_Primary}" Margin="-70,0,0,0"/>
                         </HorizontalStackLayout>
 
                         <HorizontalStackLayout Grid.Row="0" Grid.Column="5" Spacing="0">
                             <CheckBox IsChecked="{Binding AllergyShellfish}"
-                                      CheckedChanged="OnSpecificAllergyCheckedChanged" Margin="0,0,-80,0">
+                                      CheckedChanged="OnSpecificAllergyCheckedChanged" Margin="0,0,-10,0">
                                 <CheckBox.IsEnabled>
                                     <Binding Source="{x:Reference NoneCheck}" Path="IsChecked"
                                              Converter="{StaticResource InverseBoolConverter}"/>
                                 </CheckBox.IsEnabled>
                             </CheckBox>
                             <Label Text="Shellfish" VerticalTextAlignment="Center"
-                                   TextColor="{StaticResource Resident_Font_Primary}" Margin="0,0,50,0"/>
+                                   TextColor="{StaticResource Resident_Font_Primary}" Margin="-70,0,0,0"/>
                         </HorizontalStackLayout>
 
                         <HorizontalStackLayout Grid.Row="0" Grid.Column="6" Spacing="0">
                             <CheckBox IsChecked="{Binding AllergyFish}"
-                                      CheckedChanged="OnSpecificAllergyCheckedChanged" Margin="0,0,-80,0">
+                                      CheckedChanged="OnSpecificAllergyCheckedChanged" Margin="0,0,-10,0">
                                 <CheckBox.IsEnabled>
                                     <Binding Source="{x:Reference NoneCheck}" Path="IsChecked"
                                              Converter="{StaticResource InverseBoolConverter}"/>
                                 </CheckBox.IsEnabled>
                             </CheckBox>
                             <Label Text="Fish" VerticalTextAlignment="Center"
-                                   TextColor="{StaticResource Resident_Font_Primary}" Margin="0,0,50,0"/>
+                                   TextColor="{StaticResource Resident_Font_Primary}" Margin="-70,0,0,0"/>
                         </HorizontalStackLayout>
 
                         <HorizontalStackLayout Grid.Row="0" Grid.Column="7" Spacing="0">
                             <CheckBox IsChecked="{Binding AllergyWheat}"
-                                      CheckedChanged="OnSpecificAllergyCheckedChanged" Margin="0,0,-80,0">
+                                      CheckedChanged="OnSpecificAllergyCheckedChanged" Margin="0,0,-10,0">
                                 <CheckBox.IsEnabled>
                                     <Binding Source="{x:Reference NoneCheck}" Path="IsChecked"
                                              Converter="{StaticResource InverseBoolConverter}"/>
                                 </CheckBox.IsEnabled>
                             </CheckBox>
                             <Label Text="Wheat" VerticalTextAlignment="Center"
-                                   TextColor="{StaticResource Resident_Font_Primary}" Margin="0,0,50,0"/>
+                                   TextColor="{StaticResource Resident_Font_Primary}" Margin="-70,0,0,0"/>
                         </HorizontalStackLayout>
 
                         <!-- Row 1 -->
                         <HorizontalStackLayout Grid.Row="1" Grid.Column="0" Spacing="0">
                             <CheckBox IsChecked="{Binding AllergySoy}"
-                                      CheckedChanged="OnSpecificAllergyCheckedChanged" Margin="0,0,-80,0">
+                                      CheckedChanged="OnSpecificAllergyCheckedChanged" Margin="0,0,-10,0">
                                 <CheckBox.IsEnabled>
                                     <Binding Source="{x:Reference NoneCheck}" Path="IsChecked"
                                              Converter="{StaticResource InverseBoolConverter}"/>
                                 </CheckBox.IsEnabled>
                             </CheckBox>
                             <Label Text="Soy" VerticalTextAlignment="Center"
-                                   TextColor="{StaticResource Resident_Font_Primary}" Margin="0,0,50,0"/>
+                                   TextColor="{StaticResource Resident_Font_Primary}" Margin="-70,0,0,0"/>
                         </HorizontalStackLayout>
 
                         <HorizontalStackLayout Grid.Row="1" Grid.Column="1" Spacing="0">
                             <CheckBox IsChecked="{Binding AllergyLatex}"
-                                      CheckedChanged="OnSpecificAllergyCheckedChanged" Margin="0,0,-80,0">
+                                      CheckedChanged="OnSpecificAllergyCheckedChanged" Margin="0,0,-10,0">
                                 <CheckBox.IsEnabled>
                                     <Binding Source="{x:Reference NoneCheck}" Path="IsChecked"
                                              Converter="{StaticResource InverseBoolConverter}"/>
                                 </CheckBox.IsEnabled>
                             </CheckBox>
                             <Label Text="Latex" VerticalTextAlignment="Center"
-                                   TextColor="{StaticResource Resident_Font_Primary}" Margin="0,0,50,0"/>
+                                   TextColor="{StaticResource Resident_Font_Primary}" Margin="-70,0,0,0"/>
                         </HorizontalStackLayout>
 
                         <HorizontalStackLayout Grid.Row="1" Grid.Column="2" Spacing="0">
                             <CheckBox IsChecked="{Binding AllergyPenicillin}"
-                                      CheckedChanged="OnSpecificAllergyCheckedChanged" Margin="0,0,-80,0">
+                                      CheckedChanged="OnSpecificAllergyCheckedChanged" Margin="0,0,-10,0">
                                 <CheckBox.IsEnabled>
                                     <Binding Source="{x:Reference NoneCheck}" Path="IsChecked"
                                              Converter="{StaticResource InverseBoolConverter}"/>
                                 </CheckBox.IsEnabled>
                             </CheckBox>
                             <Label Text="Penicillin" VerticalTextAlignment="Center"
-                                   TextColor="{StaticResource Resident_Font_Primary}" Margin="0,0,50,0"/>
+                                   TextColor="{StaticResource Resident_Font_Primary}" Margin="-70,0,0,0"/>
                         </HorizontalStackLayout>
 
                         <HorizontalStackLayout Grid.Row="1" Grid.Column="3" Spacing="0">
                             <CheckBox IsChecked="{Binding AllergySulfa}"
-                                      CheckedChanged="OnSpecificAllergyCheckedChanged" Margin="0,0,-80,0">
+                                      CheckedChanged="OnSpecificAllergyCheckedChanged" Margin="0,0,-10,0">
                                 <CheckBox.IsEnabled>
                                     <Binding Source="{x:Reference NoneCheck}" Path="IsChecked"
                                              Converter="{StaticResource InverseBoolConverter}"/>
                                 </CheckBox.IsEnabled>
                             </CheckBox>
                             <Label Text="Sulfa" VerticalTextAlignment="Center"
-                                   TextColor="{StaticResource Resident_Font_Primary}" Margin="0,0,50,0"/>
+                                   TextColor="{StaticResource Resident_Font_Primary}" Margin="-70,0,0,0"/>
                         </HorizontalStackLayout>
 
                         <HorizontalStackLayout Grid.Row="1" Grid.Column="4" Spacing="0">
                             <CheckBox IsChecked="{Binding AllergyAspirin}"
-                                      CheckedChanged="OnSpecificAllergyCheckedChanged" Margin="0,0,-80,0">
+                                      CheckedChanged="OnSpecificAllergyCheckedChanged" Margin="0,0,-10,0">
                                 <CheckBox.IsEnabled>
                                     <Binding Source="{x:Reference NoneCheck}" Path="IsChecked"
                                              Converter="{StaticResource InverseBoolConverter}"/>
                                 </CheckBox.IsEnabled>
                             </CheckBox>
                             <Label Text="Aspirin" VerticalTextAlignment="Center"
-                                   TextColor="{StaticResource Resident_Font_Primary}" Margin="0,0,50,0"/>
+                                   TextColor="{StaticResource Resident_Font_Primary}" Margin="-70,0,0,0"/>
                         </HorizontalStackLayout>
 
                         <!-- Row 1 – Other items -->

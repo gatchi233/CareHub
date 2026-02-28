@@ -27,14 +27,15 @@ namespace MedReminder.Pages.Desktop
             BindingContext = services.GetRequiredService<MedicationInventoryViewModel>();
         }
 
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+            MedSearchBar?.Unfocus();
+        }
+
         protected override async void OnAppearing()
         {
             base.OnAppearing();
-            await ReloadAndSyncAsync();
-        }
-
-        private async void OnRefreshClicked(object sender, EventArgs e)
-        {
             await ReloadAndSyncAsync();
         }
 
@@ -161,13 +162,8 @@ namespace MedReminder.Pages.Desktop
                 ["returnTo"] = $"//{nameof(MedicationInventoryPage)}"
             };
 
-            await Shell.Current.GoToAsync(nameof(MedicationOrdersPage), true, parameters);
+            await Shell.Current.GoToAsync($"//MedicationInventoryPage/{nameof(MedicationOrdersPage)}", parameters);
         }
 
-        private async void OnLogoutClicked(object sender, EventArgs e)
-        {
-            if (Shell.Current is AppShell shell)
-                await shell.LogoutAsync();
-        }
     }
 }

@@ -24,30 +24,34 @@ namespace MedReminder.WinUI
         {
             base.OnLaunched(args);
 
-            var currentWindow = Microsoft.Maui.Controls.Application.Current.Windows[0].Handler.PlatformView as Microsoft.UI.Xaml.Window;
-            if (currentWindow == null) return;
-
-            IntPtr windowHandle = WinRT.Interop.WindowNative.GetWindowHandle(currentWindow);
-            Microsoft.UI.WindowId windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(windowHandle);
-            Microsoft.UI.Windowing.AppWindow appWindow = Microsoft.UI.Windowing.AppWindow.GetFromWindowId(windowId);
-
-            // Get the display size (DisplayArea)
-            var displayArea = Microsoft.UI.Windowing.DisplayArea.GetFromWindowId(windowId, Microsoft.UI.Windowing.DisplayAreaFallback.Nearest);
-
-            if (displayArea != null)
+            try
             {
-                var screenWidth = displayArea.WorkArea.Width;
-                var screenHeight = displayArea.WorkArea.Height;
+                var currentWindow = Microsoft.Maui.Controls.Application.Current?.Windows?[0]?.Handler?.PlatformView as Microsoft.UI.Xaml.Window;
+                if (currentWindow == null) return;
 
-                // Calculate 75%
-                int newWidth = (int)(screenWidth * 0.80);
-                int newHeight = (int)(screenHeight * 0.80);
+                IntPtr windowHandle = WinRT.Interop.WindowNative.GetWindowHandle(currentWindow);
+                Microsoft.UI.WindowId windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(windowHandle);
+                Microsoft.UI.Windowing.AppWindow appWindow = Microsoft.UI.Windowing.AppWindow.GetFromWindowId(windowId);
 
-                // Calculate center position
-                int newX = (screenWidth - newWidth) / 2;
-                int newY = (screenHeight - newHeight) / 2;
+                var displayArea = Microsoft.UI.Windowing.DisplayArea.GetFromWindowId(windowId, Microsoft.UI.Windowing.DisplayAreaFallback.Nearest);
 
-                appWindow.MoveAndResize(new RectInt32(newX, newY, newWidth, newHeight));
+                if (displayArea != null)
+                {
+                    var screenWidth = displayArea.WorkArea.Width;
+                    var screenHeight = displayArea.WorkArea.Height;
+
+                    int newWidth = (int)(screenWidth * 0.80);
+                    int newHeight = (int)(screenHeight * 0.80);
+
+                    int newX = (screenWidth - newWidth) / 2;
+                    int newY = (screenHeight - newHeight) / 2;
+
+                    appWindow.MoveAndResize(new RectInt32(newX, newY, newWidth, newHeight));
+                }
+            }
+            catch
+            {
+                // Window positioning failed — app will still show with default size
             }
         }
 

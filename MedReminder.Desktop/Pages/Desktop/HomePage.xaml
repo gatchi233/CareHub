@@ -8,10 +8,6 @@
     Title="Home"
     BackgroundColor="{StaticResource Homepage_Main_Background}">
 
-    <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Logout" Clicked="OnLogoutClicked" Priority="1" Order="Primary" />
-    </ContentPage.ToolbarItems>
-
     <Grid Padding="16"
           RowDefinitions="Auto,*"
           RowSpacing="16">
@@ -218,14 +214,15 @@
         </Grid>
 
         <!-- ========== Row 1: Medications list ========== -->
-        <VerticalStackLayout Grid.Row="1" Spacing="8">
+        <Grid Grid.Row="1" RowDefinitions="Auto,*" RowSpacing="8">
 
             <Label Text="3. Medications"
                    FontAttributes="Bold"
                    FontSize="18"
                    TextColor="{StaticResource Homepage_Font_Primary}" />
 
-            <CollectionView x:Name="MedList"
+            <CollectionView Grid.Row="1"
+                            x:Name="MedList"
                             ItemsSource="{Binding Medications}"
                             SelectionMode="Single"
                             SelectionChanged="OnSelectionChanged">
@@ -332,7 +329,7 @@
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
-        </VerticalStackLayout>
+        </Grid>
 
     </Grid>
 </pages:AuthPage>

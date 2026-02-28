@@ -6,7 +6,6 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using static System.Net.Mime.MediaTypeNames;
-using System.Text.Json;
 
 namespace MedReminder.Desktop.Services.Sync;
 
@@ -20,7 +19,6 @@ public class JsonSyncQueue : ISyncQueue
 
     public JsonSyncQueue(string fileName = "sync_queue.json")
     {
-        // AppDataDirectory is safe for MAUI desktop/mobile
         _path = Path.Combine(FileSystem.AppDataDirectory, fileName);
     }
 
@@ -39,6 +37,7 @@ public class JsonSyncQueue : ISyncQueue
         var list = await GetAllAsync();
         list.Add(item);
         await SaveAsync(list);
+        System.Diagnostics.Debug.WriteLine($"[SYNCQ] Enqueued {item.EntityType} {item.Operation} id={item.Id}");
     }
 
     public async Task RemoveAsync(Guid queueItemId)

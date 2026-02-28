@@ -1,4 +1,4 @@
-﻿using MedReminder.Models;
+using MedReminder.Models;
 using MedReminder.Pages;
 using MedReminder.Services;
 using Microsoft.Maui;

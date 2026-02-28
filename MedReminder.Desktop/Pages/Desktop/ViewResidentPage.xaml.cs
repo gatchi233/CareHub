@@ -2,6 +2,7 @@ using MedReminder.Models;
 using MedReminder.Services;
 using MedReminder.Services.Abstractions;
 using Microsoft.Maui.Controls;
+using Microsoft.Maui.Controls.Shapes;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -55,12 +56,19 @@ private Resident? _resident;
                 EditAction.Opacity = canEditResident ? 1.0 : 0.45;
             }
 
-            var residents = await _residentService.LoadAsync();
-            _resident = residents.FirstOrDefault(r => r.Id == _residentId);
+            try
+            {
+                var residents = await _residentService.LoadAsync();
+                _resident = residents.FirstOrDefault(r => r.Id == _residentId);
+            }
+            catch
+            {
+                // Offline — resident not available
+            }
 
             if (_resident == null)
             {
-                await DisplayAlert("Not found", "Resident not found.", "OK");
+                await DisplayAlert("Not found", "Resident not found (may be offline).", "OK");
                 await GoBackAsync();
                 return;
             }
@@ -68,18 +76,25 @@ private Resident? _resident;
             // Keep existing bindings (XAML binds to Resident fields)
             BindingContext = _resident;
 
-            DobAgeLabel.Text = BuildDobAgeText(_resident.DOB);
-            AllergySummaryLabel.Text = BuildAllergySummary(_resident);
+            DobAgeLabel.Text = BuildDobAgeText(_resident.DateOfBirth);
+            PopulateAllergyBadges(_resident);
 
             // Load medication schedule for this resident
             MedicationSchedules.Clear();
-            var allMeds = await _medicationService.LoadAsync();
-            var residentMeds = allMeds
-                .Where(m => m.ResidentId.HasValue && m.ResidentId.Value == _residentId)
-                .OrderBy(m => m.MedName ?? string.Empty);
+            try
+            {
+                var allMeds = await _medicationService.LoadAsync();
+                var residentMeds = allMeds
+                    .Where(m => m.ResidentId.HasValue && m.ResidentId.Value == _residentId)
+                    .OrderBy(m => m.MedName ?? string.Empty);
 
-            foreach (var m in residentMeds)
-                MedicationSchedules.Add(m);
+                foreach (var m in residentMeds)
+                    MedicationSchedules.Add(m);
+            }
+            catch
+            {
+                // Offline — medications not available
+            }
         }
 
         private async Task GoBackAsync()
@@ -91,43 +106,76 @@ private Resident? _resident;
             await Shell.Current.GoToAsync(target);
         }
 
-        private static string BuildAllergySummary(Resident r)
+        private void PopulateAllergyBadges(Resident r)
         {
-            if (r.AllergyNone) return "No known allergies.";
+            AllergyBadgesLayout.Children.Clear();
+
+            if (r.AllergyNone)
+            {
+                AllergyBadgesLayout.Children.Add(CreateAllergyBadge("No Known Allergies", Color.FromArgb("#2D7D46"), Colors.White));
+                return;
+            }
 
             var items = new List<string>();
-            if (r.AllergyPeanuts)   items.Add("Peanuts");
-            if (r.AllergyTreeNuts)  items.Add("Tree nuts");
-            if (r.AllergyMilk)      items.Add("Milk");
-            if (r.AllergyEggs)      items.Add("Eggs");
-            if (r.AllergyShellfish) items.Add("Shellfish");
-            if (r.AllergyFish)      items.Add("Fish");
-            if (r.AllergyWheat)     items.Add("Wheat");
-            if (r.AllergySoy)       items.Add("Soy");
-            if (r.AllergyLatex)     items.Add("Latex");
-            if (r.AllergyPenicillin)items.Add("Penicillin");
-            if (r.AllergySulfa)     items.Add("Sulfa");
-            if (r.AllergyAspirin)   items.Add("Aspirin");
+            if (r.AllergyPeanuts)    items.Add("Peanuts");
+            if (r.AllergyTreeNuts)   items.Add("Tree nuts");
+            if (r.AllergyMilk)       items.Add("Milk");
+            if (r.AllergyEggs)       items.Add("Eggs");
+            if (r.AllergyShellfish)  items.Add("Shellfish");
+            if (r.AllergyFish)       items.Add("Fish");
+            if (r.AllergyWheat)      items.Add("Wheat");
+            if (r.AllergySoy)        items.Add("Soy");
+            if (r.AllergyLatex)      items.Add("Latex");
+            if (r.AllergyPenicillin) items.Add("Penicillin");
+            if (r.AllergySulfa)      items.Add("Sulfa");
+            if (r.AllergyAspirin)    items.Add("Aspirin");
             if (!string.IsNullOrWhiteSpace(r.AllergyOtherItems))
                 items.Add(r.AllergyOtherItems);
 
-            return items.Count > 0 ? string.Join(", ", items) : "Not recorded.";
+            if (items.Count == 0)
+            {
+                AllergyBadgesLayout.Children.Add(CreateAllergyBadge("Not recorded", Color.FromArgb("#6B7280"), Colors.White));
+                return;
+            }
+
+            foreach (var item in items)
+                AllergyBadgesLayout.Children.Add(CreateAllergyBadge(item, Color.FromArgb("#DC2626"), Colors.White));
+        }
+
+        private static Border CreateAllergyBadge(string text, Color backgroundColor, Color textColor)
+        {
+            return new Border
+            {
+                BackgroundColor = backgroundColor,
+                Padding = new Thickness(10, 4),
+                Margin = new Thickness(0, 0, 6, 6),
+                StrokeThickness = 0,
+                StrokeShape = new RoundRectangle { CornerRadius = 12 },
+                Content = new Label
+                {
+                    Text = text,
+                    FontSize = 11,
+                    FontAttributes = FontAttributes.Bold,
+                    TextColor = textColor,
+                    VerticalTextAlignment = TextAlignment.Center
+                }
+            };
         }
 
         private string BuildDobAgeText(string? dobString)
         {
             if (string.IsNullOrWhiteSpace(dobString))
-                return "DOB: (not recorded)";
+                return "(not recorded)";
 
             if (!DateTime.TryParse(dobString, out var dob))
-                return $"DOB: {dobString}";
+                return dobString;
 
             var today = DateTime.Today;
             var age = today.Year - dob.Year;
             if (dob.Date > today.AddYears(-age))
                 age--;
 
-            return $"DOB: {dob:yyyy-MM-dd}  (Age {age})";
+            return $"{dob:yyyy-MM-dd}  (Age {age})";
         }
 
         private async void OnEditClicked(object sender, TappedEventArgs e)
@@ -198,10 +246,5 @@ private Resident? _resident;
             return $"{nameof(ViewResidentPage)}?id={_residentId}&returnTo={baseReturn}";
         }
 
-        private async void OnLogoutClicked(object sender, EventArgs e)
-        {
-            if (Shell.Current is AppShell shell)
-                await shell.LogoutAsync();
-        }
     }
 }

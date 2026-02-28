@@ -58,7 +58,6 @@ namespace MedReminder
 
                         appWindow.Resize(new Windows.Graphics.SizeInt32(width, height));
 
-                        // Optional: minimum size (prevents tiny window)
                         appWindow.SetPresenter(
                             appWindow.Presenter as Microsoft.UI.Windowing.OverlappedPresenter
                             ?? Microsoft.UI.Windowing.OverlappedPresenter.Create());
@@ -78,30 +77,58 @@ namespace MedReminder
             var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? "http://localhost:5001/";
             var apiBase = new Uri(apiBaseUrl);
 
-            // Residents
-            builder.Services.AddHttpClient<IResidentService, ResidentApiService>(client =>
+            // Sync queue (registered early so all services can use it)
+            builder.Services.AddSingleton<ISyncQueue, JsonSyncQueue>();
+
+            // HTTP clients for API services
+            builder.Services.AddHttpClient<ResidentApiService>(client =>
             {
                 client.BaseAddress = apiBase;
+                client.Timeout = TimeSpan.FromSeconds(2);
             });
-
-            // Medications
-            builder.Services.AddHttpClient<IMedicationService, MedicationApiService>(client =>
+            builder.Services.AddHttpClient<MedicationApiService>(client =>
             {
                 client.BaseAddress = apiBase;
+                client.Timeout = TimeSpan.FromSeconds(2);
             });
-
             builder.Services.AddHttpClient<ObservationApiService>(client =>
             {
                 client.BaseAddress = apiBase;
+                client.Timeout = TimeSpan.FromSeconds(2);
             });
+
+            // Local JSON services
+            builder.Services.AddSingleton<ResidentJsonService>();
+            builder.Services.AddSingleton<MedicationJsonService>();
             builder.Services.AddSingleton<ObservationJsonService>();
-            builder.Services.AddSingleton<ISyncQueue, JsonSyncQueue>();
+
+            // Medications: API + Local + Wrapper
+            builder.Services.AddSingleton<IMedicationService>(sp =>
+            {
+                var api = sp.GetRequiredService<MedicationApiService>();
+                var local = sp.GetRequiredService<MedicationJsonService>();
+                var queue = sp.GetRequiredService<ISyncQueue>();
+                return new MedReminder.Desktop.Services.MedicationService(api, local, queue);
+            });
+
+            // Observations: API + Local + Wrapper
             builder.Services.AddSingleton<IObservationService>(sp =>
             {
                 var api = sp.GetRequiredService<ObservationApiService>();
                 var local = sp.GetRequiredService<ObservationJsonService>();
                 var queue = sp.GetRequiredService<ISyncQueue>();
                 return new ObservationService(api, local, queue);
+            });
+
+            // Residents: API + Local + Wrapper (registered after Meds/Obs so it can remap their IDs)
+            builder.Services.AddSingleton<IResidentService>(sp =>
+            {
+                var api = sp.GetRequiredService<ResidentApiService>();
+                var local = sp.GetRequiredService<ResidentJsonService>();
+                var localMeds = sp.GetRequiredService<MedicationJsonService>();
+                var localObs = sp.GetRequiredService<ObservationJsonService>();
+                var queue = sp.GetRequiredService<ISyncQueue>();
+                return new MedReminder.Desktop.Services.ResidentService(api, local, localMeds, localObs, queue);
             });
 
             builder.Services.AddSingleton<IMedicationOrderService, MedicationOrderJsonService>();
@@ -140,6 +167,12 @@ namespace MedReminder
 #endif
             var app = builder.Build();
             Services = app.Services;
+
+            // Load persisted connectivity state (sync-safe, no deadlock)
+            ConnectivityHelper.InitializeSync();
+
+            // Probe API reachability in the background (non-blocking)
+            _ = ConnectivityHelper.ProbeApiInBackgroundAsync(apiBase);
 
             return app;
         }

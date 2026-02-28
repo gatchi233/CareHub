@@ -25,7 +25,6 @@
     <Color x:Key="Medication_Card_Background">#FFFFFF</Color>
     <Color x:Key="Medication_Font_Primary">#3D3D35</Color>
     <Color x:Key="Medication_Font_Secondary">#6B6B5D</Color>
-
     <!-- Observation (personal care / notes style) -->
     <Color x:Key="Observation_Main_Background">#F8F1EB</Color> 
     <Color x:Key="Observation_Card_Border">#CB997E</Color>    
@@ -109,8 +108,15 @@
     <Color x:Key="Role_Facilities">#2E7D32</Color>
 
     <!-- Badge Colors -->
-    <Color x:Key="Badge_Time_Background">#E0B875</Color>   
+    <Color x:Key="Badge_Time_Background">#E0B875</Color>
     <Color x:Key="Badge_Completed_Background">#FFF5DA</Color>
-    <Color x:Key="Badge_Completed_Border">#7A6657</Color> 
+    <Color x:Key="Badge_Completed_Border">#7A6657</Color>
+
+    <!-- Observation Vital Badges -->
+    <Color x:Key="Badge_Temp">#E57373</Color>
+    <Color x:Key="Badge_BP">#5C6BC0</Color>
+    <Color x:Key="Badge_Pulse">#66BB6A</Color>
+    <Color x:Key="Badge_SPO2">#26A69A</Color>
+    <Color x:Key="Badge_Note">#E0B875</Color>
 
 </ResourceDictionary>

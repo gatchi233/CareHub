@@ -9,10 +9,6 @@
     Title="Residents"
     BackgroundColor="{StaticResource Resident_Main_Background}">
 
-    <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Logout" Clicked="OnLogoutClicked" Priority="0" Order="Primary" />
-    </ContentPage.ToolbarItems>
-
     <Grid Padding="16" RowDefinitions="Auto,*" RowSpacing="12">
 
         <!-- Top bar -->
@@ -57,82 +53,27 @@
                             <RoundRectangle CornerRadius="8"/>
                         </Border.StrokeShape>
 
-                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
-                            <!-- Left side: Name, Gender, Room info -->
-                            <HorizontalStackLayout Spacing="12" VerticalOptions="Center">
-                                <!-- Resident Name -->
-                                <Label Text="{Binding ResidentName}" FontAttributes="Bold" FontSize="20" TextColor="{StaticResource Resident_Font_Primary}" VerticalOptions="Center"/>
-                                <BoxView WidthRequest="1" HeightRequest="20" Color="{StaticResource Resident_Font_Secondary}" VerticalOptions="Center"/>
+                        <HorizontalStackLayout Spacing="12" VerticalOptions="Center">
+                            <!-- Resident Name -->
+                            <Label Text="{Binding ResidentName}" FontAttributes="Bold" FontSize="20" TextColor="{StaticResource Resident_Font_Primary}" VerticalOptions="Center"/>
+                            <BoxView WidthRequest="1" HeightRequest="20" Color="{StaticResource Resident_Font_Secondary}" VerticalOptions="Center"/>
 
-                                <!-- Gender -->
-                                <Label Text="{Binding Gender}" FontSize="13" TextColor="{StaticResource Resident_Font_Secondary}" VerticalOptions="Center"/>
-                                <BoxView WidthRequest="1" HeightRequest="20" Color="{StaticResource Resident_Font_Secondary}" VerticalOptions="Center"/>
+                            <!-- Gender -->
+                            <Label Text="{Binding Gender}" FontSize="13" TextColor="{StaticResource Resident_Font_Secondary}" VerticalOptions="Center"/>
+                            <BoxView WidthRequest="1" HeightRequest="20" Color="{StaticResource Resident_Font_Secondary}" VerticalOptions="Center"/>
 
-                                <!-- Room & Bed -->
-                                <Label FontSize="13" TextColor="{StaticResource Resident_Font_Secondary}" VerticalOptions="Center">
-                                    <Label.FormattedText>
-                                        <FormattedString>
-                                            <Span Text="Room "/>
-                                            <Span Text="{Binding RoomNumber}"/>
-                                            <Span Text=" • "/>
-                                            <Span Text="{Binding BedLabel}"/>
-                                        </FormattedString>
-                                    </Label.FormattedText>
-                                </Label>
-
-                            </HorizontalStackLayout>
-
-                            <!-- Right side: Action Button -->
-                            <HorizontalStackLayout Grid.Column="1" Spacing="8">
-                                <!-- View -->
-                                <Border StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
-                                    <Border.StrokeShape>
-                                        <RoundRectangle CornerRadius="4"/>
-                                    </Border.StrokeShape>
-                                    <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
-                                        <Image Grid.Column="0" Source="icons8_view_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
-                                        <Border Grid.Column="1" BackgroundColor="{StaticResource Button_View}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
-                                            <Label Text="VIEW" TextColor="{StaticResource Button_Font_Primary}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
-                                        </Border>
-                                    </Grid>
-                                    <Border.GestureRecognizers>
-                                        <TapGestureRecognizer Tapped="OnViewResidentClicked" CommandParameter="{Binding .}"/>
-                                    </Border.GestureRecognizers>
-                                </Border>
-
-                                <!-- Edit -->
-                                <Border x:Name="EditAction" StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}" IsVisible="{Binding Source={x:Reference Root}, Path=CanEditResidents}">
-                                    <Border.StrokeShape>
-                                        <RoundRectangle CornerRadius="4"/>
-                                    </Border.StrokeShape>
-                                    <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
-                                        <Image Grid.Column="0" Source="icons8_edit_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
-                                        <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Edit}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
-                                            <Label Text="EDIT" TextColor="{StaticResource Button_Font_Secondary}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
-                                        </Border>
-                                    </Grid>
-                                    <Border.GestureRecognizers>
-                                        <TapGestureRecognizer Tapped="OnEditResidentClicked" CommandParameter="{Binding .}"/>
-                                    </Border.GestureRecognizers>
-                                </Border>
-
-                                <!-- Delete -->
-                                <Border x:Name="DeleteAction" StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}" IsVisible="{Binding Source={x:Reference Root}, Path=CanEditResidents}">
-                                    <Border.StrokeShape>
-                                        <RoundRectangle CornerRadius="4"/>
-                                    </Border.StrokeShape>
-                                    <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
-                                        <Image Grid.Column="0" Source="icons8_delete_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
-                                        <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Delete}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
-                                            <Label Text="DELETE" TextColor="{StaticResource Button_Font_Primary}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
-                                        </Border>
-                                    </Grid>
-                                    <Border.GestureRecognizers>
-                                        <TapGestureRecognizer Tapped="OnDeleteResidentClicked" CommandParameter="{Binding .}"/>
-                                    </Border.GestureRecognizers>
-                                </Border>
-                            </HorizontalStackLayout>
-                        </Grid>
+                            <!-- Room & Bed -->
+                            <Label FontSize="13" TextColor="{StaticResource Resident_Font_Secondary}" VerticalOptions="Center">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="Room "/>
+                                        <Span Text="{Binding RoomNumber}"/>
+                                        <Span Text=" • "/>
+                                        <Span Text="{Binding BedLabel}"/>
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                        </HorizontalStackLayout>
                     </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>

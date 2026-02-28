@@ -18,6 +18,7 @@ namespace MedReminder.Pages.Desktop
 
         private List<Medication> _allMedications = new();
         private List<Resident> _allResidents = new();
+        private List<Medication> _inventoryMeds = new();
 
         // MUST be parameterless (Shell creates pages)
         public HomePage()
@@ -52,16 +53,34 @@ namespace MedReminder.Pages.Desktop
             }
         }
 
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+            ResidentSearchEntry?.Unfocus();
+        }
+
         protected override async void OnAppearing()
         {
             base.OnAppearing();
 
-            await _vm.InitializeAsync();
+            try
+            {
+                await _vm.InitializeAsync();
 
-            _allMedications = _vm.Medications?.ToList() ?? new List<Medication>();
-            _allResidents = (await _residentService.LoadAsync())?.ToList() ?? new List<Resident>();
+                _allMedications = _vm.Medications?.ToList() ?? new List<Medication>();
+                _allResidents = (await _residentService.LoadAsync())?.ToList() ?? new List<Resident>();
+                _inventoryMeds = _allMedications
+                    .Where(m => !m.ResidentId.HasValue || m.ResidentId.Value == Guid.Empty)
+                    .ToList();
 
-            RunSearch();
+                RunSearch();
+            }
+            catch
+            {
+                // Offline — show empty state, no crash
+                _allMedications ??= new List<Medication>();
+                _allResidents ??= new List<Resident>();
+            }
         }
 
         private void OnResidentSearchClicked(object sender, EventArgs e) => RunSearch();
@@ -111,7 +130,24 @@ namespace MedReminder.Pages.Desktop
 
             m.IsDone = e.Value;
 
-            await _medicationService.UpsertAsync(m);
+            try
+            {
+                await _medicationService.UpsertAsync(m);
+
+                // Deduct or restore inventory stock
+                var inventoryMatch = _inventoryMeds.FirstOrDefault(inv =>
+                    string.Equals(inv.MedName, m.MedName, StringComparison.OrdinalIgnoreCase));
+
+                if (inventoryMatch != null)
+                {
+                    int delta = e.Value ? -m.Quantity : m.Quantity;
+                    await _medicationService.AdjustStockAsync(inventoryMatch.Id, delta);
+                }
+            }
+            catch
+            {
+                // Offline — change queued by wrapper
+            }
         }
 
 
@@ -142,10 +178,11 @@ namespace MedReminder.Pages.Desktop
 
             foreach (var med in _allMedications)
             {
-                Resident? resident = null;
+                // Skip inventory items — they have no resident
+                if (!med.ResidentId.HasValue || med.ResidentId.Value == Guid.Empty)
+                    continue;
 
-                if (med.ResidentId.HasValue)
-                    resident = _allResidents.FirstOrDefault(r => r.Id == med.ResidentId);
+                Resident? resident = _allResidents.FirstOrDefault(r => r.Id == med.ResidentId);
 
                 // Prefer linked resident; fall back to any existing name or a placeholder.
                 med.ResidentName = resident?.ResidentName
@@ -207,23 +244,5 @@ namespace MedReminder.Pages.Desktop
             };
         }
 
-        protected async Task LogoutAsync()
-        {
-            var auth = Application.Current?
-                .Handler?
-                .MauiContext?
-                .Services
-                .GetService<MedReminder.Services.AuthService>();
-
-            auth?.Logout();
-
-            await Shell.Current.GoToAsync($"//{nameof(LoginPage)}");
-        }
-
-        // Add this event handler for the ToolbarItem
-        private async void OnLogoutClicked(object sender, EventArgs e)
-        {
-            await LogoutAsync();
-        }
     }
 }

@@ -1,48 +1,54 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Net;
 using System.Net.Http.Json;
+using MedReminder.Desktop.Services.Sync;
 using MedReminder.Models;
 using MedReminder.Services.Abstractions;
 
-namespace MedReminder.Services.Remote
+namespace MedReminder.Services.Remote;
+
+public class MedicationApiService : IMedicationService
 {
-    public class MedicationApiService : IMedicationService
+    private readonly HttpClient _http;
+
+    public MedicationApiService(HttpClient http)
     {
-        private readonly HttpClient _http;
+        _http = http;
+    }
 
-        public MedicationApiService(HttpClient http)
+    public async Task<List<Medication>> LoadAsync()
+    {
+        try
         {
-            _http = http;
-        }
-
-        public async Task<List<Medication>> LoadAsync()
-        {
-            if (_http.BaseAddress is null)
-                throw new InvalidOperationException("MedicationApiService HttpClient.BaseAddress is NULL. DI registration is wrong.");
-
             return await _http.GetFromJsonAsync<List<Medication>>("api/medications")
                    ?? new List<Medication>();
         }
-
-        public async Task UpsertAsync(Medication item)
+        catch (HttpRequestException ex)
         {
-            if (item == null) throw new ArgumentNullException(nameof(item));
+            throw new OfflineException("API unreachable (Load Medications).", ex);
+        }
+        catch (TaskCanceledException ex)
+        {
+            throw new OfflineException("API timeout (Load Medications).", ex);
+        }
+    }
 
-            // Normalize empty Guid to null to avoid FK violations in API DB.
-            if (item.ResidentId.HasValue && item.ResidentId.Value == Guid.Empty)
-                item.ResidentId = null;
+    public async Task UpsertAsync(Medication item)
+    {
+        if (item == null) throw new ArgumentNullException(nameof(item));
 
+        // Normalize empty Guid to null to avoid FK violations in API DB.
+        if (item.ResidentId.HasValue && item.ResidentId.Value == Guid.Empty)
+            item.ResidentId = null;
+
+        try
+        {
             if (item.Id == Guid.Empty)
             {
                 var resp = await _http.PostAsJsonAsync("api/medications", item);
                 resp.EnsureSuccessStatusCode();
 
-                // If API returns created medication, sync the Id
                 var created = await resp.Content.ReadFromJsonAsync<Medication>();
-                if (created != null && created.Id > Guid.Empty)
+                if (created != null && created.Id != Guid.Empty)
                     item.Id = created.Id;
 
                 return;
@@ -51,27 +57,73 @@ namespace MedReminder.Services.Remote
             var put = await _http.PutAsJsonAsync($"api/medications/{item.Id}", item);
             put.EnsureSuccessStatusCode();
         }
-
-        public async Task DeleteAsync(Medication item)
+        catch (HttpRequestException ex)
         {
-            if (item == null) throw new ArgumentNullException(nameof(item));
-            if (item.Id <= Guid.Empty) return;
-
-            var del = await _http.DeleteAsync($"api/medications/{item.Id}");
-            del.EnsureSuccessStatusCode();
+            throw new OfflineException("API unreachable (Upsert Medication).", ex);
         }
+        catch (TaskCanceledException ex)
+        {
+            throw new OfflineException("API timeout (Upsert Medication).", ex);
+        }
+    }
 
-        public async Task<List<Medication>> GetLowStockAsync()
+    public Task ReplaceAllAsync(List<Medication> items) => Task.CompletedTask;
+
+    public async Task DeleteAsync(Medication item)
+    {
+        if (item == null) throw new ArgumentNullException(nameof(item));
+        if (item.Id == Guid.Empty) return;
+
+        try
+        {
+            var resp = await _http.DeleteAsync($"api/medications/{item.Id}");
+
+            if (resp.StatusCode == HttpStatusCode.NotFound)
+                return;
+
+            resp.EnsureSuccessStatusCode();
+        }
+        catch (HttpRequestException ex)
+        {
+            throw new OfflineException("API unreachable (Delete Medication).", ex);
+        }
+        catch (TaskCanceledException ex)
+        {
+            throw new OfflineException("API timeout (Delete Medication).", ex);
+        }
+    }
+
+    public async Task<List<Medication>> GetLowStockAsync()
+    {
+        try
         {
             return await _http.GetFromJsonAsync<List<Medication>>("api/medications/lowstock")
                    ?? new List<Medication>();
         }
-
-        public async Task AdjustStockAsync(Guid medicationId, int delta)
+        catch (HttpRequestException ex)
         {
-            // POST api/medications/{id}/adjustStock?delta=...
+            throw new OfflineException("API unreachable (GetLowStock).", ex);
+        }
+        catch (TaskCanceledException ex)
+        {
+            throw new OfflineException("API timeout (GetLowStock).", ex);
+        }
+    }
+
+    public async Task AdjustStockAsync(Guid medicationId, int delta)
+    {
+        try
+        {
             var resp = await _http.PostAsync($"api/medications/{medicationId}/adjustStock?delta={delta}", content: null);
             resp.EnsureSuccessStatusCode();
+        }
+        catch (HttpRequestException ex)
+        {
+            throw new OfflineException("API unreachable (AdjustStock).", ex);
+        }
+        catch (TaskCanceledException ex)
+        {
+            throw new OfflineException("API timeout (AdjustStock).", ex);
         }
     }
 }

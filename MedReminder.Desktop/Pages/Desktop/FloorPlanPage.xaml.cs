@@ -39,10 +39,5 @@ namespace MedReminder.Pages.Desktop
                 vm.Floor = 2;
         }
 
-        private async void OnLogoutClicked(object sender, EventArgs e)
-        {
-            if (Shell.Current is AppShell shell)
-                await shell.LogoutAsync();
-        }
     }
 }

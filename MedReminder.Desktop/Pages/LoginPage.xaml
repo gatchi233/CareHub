@@ -6,19 +6,29 @@
     Title="Staff Login"
     BackgroundColor="{StaticResource Homepage_Main_Background}">
 
-    <ScrollView>
-        <VerticalStackLayout Padding="24" Spacing="16" VerticalOptions="Center">
+    <Grid VerticalOptions="Center" HorizontalOptions="Center" ColumnSpacing="40" Padding="40">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
 
-            <Label
-                Text="MedReminder Pro"
-                FontSize="24"
-                FontAttributes="Bold"
-                TextColor="{StaticResource Homepage_Font_Primary}" />
+        <!-- Logo on the left -->
+        <Image
+            Grid.Column="0"
+            Source="carehub_logo.jpg"
+            HeightRequest="200"
+            WidthRequest="200"
+            Aspect="AspectFit"
+            VerticalOptions="Center" />
+
+        <!-- Login form on the right -->
+        <VerticalStackLayout Grid.Column="1" Spacing="16" VerticalOptions="Center" WidthRequest="300">
 
             <Label
                 Text="Staff Login"
-                FontSize="18"
-                TextColor="{StaticResource Homepage_Font_Secondary}" />
+                FontSize="22"
+                FontAttributes="Bold"
+                TextColor="{StaticResource Homepage_Font_Primary}" />
 
             <Entry
                 Placeholder="Username"
@@ -44,5 +54,5 @@
                 Command="{Binding LoginCommand}" />
 
         </VerticalStackLayout>
-    </ScrollView>
+    </Grid>
 </ContentPage>

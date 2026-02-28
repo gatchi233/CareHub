@@ -5,7 +5,7 @@
     "Usage": "Hypertension",
     "StockQuantity": 500,
     "ReorderLevel": 180,
-    "Unit": "tablet",
+    "QuantityUnit": "tablet",
     "ExpiryDate": "2026-06-06T00:00:00-07:00"
   },
   {
@@ -14,7 +14,7 @@
     "Usage": "Heart failure",
     "StockQuantity": 300,
     "ReorderLevel": 100,
-    "Unit": "tablet",
+    "QuantityUnit": "tablet",
     "ExpiryDate": "2026-05-20T00:00:00-07:00"
   },
   {
@@ -23,7 +23,7 @@
     "Usage": "Hyponatremia",
     "StockQuantity": 90,
     "ReorderLevel": 30,
-    "Unit": "tablet",
+    "QuantityUnit": "tablet",
     "ExpiryDate": "2026-04-15T00:00:00-07:00"
   },
   {
@@ -32,7 +32,7 @@
     "Usage": "Insomnia",
     "StockQuantity": 200,
     "ReorderLevel": 60,
-    "Unit": "tablet",
+    "QuantityUnit": "tablet",
     "ExpiryDate": "2026-08-01T00:00:00-07:00"
   },
   {
@@ -41,7 +41,7 @@
     "Usage": "Type 2 Diabetes",
     "StockQuantity": 600,
     "ReorderLevel": 200,
-    "Unit": "tablet",
+    "QuantityUnit": "tablet",
     "ExpiryDate": "2026-07-12T00:00:00-07:00"
   },
   {
@@ -50,7 +50,7 @@
     "Usage": "High cholesterol",
     "StockQuantity": 500,
     "ReorderLevel": 180,
-    "Unit": "tablet",
+    "QuantityUnit": "tablet",
     "ExpiryDate": "2026-09-01T00:00:00-07:00"
   },
   {
@@ -59,7 +59,7 @@
     "Usage": "Blood pressure",
     "StockQuantity": 450,
     "ReorderLevel": 150,
-    "Unit": "tablet",
+    "QuantityUnit": "tablet",
     "ExpiryDate": "2026-03-28T00:00:00-07:00"
   },
   {
@@ -68,7 +68,7 @@
     "Usage": "Fluid retention",
     "StockQuantity": 400,
     "ReorderLevel": 150,
-    "Unit": "tablet",
+    "QuantityUnit": "tablet",
     "ExpiryDate": "2026-11-04T23:00:00-08:00"
   },
   {
@@ -77,7 +77,7 @@
     "Usage": "Hypothyroidism",
     "StockQuantity": 300,
     "ReorderLevel": 100,
-    "Unit": "tablet",
+    "QuantityUnit": "tablet",
     "ExpiryDate": "2026-10-10T00:00:00-07:00"
   },
   {
@@ -86,7 +86,7 @@
     "Usage": "Blood thinner",
     "StockQuantity": 400,
     "ReorderLevel": 150,
-    "Unit": "tablet",
+    "QuantityUnit": "tablet",
     "ExpiryDate": "2026-02-17T23:00:00-08:00"
   },
   {
@@ -95,7 +95,7 @@
     "Usage": "Acid reflux",
     "StockQuantity": 450,
     "ReorderLevel": 150,
-    "Unit": "capsule",
+    "QuantityUnit": "capsule",
     "ExpiryDate": "2026-11-30T23:00:00-08:00"
   },
   {
@@ -104,7 +104,7 @@
     "Usage": "Neuropathic pain",
     "StockQuantity": 350,
     "ReorderLevel": 120,
-    "Unit": "capsule",
+    "QuantityUnit": "capsule",
     "ExpiryDate": "2026-06-30T00:00:00-07:00"
   },
   {
@@ -113,7 +113,7 @@
     "Usage": "Hypertension",
     "StockQuantity": 500,
     "ReorderLevel": 180,
-    "Unit": "tablet",
+    "QuantityUnit": "tablet",
     "ExpiryDate": "2026-08-15T00:00:00-07:00"
   },
   {
@@ -122,7 +122,7 @@
     "Usage": "Blood pressure",
     "StockQuantity": 450,
     "ReorderLevel": 150,
-    "Unit": "tablet",
+    "QuantityUnit": "tablet",
     "ExpiryDate": "2026-07-20T00:00:00-07:00"
   },
   {
@@ -131,7 +131,7 @@
     "Usage": "High cholesterol",
     "StockQuantity": 450,
     "ReorderLevel": 150,
-    "Unit": "tablet",
+    "QuantityUnit": "tablet",
     "ExpiryDate": "2026-09-10T00:00:00-07:00"
   },
   {
@@ -140,7 +140,7 @@
     "Usage": "Pain and fever",
     "StockQuantity": 800,
     "ReorderLevel": 250,
-    "Unit": "tablet",
+    "QuantityUnit": "tablet",
     "ExpiryDate": "2026-12-14T23:00:00-08:00"
   },
   {
@@ -149,7 +149,7 @@
     "Usage": "Pain and inflammation",
     "StockQuantity": 400,
     "ReorderLevel": 120,
-    "Unit": "tablet",
+    "QuantityUnit": "tablet",
     "ExpiryDate": "2026-10-20T00:00:00-07:00"
   },
   {
@@ -158,7 +158,7 @@
     "Usage": "Alzheimer's disease",
     "StockQuantity": 250,
     "ReorderLevel": 90,
-    "Unit": "tablet",
+    "QuantityUnit": "tablet",
     "ExpiryDate": "2026-11-29T23:00:00-08:00"
   },
   {
@@ -167,7 +167,7 @@
     "Usage": "Blood thinner",
     "StockQuantity": 400,
     "ReorderLevel": 150,
-    "Unit": "tablet",
+    "QuantityUnit": "tablet",
     "ExpiryDate": "2026-08-25T00:00:00-07:00"
   },
   {
@@ -176,7 +176,7 @@
     "Usage": "Blood thinner",
     "StockQuantity": 600,
     "ReorderLevel": 200,
-    "Unit": "tablet",
+    "QuantityUnit": "tablet",
     "ExpiryDate": "2027-01-14T23:00:00-08:00"
   },
   {
@@ -185,7 +185,7 @@
     "Usage": "Allergies",
     "StockQuantity": 200,
     "ReorderLevel": 60,
-    "Unit": "tablet",
+    "QuantityUnit": "tablet",
     "ExpiryDate": "2026-09-30T00:00:00-07:00"
   },
   {
@@ -194,7 +194,7 @@
     "Usage": "Nasal congestion",
     "StockQuantity": 150,
     "ReorderLevel": 50,
-    "Unit": "tablet",
+    "QuantityUnit": "tablet",
     "ExpiryDate": "2026-07-15T00:00:00-07:00"
   },
   {
@@ -203,7 +203,7 @@
     "Usage": "Pain and inflammation",
     "StockQuantity": 300,
     "ReorderLevel": 100,
-    "Unit": "tablet",
+    "QuantityUnit": "tablet",
     "ExpiryDate": "2026-10-05T00:00:00-07:00"
   },
   {
@@ -212,7 +212,7 @@
     "Usage": "Cough suppressant",
     "StockQuantity": 150,
     "ReorderLevel": 50,
-    "Unit": "capsule",
+    "QuantityUnit": "capsule",
     "ExpiryDate": "2026-06-20T00:00:00-07:00"
   },
   {
@@ -221,7 +221,7 @@
     "Usage": "Expectorant",
     "StockQuantity": 200,
     "ReorderLevel": 60,
-    "Unit": "tablet",
+    "QuantityUnit": "tablet",
     "ExpiryDate": "2026-08-10T00:00:00-07:00"
   },
   {
@@ -230,7 +230,7 @@
     "Usage": "Antiviral",
     "StockQuantity": 100,
     "ReorderLevel": 35,
-    "Unit": "capsule",
+    "QuantityUnit": "capsule",
     "ExpiryDate": "2026-05-30T00:00:00-07:00"
   },
   {
@@ -239,7 +239,7 @@
     "Usage": "Nasal care",
     "StockQuantity": 50,
     "ReorderLevel": 20,
-    "Unit": "bottle",
+    "QuantityUnit": "bottle",
     "ExpiryDate": "2027-02-28T23:00:00-08:00"
   },
   {
@@ -248,7 +248,7 @@
     "Usage": "Anti-inflammatory",
     "StockQuantity": 40,
     "ReorderLevel": 15,
-    "Unit": "tube",
+    "QuantityUnit": "tube",
     "ExpiryDate": "2026-11-14T23:00:00-08:00"
   },
   {
@@ -257,7 +257,7 @@
     "Usage": "Anti-inflammatory",
     "StockQuantity": 30,
     "ReorderLevel": 12,
-    "Unit": "tube",
+    "QuantityUnit": "tube",
     "ExpiryDate": "2026-09-20T00:00:00-07:00"
   },
   {
@@ -266,7 +266,7 @@
     "Usage": "Anti-inflammatory",
     "StockQuantity": 30,
     "ReorderLevel": 12,
-    "Unit": "tube",
+    "QuantityUnit": "tube",
     "ExpiryDate": "2026-10-25T00:00:00-07:00"
   },
   {
@@ -275,7 +275,7 @@
     "Usage": "Antifungal",
     "StockQuantity": 35,
     "ReorderLevel": 15,
-    "Unit": "tube",
+    "QuantityUnit": "tube",
     "ExpiryDate": "2026-12-09T23:00:00-08:00"
   },
   {
@@ -284,7 +284,7 @@
     "Usage": "Antifungal",
     "StockQuantity": 30,
     "ReorderLevel": 12,
-    "Unit": "tube",
+    "QuantityUnit": "tube",
     "ExpiryDate": "2026-11-19T23:00:00-08:00"
   },
   {
@@ -293,7 +293,7 @@
     "Usage": "Antibiotic",
     "StockQuantity": 45,
     "ReorderLevel": 18,
-    "Unit": "tube",
+    "QuantityUnit": "tube",
     "ExpiryDate": "2026-08-30T00:00:00-07:00"
   },
   {
@@ -302,7 +302,7 @@
     "Usage": "Antibiotic",
     "StockQuantity": 45,
     "ReorderLevel": 18,
-    "Unit": "tube",
+    "QuantityUnit": "tube",
     "ExpiryDate": "2026-09-15T00:00:00-07:00"
   },
   {
@@ -311,7 +311,7 @@
     "Usage": "Barrier cream",
     "StockQuantity": 50,
     "ReorderLevel": 20,
-    "Unit": "tube",
+    "QuantityUnit": "tube",
     "ExpiryDate": "2027-02-14T23:00:00-08:00"
   },
   {
@@ -320,7 +320,7 @@
     "Usage": "Barrier cream",
     "StockQuantity": 50,
     "ReorderLevel": 20,
-    "Unit": "tube",
+    "QuantityUnit": "tube",
     "ExpiryDate": "2027-01-19T23:00:00-08:00"
   },
   {
@@ -329,7 +329,7 @@
     "Usage": "Anti-itch",
     "StockQuantity": 35,
     "ReorderLevel": 15,
-    "Unit": "bottle",
+    "QuantityUnit": "bottle",
     "ExpiryDate": "2026-10-30T00:00:00-07:00"
   },
   {
@@ -338,7 +338,7 @@
     "Usage": "Laxative",
     "StockQuantity": 40,
     "ReorderLevel": 15,
-    "Unit": "bottle",
+    "QuantityUnit": "bottle",
     "ExpiryDate": "2026-12-19T23:00:00-08:00"
   },
   {
@@ -347,7 +347,7 @@
     "Usage": "Stool softener",
     "StockQuantity": 400,
     "ReorderLevel": 150,
-    "Unit": "capsule",
+    "QuantityUnit": "capsule",
     "ExpiryDate": "2026-11-09T23:00:00-08:00"
   },
   {
@@ -356,7 +356,7 @@
     "Usage": "Antacid",
     "StockQuantity": 500,
     "ReorderLevel": 150,
-    "Unit": "tablet",
+    "QuantityUnit": "tablet",
     "ExpiryDate": "2027-02-27T23:00:00-08:00"
   },
   {
@@ -365,7 +365,7 @@
     "Usage": "Vitamin supplement",
     "StockQuantity": 700,
     "ReorderLevel": 250,
-    "Unit": "tablet",
+    "QuantityUnit": "tablet",
     "ExpiryDate": "2027-06-15T00:00:00-07:00"
   },
   {
@@ -374,7 +374,7 @@
     "Usage": "Mineral supplement",
     "StockQuantity": 700,
     "ReorderLevel": 250,
-    "Unit": "tablet",
+    "QuantityUnit": "tablet",
     "ExpiryDate": "2027-05-20T00:00:00-07:00"
   },
   {
@@ -383,7 +383,7 @@
     "Usage": "Antidepressant",
     "StockQuantity": 300,
     "ReorderLevel": 100,
-    "Unit": "tablet",
+    "QuantityUnit": "tablet",
     "ExpiryDate": "2026-09-25T00:00:00-07:00"
   },
   {
@@ -392,7 +392,7 @@
     "Usage": "Dry eyes",
     "StockQuantity": 60,
     "ReorderLevel": 25,
-    "Unit": "bottle",
+    "QuantityUnit": "bottle",
     "ExpiryDate": "2026-08-15T00:00:00-07:00"
   },
   {
@@ -401,7 +401,7 @@
     "Usage": "Dry eyes",
     "StockQuantity": 50,
     "ReorderLevel": 20,
-    "Unit": "bottle",
+    "QuantityUnit": "bottle",
     "ExpiryDate": "2026-09-20T00:00:00-07:00"
   },
   {
@@ -410,7 +410,7 @@
     "Usage": "Eye inflammation",
     "StockQuantity": 25,
     "ReorderLevel": 10,
-    "Unit": "bottle",
+    "QuantityUnit": "bottle",
     "ExpiryDate": "2026-06-10T00:00:00-07:00"
   },
   {
@@ -419,7 +419,7 @@
     "Usage": "Glaucoma",
     "StockQuantity": 40,
     "ReorderLevel": 15,
-    "Unit": "bottle",
+    "QuantityUnit": "bottle",
     "ExpiryDate": "2026-07-25T00:00:00-07:00"
   },
   {
@@ -428,7 +428,7 @@
     "Usage": "Glaucoma",
     "StockQuantity": 35,
     "ReorderLevel": 15,
-    "Unit": "bottle",
+    "QuantityUnit": "bottle",
     "ExpiryDate": "2026-08-30T00:00:00-07:00"
   },
   {
@@ -437,7 +437,7 @@
     "Usage": "Antibiotic",
     "StockQuantity": 300,
     "ReorderLevel": 100,
-    "Unit": "capsule",
+    "QuantityUnit": "capsule",
     "ExpiryDate": "2026-05-15T00:00:00-07:00"
   },
   {
@@ -446,7 +446,7 @@
     "Usage": "Antibiotic",
     "StockQuantity": 200,
     "ReorderLevel": 75,
-    "Unit": "tablet",
+    "QuantityUnit": "tablet",
     "ExpiryDate": "2026-07-20T00:00:00-07:00"
   },
   {
@@ -455,7 +455,7 @@
     "Usage": "Antibiotic",
     "StockQuantity": 200,
     "ReorderLevel": 75,
-    "Unit": "tablet",
+    "QuantityUnit": "tablet",
     "ExpiryDate": "2026-09-10T00:00:00-07:00"
   },
   {
@@ -464,7 +464,7 @@
     "Usage": "Antibiotic",
     "StockQuantity": 250,
     "ReorderLevel": 90,
-    "Unit": "capsule",
+    "QuantityUnit": "capsule",
     "ExpiryDate": "2026-06-25T00:00:00-07:00"
   },
   {
@@ -473,7 +473,7 @@
     "Usage": "Antibiotic",
     "StockQuantity": 150,
     "ReorderLevel": 50,
-    "Unit": "tablet",
+    "QuantityUnit": "tablet",
     "ExpiryDate": "2026-08-05T00:00:00-07:00"
   },
   {
@@ -482,7 +482,7 @@
     "Usage": "Digestive health",
     "StockQuantity": 300,
     "ReorderLevel": 100,
-    "Unit": "capsule",
+    "QuantityUnit": "capsule",
     "ExpiryDate": "2026-12-29T23:00:00-08:00"
   },
   {
@@ -491,7 +491,7 @@
     "Usage": "Digestive health",
     "StockQuantity": 250,
     "ReorderLevel": 90,
-    "Unit": "capsule",
+    "QuantityUnit": "capsule",
     "ExpiryDate": "2027-01-14T23:00:00-08:00"
   },
   {
@@ -500,7 +500,7 @@
     "Usage": "Sore throat",
     "StockQuantity": 400,
     "ReorderLevel": 150,
-    "Unit": "lozenge",
+    "QuantityUnit": "lozenge",
     "ExpiryDate": "2027-03-20T00:00:00-07:00"
   },
   {
@@ -509,7 +509,7 @@
     "Usage": "Sore throat",
     "StockQuantity": 350,
     "ReorderLevel": 120,
-    "Unit": "lozenge",
+    "QuantityUnit": "lozenge",
     "ExpiryDate": "2027-02-27T23:00:00-08:00"
   },
   {
@@ -518,7 +518,7 @@
     "Usage": "Sore throat",
     "StockQuantity": 40,
     "ReorderLevel": 15,
-    "Unit": "bottle",
+    "QuantityUnit": "bottle",
     "ExpiryDate": "2026-11-09T23:00:00-08:00"
   },
   {
@@ -527,7 +527,7 @@
     "Usage": "Iron supplement",
     "StockQuantity": 300,
     "ReorderLevel": 100,
-    "Unit": "tablet",
+    "QuantityUnit": "tablet",
     "ExpiryDate": "2027-04-15T00:00:00-07:00"
   },
   {
@@ -536,7 +536,7 @@
     "Usage": "Vitamin supplement",
     "StockQuantity": 400,
     "ReorderLevel": 150,
-    "Unit": "tablet",
+    "QuantityUnit": "tablet",
     "ExpiryDate": "2027-05-30T00:00:00-07:00"
   }
 ]

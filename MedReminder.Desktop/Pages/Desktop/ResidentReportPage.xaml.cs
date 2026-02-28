@@ -52,10 +52,5 @@ namespace MedReminder.Pages.Desktop
             await Shell.Current.GoToAsync($"//{nameof(FloorPlanPage)}");
         }
 
-        private async void OnLogoutClicked(object sender, EventArgs e)
-        {
-            if (Shell.Current is AppShell shell)
-                await shell.LogoutAsync();
-        }
     }
 }

@@ -8,10 +8,6 @@
     Title="Floor Plan"
     BackgroundColor="{StaticResource Floorplan_Main_Background}">
 
-    <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Logout" Clicked="OnLogoutClicked" Priority="0" Order="Primary" />
-    </ContentPage.ToolbarItems>
-
     <!-- Whole page -->
     <Grid Padding="16"
           ColumnDefinitions="3*,2*"
@@ -87,12 +83,12 @@
 
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="vm:RoomTile">
-                    <Border Padding="10"
+                    <Border Padding="12"
                             Margin="6"
                             StrokeThickness="1"
                             Stroke="{StaticResource Floorplan_Card_Border}"
                             BackgroundColor="{StaticResource Floorplan_Card_Background}"
-                            HeightRequest="82">
+                            HeightRequest="88">
                         <Border.Triggers>
                             <DataTrigger TargetType="Border" Binding="{Binding IsSelected}" Value="True">
                                 <Setter Property="BackgroundColor" Value="{StaticResource Button_View}"/>
@@ -100,41 +96,34 @@
                             </DataTrigger>
                         </Border.Triggers>
 
-                        <Grid RowDefinitions="Auto,*">
-                            <HorizontalStackLayout Spacing="8">
-                                <Label Text="{Binding RoomLabel}"
-                                       FontSize="13"
-                                       FontAttributes="Bold"
-                                       TextColor="{StaticResource Floorplan_Font_Primary}">
-                                    <Label.Triggers>
-                                        <DataTrigger TargetType="Label" Binding="{Binding IsSelected}" Value="True">
-                                            <Setter Property="TextColor" Value="White"/>
-                                        </DataTrigger>
-                                    </Label.Triggers>
-                                </Label>
-                                <Label Text="{Binding KindShort}"
-                                       FontSize="12"
-                                       TextColor="{StaticResource Floorplan_Font_Primary}"
-                                       VerticalOptions="Center">
-                                    <Label.Triggers>
-                                        <DataTrigger TargetType="Label" Binding="{Binding IsSelected}" Value="True">
-                                            <Setter Property="TextColor" Value="White"/>
-                                        </DataTrigger>
-                                    </Label.Triggers>
-                                </Label>
-                            </HorizontalStackLayout>
+                        <Grid RowDefinitions="1*,2*" RowSpacing="2">
 
+                            <!-- Top 1/3: icon (1/5) + room number (4/5) -->
+                            <Grid ColumnDefinitions="1*,4*" ColumnSpacing="2">
+                                <Image Source="{Binding KindIcon}" 
+                                       WidthRequest="36" HeightRequest="36" VerticalOptions="Start" HorizontalOptions="Start" Margin="0,-5,0,0"/>
+                                <Label Grid.Column="1"
+                                       Text="{Binding RoomLabel}" FontSize="16" FontAttributes="Bold" 
+                                       TextColor="{StaticResource Floorplan_Font_Primary}" VerticalOptions="Center" Margin="15,0,0,0">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding IsSelected}" Value="True">
+                                            <Setter Property="TextColor" Value="White"/>
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+                            </Grid>
+
+                            <!-- Bottom 2/3: resident names -->
                             <Label Grid.Row="1"
-                                   Text="{Binding OccupancyText}"
-                                   FontSize="12"
-                                   TextColor="{StaticResource Floorplan_Font_Primary}"
-                                   LineBreakMode="TailTruncation">
+                                   Text="{Binding OccupancyText}" FontSize="12" TextColor="{StaticResource Floorplan_Font_Primary}"
+                                   LineBreakMode="WordWrap" MaxLines="3" Margin="5,8,0,0">
                                 <Label.Triggers>
                                     <DataTrigger TargetType="Label" Binding="{Binding IsSelected}" Value="True">
                                         <Setter Property="TextColor" Value="White"/>
                                     </DataTrigger>
                                 </Label.Triggers>
                             </Label>
+
                         </Grid>
 
                     </Border>

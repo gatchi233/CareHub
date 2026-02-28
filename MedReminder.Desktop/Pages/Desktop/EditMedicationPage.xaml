@@ -7,10 +7,6 @@
     Title="Medication"
     BackgroundColor="{StaticResource Medication_Main_Background}">
 
-    <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Logout" Clicked="OnLogoutClicked" Priority="1" Order="Primary" />
-    </ContentPage.ToolbarItems>
-
     <Grid Padding="16" RowDefinitions="Auto,Auto,*" RowSpacing="12">
 
         <!-- ── Page header ─────────────────────────────────────────────────── -->
@@ -33,7 +29,7 @@
                 <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
                     <Image Grid.Column="0" Source="icons8_save_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
                     <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Save}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
-                        <Label Text="SAVE" TextColor="{StaticResource Button_Save_Font}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
+                        <Label Text="SAVE" TextColor="{StaticResource Button_Font_Primary}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
                     </Border>
                 </Grid>
                 <Border.GestureRecognizers>
@@ -61,7 +57,7 @@
                 <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
                     <Image Grid.Column="0" Source="icons8_delete_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
                     <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Delete}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
-                        <Label Text="DELETE" TextColor="{StaticResource Button_Delete_Font}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
+                        <Label Text="DELETE" TextColor="{StaticResource Button_Font_Primary}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
                     </Border>
                 </Grid>
                 <Border.GestureRecognizers>
@@ -82,120 +78,147 @@
             </Border.StrokeShape>
 
             <ScrollView>
-                <VerticalStackLayout Spacing="16">
+                <VerticalStackLayout Spacing="0">
 
-                    <Label Text="MEDICATION DETAILS"
-                           FontSize="11" FontAttributes="Bold" CharacterSpacing="1.5"
+                    <!-- ─── MEDICATION INFO ─────────────────────────────── -->
+                    <Label Text="MEDICATION INFO"
+                           FontSize="10" FontAttributes="Bold" CharacterSpacing="1"
                            TextColor="{StaticResource Medication_Font_Secondary}"
-                           Margin="0,0,0,4"/>
-                    <BoxView HeightRequest="1" Color="{StaticResource Medication_Card_Border}" Margin="0,0,0,4"/>
+                           Margin="0,4,0,0"/>
+                    <BoxView HeightRequest="1" Color="{StaticResource Medication_Card_Border}" Margin="0,4,0,10"/>
 
-                    <!-- Medication name -->
-            <VerticalStackLayout Spacing="4">
-                <Label Text="Medication name *" TextColor="{StaticResource Medication_Font_Primary}" />
-                <Entry Placeholder="e.g., Amlodipine"
-                       Text="{Binding MedName}" />
-            </VerticalStackLayout>
+                    <!-- Medication name with autocomplete -->
+                    <VerticalStackLayout Spacing="4" Margin="0,0,0,10">
+                        <Label Text="Medication name *" FontSize="11"
+                               TextColor="{StaticResource Medication_Font_Secondary}"/>
+                        <Entry x:Name="MedNameEntry"
+                               Placeholder="Start typing to search inventory..."
+                               PlaceholderColor="{StaticResource Medication_Font_Secondary}"
+                               Text="{Binding MedName}"
+                               TextChanged="OnMedNameTextChanged"
+                               Completed="OnMedNameCompleted"
+                               TextColor="{StaticResource Medication_Font_Primary}"/>
+                        <CollectionView x:Name="SuggestionList"
+                                        IsVisible="False"
+                                        MaximumHeightRequest="160"
+                                        SelectionMode="Single"
+                                        SelectionChanged="OnSuggestionSelected">
+                            <CollectionView.ItemsLayout>
+                                <LinearItemsLayout Orientation="Vertical" ItemSpacing="1"/>
+                            </CollectionView.ItemsLayout>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Padding="10,7"
+                                            BackgroundColor="{StaticResource Medication_Main_Background}"
+                                            Stroke="{StaticResource Medication_Card_Border}"
+                                            StrokeThickness="0.5">
+                                        <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                                        <Label Text="{Binding MedName}" FontSize="12"
+                                               TextColor="{StaticResource Medication_Font_Primary}"/>
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
 
-            <!-- Treated condition -->
-            <VerticalStackLayout Spacing="4">
-                <Label Text="Treated condition"
-                       FontAttributes="Bold"
-                       TextColor="{StaticResource Medication_Font_Primary}" />
-                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
-                    <Picker x:Name="ConditionPicker"
-                            Grid.Column="0"
-                            WidthRequest="180"
-                            HeightRequest="40"
-                            SelectedIndexChanged="OnConditionPickerChanged">
-                        <Picker.Items>
-                            <x:String>Select condition</x:String>
-                            <x:String>Hypertension</x:String>
-                            <x:String>Heart disease</x:String>
-                            <x:String>Renal issue</x:String>
-                            <x:String>Diabetes</x:String>
-                            <x:String>Pain management</x:String>
-                            <x:String>Allergy control</x:String>
-                            <x:String>Infection</x:String>
-                            <x:String>Other</x:String>
-                        </Picker.Items>
-                    </Picker>
-                    <Entry x:Name="ConditionOtherEntry"
-                           Grid.Column="1"
-                           HeightRequest="40"
-                           HorizontalOptions="FillAndExpand"
-                           Placeholder="Details or other condition"
-                           Text="{Binding Usage}"
-                           IsEnabled="False" />
-                </Grid>
-            </VerticalStackLayout>
+                    <!-- Dose per administration -->
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="12" Margin="0,0,0,4">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Qty per dose *" FontSize="11"
+                                   TextColor="{StaticResource Medication_Font_Secondary}"/>
+                            <Entry x:Name="QtyEntry" Keyboard="Numeric" Placeholder="1"
+                                   PlaceholderColor="{StaticResource Medication_Font_Secondary}"
+                                   Text="{Binding Quantity}"
+                                   TextColor="{StaticResource Medication_Font_Primary}"/>
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Column="1" Spacing="4">
+                            <Label Text="Unit *" FontSize="11"
+                                   TextColor="{StaticResource Medication_Font_Secondary}"/>
+                            <Picker x:Name="UnitPicker"
+                                    SelectedItem="{Binding QuantityUnit}"
+                                    TextColor="{StaticResource Medication_Font_Primary}">
+                                <Picker.Items>
+                                    <x:String>Select unit</x:String>
+                                    <x:String>tablet</x:String>
+                                    <x:String>capsule</x:String>
+                                    <x:String>mL</x:String>
+                                    <x:String>drop</x:String>
+                                    <x:String>puff</x:String>
+                                    <x:String>patch</x:String>
+                                    <x:String>thin layer</x:String>
+                                    <x:String>other</x:String>
+                                </Picker.Items>
+                            </Picker>
+                        </VerticalStackLayout>
+                    </Grid>
 
-            <!-- Dose per time -->
-            <VerticalStackLayout Spacing="4">
-                <Label Text="Dose per time" TextColor="{StaticResource Medication_Font_Primary}"
-                       FontAttributes="Bold" />
-                <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="8">
-                    <Entry Grid.Column="0"
-                           WidthRequest="80"
-                           HeightRequest="40"
-                           Keyboard="Numeric"
-                           Placeholder="1"
-                           Text="{Binding Quantity}" />
-                    <Picker Grid.Column="1"
-                            x:Name="UnitPicker"
-                            WidthRequest="130"
-                            HeightRequest="40"
-                            HorizontalOptions="Start"
-                            SelectedItem="{Binding QuantityUnit}">
-                        <Picker.Items>
-                            <x:String>Select unit</x:String>
-                            <x:String>tablet</x:String>
-                            <x:String>capsule</x:String>
-                            <x:String>mL</x:String>
-                            <x:String>drop</x:String>
-                            <x:String>puff</x:String>
-                            <x:String>patch</x:String>
-                            <x:String>other</x:String>
-                        </Picker.Items>
-                    </Picker>
-                </Grid>
-            </VerticalStackLayout>
+                    <!-- Indication badges -->
+                    <VerticalStackLayout x:Name="IndicationSection" Spacing="4" Margin="0,6,0,4" IsVisible="False">
+                        <Label Text="Indication" FontSize="11"
+                               TextColor="{StaticResource Medication_Font_Secondary}"/>
+                        <FlexLayout x:Name="IndicationBadges" Wrap="Wrap"
+                                    Direction="Row" JustifyContent="Start"
+                                    AlignItems="Center" />
+                    </VerticalStackLayout>
 
-            <!-- Schedule -->
-            <VerticalStackLayout Spacing="8" Margin="0,8,0,0">
-                <Label Text="Schedule" FontAttributes="Bold" TextColor="{StaticResource Medication_Font_Primary}" />
-                <Label Text="Check days and set times per day." FontSize="12" TextColor="#78290F" />
+                    <!-- ─── SCHEDULE ────────────────────────────────────── -->
+                    <Label Text="SCHEDULE"
+                           FontSize="10" FontAttributes="Bold" CharacterSpacing="1"
+                           TextColor="{StaticResource Medication_Font_Secondary}"
+                           Margin="0,16,0,0"/>
+                    <BoxView HeightRequest="1" Color="{StaticResource Medication_Card_Border}" Margin="0,4,0,10"/>
 
-                <!-- Time frequency selection - aligned with columns -->
-                <Grid ColumnDefinitions="40,40,130,20,130,20,130" Margin="0,4,0,0" ColumnSpacing="2">
-                    <Label Grid.Column="0" Text="" />
-                    <Label Grid.Column="1" Text="" />
-                    <RadioButton x:Name="Radio1Time" Grid.Column="2" Content="1 time" GroupName="TimeFrequency" CheckedChanged="OnTimeFrequencyChanged" HorizontalOptions="Center" />
-                    <Label Grid.Column="3" Text="" />
-                    <RadioButton x:Name="Radio2Times" Grid.Column="4" Content="2 times" GroupName="TimeFrequency" CheckedChanged="OnTimeFrequencyChanged" HorizontalOptions="Center" />
-                    <Label Grid.Column="5" Text="" />
-                    <RadioButton x:Name="Radio3Times" Grid.Column="6" Content="3 times" GroupName="TimeFrequency" IsChecked="True" CheckedChanged="OnTimeFrequencyChanged" HorizontalOptions="Center" />
-                </Grid>
+                    <!-- Frequency selector -->
+                    <HorizontalStackLayout Spacing="4" Margin="0,0,0,8">
+                        <Label Text="Frequency:" FontSize="11" VerticalTextAlignment="Center"
+                               TextColor="{StaticResource Medication_Font_Secondary}"/>
+                        <RadioButton x:Name="Radio1Time" Content="1x" GroupName="TimeFrequency"
+                                     CheckedChanged="OnTimeFrequencyChanged"/>
+                        <RadioButton x:Name="Radio2Times" Content="2x" GroupName="TimeFrequency"
+                                     CheckedChanged="OnTimeFrequencyChanged"/>
+                        <RadioButton x:Name="Radio3Times" Content="3x" GroupName="TimeFrequency"
+                                     IsChecked="True" CheckedChanged="OnTimeFrequencyChanged"/>
+                    </HorizontalStackLayout>
 
-                <!-- Column headers -->
-                <Grid ColumnDefinitions="40,40,65,65,20,65,65,20,65,65" Margin="0,4,0,0" ColumnSpacing="2">
-                    <Label Grid.Column="0" Text="" />
-                    <Label Grid.Column="1" Text="" />
-                    <Label x:Name="LblHH1" Grid.Column="2" Text="HH1" FontSize="11" HorizontalTextAlignment="Center" />
-                    <Label x:Name="LblMM1" Grid.Column="3" Text="MM1" FontSize="11" HorizontalTextAlignment="Center" />
-                    <Label Grid.Column="4" Text="" />
-                    <Label x:Name="LblHH2" Grid.Column="5" Text="HH2" FontSize="11" HorizontalTextAlignment="Center" />
-                    <Label x:Name="LblMM2" Grid.Column="6" Text="MM2" FontSize="11" HorizontalTextAlignment="Center" />
-                    <Label Grid.Column="7" Text="" />
-                    <Label x:Name="LblHH3" Grid.Column="8" Text="HH3" FontSize="11" HorizontalTextAlignment="Center" />
-                    <Label x:Name="LblMM3" Grid.Column="9" Text="MM3" FontSize="11" HorizontalTextAlignment="Center" />
-                </Grid>
+                    <!-- Column headers: group labels + HH/MM sub-headers -->
+                    <Grid ColumnDefinitions="40,40,130,20,130,20,130" Margin="0,0,0,0" ColumnSpacing="2">
+                        <Label Grid.Column="0" Text=""/>
+                        <Label Grid.Column="1" Text=""/>
+                        <Label Grid.Column="2" Text="Time 1" FontSize="10" FontAttributes="Bold"
+                               TextColor="{StaticResource Medication_Font_Primary}" HorizontalTextAlignment="Center"/>
+                        <Label Grid.Column="3" Text=""/>
+                        <Label x:Name="LblTime2" Grid.Column="4" Text="Time 2" FontSize="10" FontAttributes="Bold"
+                               TextColor="{StaticResource Medication_Font_Primary}" HorizontalTextAlignment="Center"/>
+                        <Label Grid.Column="5" Text=""/>
+                        <Label x:Name="LblTime3" Grid.Column="6" Text="Time 3" FontSize="10" FontAttributes="Bold"
+                               TextColor="{StaticResource Medication_Font_Primary}" HorizontalTextAlignment="Center"/>
+                    </Grid>
+                    <Grid ColumnDefinitions="40,40,65,65,20,65,65,20,65,65" Margin="0,0,0,2" ColumnSpacing="2">
+                        <Label Grid.Column="0" Text="Day" FontSize="10"
+                               TextColor="{StaticResource Medication_Font_Secondary}" VerticalTextAlignment="Center"/>
+                        <Label Grid.Column="1" Text=""/>
+                        <Label x:Name="LblHH1" Grid.Column="2" Text="HH" FontSize="10"
+                               TextColor="{StaticResource Medication_Font_Secondary}" HorizontalTextAlignment="Center"/>
+                        <Label x:Name="LblMM1" Grid.Column="3" Text="MM" FontSize="10"
+                               TextColor="{StaticResource Medication_Font_Secondary}" HorizontalTextAlignment="Center"/>
+                        <Label Grid.Column="4" Text=""/>
+                        <Label x:Name="LblHH2" Grid.Column="5" Text="HH" FontSize="10"
+                               TextColor="{StaticResource Medication_Font_Secondary}" HorizontalTextAlignment="Center"/>
+                        <Label x:Name="LblMM2" Grid.Column="6" Text="MM" FontSize="10"
+                               TextColor="{StaticResource Medication_Font_Secondary}" HorizontalTextAlignment="Center"/>
+                        <Label Grid.Column="7" Text=""/>
+                        <Label x:Name="LblHH3" Grid.Column="8" Text="HH" FontSize="10"
+                               TextColor="{StaticResource Medication_Font_Secondary}" HorizontalTextAlignment="Center"/>
+                        <Label x:Name="LblMM3" Grid.Column="9" Text="MM" FontSize="10"
+                               TextColor="{StaticResource Medication_Font_Secondary}" HorizontalTextAlignment="Center"/>
+                    </Grid>
 
                 <!-- Sunday -->
                 <Grid ColumnDefinitions="40,40,65,65,20,65,65,20,65,65" Margin="0,4,0,0" ColumnSpacing="2">
                     <Label Grid.Column="0" Text="Sun" VerticalOptions="Center" />
                     <CheckBox Grid.Column="1" IsChecked="{Binding ReminderSun}" VerticalOptions="Center" />
-                    <Picker x:Name="SunHH1" Grid.Column="2" WidthRequest="65" HeightRequest="36">
+                    <Picker x:Name="SunHH1" Grid.Column="2" WidthRequest="65" HeightRequest="36"
+                            SelectedIndexChanged="OnScheduleTimeChanged">
                         <Picker.Items>
                             <x:String>0</x:String>
                             <x:String>1</x:String>
@@ -223,7 +246,8 @@
                             <x:String>23</x:String>
                         </Picker.Items>
                     </Picker>
-                    <Picker x:Name="SunMM1" Grid.Column="3" WidthRequest="65" HeightRequest="36">
+                    <Picker x:Name="SunMM1" Grid.Column="3" WidthRequest="65" HeightRequest="36"
+                            SelectedIndexChanged="OnScheduleTimeChanged">
                         <Picker.Items>
                             <x:String>00</x:String>
                             <x:String>15</x:String>
@@ -232,7 +256,8 @@
                         </Picker.Items>
                     </Picker>
                     <Label Grid.Column="4" Text="" />
-                    <Picker x:Name="SunHH2" Grid.Column="5" WidthRequest="65" HeightRequest="36">
+                    <Picker x:Name="SunHH2" Grid.Column="5" WidthRequest="65" HeightRequest="36"
+                            SelectedIndexChanged="OnScheduleTimeChanged">
                         <Picker.Items>
                             <x:String>0</x:String>
                             <x:String>1</x:String>
@@ -260,7 +285,8 @@
                             <x:String>23</x:String>
                         </Picker.Items>
                     </Picker>
-                    <Picker x:Name="SunMM2" Grid.Column="6" WidthRequest="65" HeightRequest="36">
+                    <Picker x:Name="SunMM2" Grid.Column="6" WidthRequest="65" HeightRequest="36"
+                            SelectedIndexChanged="OnScheduleTimeChanged">
                         <Picker.Items>
                             <x:String>00</x:String>
                             <x:String>15</x:String>
@@ -269,7 +295,8 @@
                         </Picker.Items>
                     </Picker>
                     <Label Grid.Column="7" Text="" />
-                    <Picker x:Name="SunHH3" Grid.Column="8" WidthRequest="65" HeightRequest="36">
+                    <Picker x:Name="SunHH3" Grid.Column="8" WidthRequest="65" HeightRequest="36"
+                            SelectedIndexChanged="OnScheduleTimeChanged">
                         <Picker.Items>
                             <x:String>0</x:String>
                             <x:String>1</x:String>
@@ -297,7 +324,8 @@
                             <x:String>23</x:String>
                         </Picker.Items>
                     </Picker>
-                    <Picker x:Name="SunMM3" Grid.Column="9" WidthRequest="65" HeightRequest="36">
+                    <Picker x:Name="SunMM3" Grid.Column="9" WidthRequest="65" HeightRequest="36"
+                            SelectedIndexChanged="OnScheduleTimeChanged">
                         <Picker.Items>
                             <x:String>00</x:String>
                             <x:String>15</x:String>
@@ -1001,8 +1029,7 @@
                             <x:String>45</x:String>
                         </Picker.Items>
                     </Picker>
-                </Grid>
-            </VerticalStackLayout>
+                    </Grid>
 
                 </VerticalStackLayout>
             </ScrollView>

@@ -6,10 +6,6 @@
     xmlns:pages="clr-namespace:MedReminder.Pages"
     Title="Help"
     BackgroundColor="{StaticResource Medication_Main_Background}">
-    <pages:AuthPage.ToolbarItems>
-        <ToolbarItem Text="Logout" Clicked="OnLogoutClicked" Priority="1" Order="Primary" />
-    </pages:AuthPage.ToolbarItems>
-
     <Grid Padding="16" RowDefinitions="Auto,*" RowSpacing="12">
 
         <!-- ── Page header ─────────────────────────────────────────────────── -->

@@ -42,13 +42,20 @@ namespace MedReminder.Pages.Desktop
                 ? "Medications"
                 : $"Medications for {ResidentName}";
 
-            var all = await _medicationService.LoadAsync();
-            var filtered = all.Where(m => m.ResidentId == ResidentId)
-                              .OrderBy(m => m.MedName ?? string.Empty);
+            try
+            {
+                var all = await _medicationService.LoadAsync();
+                var filtered = all.Where(m => m.ResidentId == ResidentId)
+                                  .OrderBy(m => m.MedName ?? string.Empty);
 
-            Medications.Clear();
-            foreach (var med in filtered)
-                Medications.Add(med);
+                Medications.Clear();
+                foreach (var med in filtered)
+                    Medications.Add(med);
+            }
+            catch
+            {
+                // Offline — keep whatever's currently in the list
+            }
         }
 
         private async void OnEditClicked(object sender, EventArgs e)
@@ -80,7 +87,14 @@ namespace MedReminder.Pages.Desktop
             if (!ok)
                 return;
 
-            await _medicationService.DeleteAsync(med);
+            try
+            {
+                await _medicationService.DeleteAsync(med);
+            }
+            catch
+            {
+                // Offline — delete queued by wrapper
+            }
 
             Medications.Remove(med);
         }
@@ -119,10 +133,5 @@ namespace MedReminder.Pages.Desktop
             await Shell.Current.GoToAsync($"{nameof(EditResidentPage)}?id={ResidentId}");
         }
 
-        private async void OnLogoutClicked(object sender, EventArgs e)
-        {
-            if (Shell.Current is AppShell shell)
-                await shell.LogoutAsync();
-        }
     }
 }

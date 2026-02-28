@@ -1,40 +1,48 @@
-﻿using System.Net.Http.Json;
+using System.Net;
+using System.Net.Http.Json;
+using MedReminder.Desktop.Services.Sync;
 using MedReminder.Models;
 using MedReminder.Services.Abstractions;
 
+namespace MedReminder.Services.Remote;
 
-namespace MedReminder.Services.Remote
+public class ResidentApiService : IResidentService
 {
-    public class ResidentApiService : IResidentService
+    private readonly HttpClient _http;
+
+    public ResidentApiService(HttpClient http)
     {
-        private readonly HttpClient _http;
+        _http = http;
+    }
 
-        public ResidentApiService(HttpClient http)
+    public async Task<List<Resident>> LoadAsync()
+    {
+        try
         {
-            _http = http;
-        }
-
-        public async Task<List<Resident>> LoadAsync()
-        {
-            // GET api/residents
             return await _http.GetFromJsonAsync<List<Resident>>("api/residents")
                    ?? new List<Resident>();
         }
-
-        public async Task UpsertAsync(Resident item)
+        catch (HttpRequestException ex)
         {
-            if (item == null) throw new ArgumentNullException(nameof(item));
+            throw new OfflineException("API unreachable (Load Residents).", ex);
+        }
+        catch (TaskCanceledException ex)
+        {
+            throw new OfflineException("API timeout (Load Residents).", ex);
+        }
+    }
 
-            // Your model uses int Id. We keep the same semantics as your JSON service:
-            // - Id == 0 => create
-            // - Id > 0  => update
+    public async Task UpsertAsync(Resident item)
+    {
+        if (item == null) throw new ArgumentNullException(nameof(item));
+
+        try
+        {
             if (item.Id == Guid.Empty)
             {
-                // POST api/residents
                 var resp = await _http.PostAsJsonAsync("api/residents", item);
                 resp.EnsureSuccessStatusCode();
 
-                // Recommended: API returns the created resident with generated Id
                 var created = await resp.Content.ReadFromJsonAsync<Resident>();
                 if (created != null && created.Id != Guid.Empty)
                     item.Id = created.Id;
@@ -42,19 +50,42 @@ namespace MedReminder.Services.Remote
                 return;
             }
 
-            // PUT api/residents/{id}
             var put = await _http.PutAsJsonAsync($"api/residents/{item.Id}", item);
             put.EnsureSuccessStatusCode();
         }
-
-        public async Task DeleteAsync(Resident item)
+        catch (HttpRequestException ex)
         {
-            if (item == null) throw new ArgumentNullException(nameof(item));
-            if (item.Id <= Guid.Empty) return;
+            throw new OfflineException("API unreachable (Upsert Resident).", ex);
+        }
+        catch (TaskCanceledException ex)
+        {
+            throw new OfflineException("API timeout (Upsert Resident).", ex);
+        }
+    }
 
-            // DELETE api/residents/{id}
-            var del = await _http.DeleteAsync($"api/residents/{item.Id}");
-            del.EnsureSuccessStatusCode();
+    public Task ReplaceAllAsync(List<Resident> items) => Task.CompletedTask;
+
+    public async Task DeleteAsync(Resident item)
+    {
+        if (item == null) throw new ArgumentNullException(nameof(item));
+        if (item.Id == Guid.Empty) return;
+
+        try
+        {
+            var resp = await _http.DeleteAsync($"api/residents/{item.Id}");
+
+            if (resp.StatusCode == HttpStatusCode.NotFound)
+                return;
+
+            resp.EnsureSuccessStatusCode();
+        }
+        catch (HttpRequestException ex)
+        {
+            throw new OfflineException("API unreachable (Delete Resident).", ex);
+        }
+        catch (TaskCanceledException ex)
+        {
+            throw new OfflineException("API timeout (Delete Resident).", ex);
         }
     }
 }

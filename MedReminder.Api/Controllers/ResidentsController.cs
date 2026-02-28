@@ -48,11 +48,16 @@ public sealed class ResidentsController : ControllerBase
             return BadRequest("Route id does not match resident.Id");
 
         var exists = await _db.Residents.AnyAsync(r => r.Id == id, ct);
-        if (!exists) return NotFound();
+        if (exists)
+        {
+            _db.Entry(resident).State = EntityState.Modified;
+        }
+        else
+        {
+            _db.Residents.Add(resident);
+        }
 
-        _db.Entry(resident).State = EntityState.Modified;
         await _db.SaveChangesAsync(ct);
-
         return NoContent();
     }
 

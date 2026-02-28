@@ -1,10 +1,11 @@
+using MedReminder.Desktop.Services.Sync;
+using MedReminder.Models;
+using MedReminder.Services;
+using MedReminder.Services.Abstractions;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
-using MedReminder.Desktop.Services.Sync;
-using MedReminder.Models;
-using MedReminder.Services.Abstractions;
 
 namespace MedReminder.ViewModels;
 
@@ -13,7 +14,6 @@ public class ResidentObservationsViewModel : INotifyPropertyChanged
     private readonly IObservationService _observations;
     private bool _hasLoadedOnce;
     public bool IsOffline => !ConnectivityHelper.IsOnline();
-    public ICommand SyncCommand { get; }
     public enum ObservationRange
     {
         Today,
@@ -49,29 +49,6 @@ public class ResidentObservationsViewModel : INotifyPropertyChanged
         AddCommand = new Command(async () => await AddAsync());
         EditCommand = new Command<Observation>(async o => await EditAsync(o));
         DeleteCommand = new Command<Observation>(async o => await DeleteAsync(o));
-        SyncCommand = new Command(async() => await SyncAsync(),() => !IsBusy);
-    }
-
-    private async Task SyncAsync()
-    {
-        if (IsBusy) return;
-
-        try
-        {
-            IsBusy = true;
-            var synced = await _observations.SyncAsync(); // wrapper/coordinator
-            StatusMessage = $"Synced {synced} item(s)";
-            await LoadAsync();
-        }
-        catch (Exception ex)
-        {
-            await Shell.Current.DisplayAlert("Sync failed", ex.Message, "OK");
-        }
-        finally
-        {
-            IsBusy = false;
-            (SyncCommand as Command)?.ChangeCanExecute();
-        }
     }
 
     public Guid ResidentId { get; private set; } = Guid.Empty;
@@ -197,6 +174,10 @@ public class ResidentObservationsViewModel : INotifyPropertyChanged
             StatusMessage = $"{Items.Count} observations";
             SelectedObservation = null;
         }
+        catch (OfflineException)
+        {
+            StatusMessage = "Offline mode (API unreachable)";
+        }
         catch (Exception ex)
         {
             if (Shell.Current != null)
@@ -208,38 +189,46 @@ public class ResidentObservationsViewModel : INotifyPropertyChanged
         }
     }
 
-    private async Task AddAsync()
+    private string GetRecordedBy()
     {
-        if (ResidentId == Guid.Empty)
-            return;
+        var auth = MauiProgram.Services.GetService<AuthService>();
+        return auth?.CurrentUser?.StaffName ?? "Unknown";
+    }
 
-        if (IsBusy)
+    // Called from the page after ADD popup returns
+    public async Task AddObservationFromPopupAsync(
+        string? temperature, string? bpHigh, string? bpLow,
+        string? pulse, string? spo2, string? notes)
+    {
+        if (ResidentId == Guid.Empty || IsBusy)
             return;
 
         try
         {
-            // Minimal: prompt for Type + Value + RecordedBy
-            var type = await Shell.Current.DisplayPromptAsync("New Observation", "Type (e.g., Note / BP / Temp):", "OK", "Cancel", "Note");
-            if (string.IsNullOrWhiteSpace(type)) return;
-
-            var value = await Shell.Current.DisplayPromptAsync("New Observation", "Value:", "OK", "Cancel", "Example");
-            if (string.IsNullOrWhiteSpace(value)) return;
-
-            var by = await Shell.Current.DisplayPromptAsync("New Observation", "Recorded by:", "OK", "Cancel", "Staff");
-            if (string.IsNullOrWhiteSpace(by)) by = "Staff";
-
             IsBusy = true;
 
             var obs = new Observation
             {
                 Id = Guid.Empty,
                 ResidentId = ResidentId,
-                RecordedBy = by,
-                Type = type,
-                Value = value
+                RecordedBy = GetRecordedBy()
             };
 
+            obs.SetVitals(new VitalsData
+            {
+                Temp = string.IsNullOrWhiteSpace(temperature) ? null : temperature,
+                BpHigh = string.IsNullOrWhiteSpace(bpHigh) ? null : bpHigh,
+                BpLow = string.IsNullOrWhiteSpace(bpLow) ? null : bpLow,
+                Pulse = string.IsNullOrWhiteSpace(pulse) ? null : pulse,
+                Spo2 = string.IsNullOrWhiteSpace(spo2) ? null : spo2,
+                Notes = string.IsNullOrWhiteSpace(notes) ? null : notes
+            });
+
             await _observations.UpsertAsync(obs);
+        }
+        catch (OfflineException)
+        {
+            StatusMessage = "Saved offline (queued) - sync when online";
         }
         catch (Exception ex)
         {
@@ -254,17 +243,72 @@ public class ResidentObservationsViewModel : INotifyPropertyChanged
         await LoadAsync();
     }
 
-    private async Task EditAsync(Observation? item)
+    // Called from the page after EDIT popup returns
+    public async Task EditObservationFromPopupAsync(Observation item,
+        string? temperature, string? bpHigh, string? bpLow,
+        string? pulse, string? spo2, string? notes)
     {
-        if (item is null) return;
+        if (IsBusy) return;
 
-        // Simple edit: edit Notes
-        var notes = await Shell.Current.DisplayPromptAsync("Edit Observation", "Notes:", "Save", "Cancel", item.Value);
-        if (notes is null) return;
+        try
+        {
+            IsBusy = true;
 
-        item.Value = notes;
-        await _observations.UpsertAsync(item);
+            item.SetVitals(new VitalsData
+            {
+                Temp = string.IsNullOrWhiteSpace(temperature) ? null : temperature,
+                BpHigh = string.IsNullOrWhiteSpace(bpHigh) ? null : bpHigh,
+                BpLow = string.IsNullOrWhiteSpace(bpLow) ? null : bpLow,
+                Pulse = string.IsNullOrWhiteSpace(pulse) ? null : pulse,
+                Spo2 = string.IsNullOrWhiteSpace(spo2) ? null : spo2,
+                Notes = string.IsNullOrWhiteSpace(notes) ? null : notes
+            });
+
+            await _observations.UpsertAsync(item);
+        }
+        catch (OfflineException)
+        {
+            StatusMessage = "Edit saved offline (queued) - sync when online";
+        }
+        catch (Exception ex)
+        {
+            if (Shell.Current != null)
+                await Shell.Current.DisplayAlert("Edit Error", ex.Message, "OK");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+
         await LoadAsync();
+    }
+
+    private Task AddAsync()
+    {
+        _addRequested?.Invoke();
+        return Task.CompletedTask;
+    }
+
+    private Task EditAsync(Observation? item)
+    {
+        if (item is null) return Task.CompletedTask;
+        _editRequested?.Invoke(item);
+        return Task.CompletedTask;
+    }
+
+    // The page sets these actions to trigger popups
+    private Action? _addRequested;
+    public Action? AddRequested
+    {
+        get => _addRequested;
+        set => _addRequested = value;
+    }
+
+    private Action<Observation>? _editRequested;
+    public Action<Observation>? EditRequested
+    {
+        get => _editRequested;
+        set => _editRequested = value;
     }
 
     private async Task DeleteAsync(Observation? item)
@@ -274,7 +318,14 @@ public class ResidentObservationsViewModel : INotifyPropertyChanged
         var ok = await Shell.Current.DisplayAlert("Delete", "Delete this observation?", "Delete", "Cancel");
         if (!ok) return;
 
-        await _observations.DeleteAsync(item);
+        try
+        {
+            await _observations.DeleteAsync(item);
+        }
+        catch (OfflineException)
+        {
+            StatusMessage = "Delete queued offline - sync when online";
+        }
         await LoadAsync();
     }
 

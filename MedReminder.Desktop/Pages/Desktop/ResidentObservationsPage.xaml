@@ -6,10 +6,6 @@
     Title="Observations"
     BackgroundColor="{StaticResource Observation_Main_Background}">
 
-    <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Logout" Clicked="OnLogoutClicked" Priority="1" Order="Primary" />
-    </ContentPage.ToolbarItems>
-
     <Grid Padding="16" RowDefinitions="Auto,Auto,Auto,*" RowSpacing="12">
 
         <!-- ── Page header ─────────────────────────────────────────────────── -->
@@ -28,7 +24,7 @@
                     BackgroundColor="{StaticResource Alert_Warning}"
                     VerticalOptions="Center"
                     IsVisible="{Binding IsOffline}">
-                <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
                 <Label Text="OFFLINE" FontSize="10" FontAttributes="Bold"
                        TextColor="{StaticResource Button_Font_Primary}"/>
             </Border>
@@ -40,7 +36,7 @@
             <!-- ADD — dimmed when not available -->
             <Border StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}"
                     InputTransparent="{Binding CanAdd, Converter={StaticResource InverseBoolConverter}}">
-                <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
                 <Border.Triggers>
                     <DataTrigger TargetType="Border" Binding="{Binding CanAdd}" Value="False">
                         <Setter Property="Opacity" Value="0.35"/>
@@ -60,7 +56,7 @@
             <!-- EDIT — dimmed when no row selected -->
             <Border StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}"
                     InputTransparent="{Binding CanEdit, Converter={StaticResource InverseBoolConverter}}">
-                <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
                 <Border.Triggers>
                     <DataTrigger TargetType="Border" Binding="{Binding CanEdit}" Value="False">
                         <Setter Property="Opacity" Value="0.35"/>
@@ -79,7 +75,7 @@
 
             <!-- REFRESH -->
             <Border StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
-                <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
                 <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
                     <Image Grid.Column="0" Source="icons8_updates_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
                     <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Logout}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
@@ -91,24 +87,9 @@
                 </Border.GestureRecognizers>
             </Border>
 
-            <!-- SYNC — visible only when offline -->
-            <Border StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}"
-                    IsVisible="{Binding IsOffline}">
-                <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
-                <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
-                    <Image Grid.Column="0" Source="icons8_updates_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
-                    <Border Grid.Column="1" BackgroundColor="{StaticResource Alert_Info}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
-                        <Label Text="SYNC" TextColor="{StaticResource Button_Font_Primary}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
-                    </Border>
-                </Grid>
-                <Border.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding SyncCommand}"/>
-                </Border.GestureRecognizers>
-            </Border>
-
             <!-- CLOSE — back to resident page -->
             <Border StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
-                <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
                 <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
                     <Image Grid.Column="0" Source="icons8_close_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
                     <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Close}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
@@ -235,28 +216,22 @@
                                         <RoundRectangle CornerRadius="8"/>
                                     </Border.StrokeShape>
 
-                                    <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="5">
+                                    <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="6">
 
-                                        <!-- Type badge + date + actions -->
-                                        <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="6">
+                                        <!-- Header row: date + recorded by + actions -->
+                                        <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="6">
 
-                                            <Border Padding="6,2" StrokeThickness="0"
-                                                    BackgroundColor="{StaticResource Observation_Card_Border}"
-                                                    VerticalOptions="Center">
-                                                <Border.StrokeShape><RoundRectangle CornerRadius="3"/></Border.StrokeShape>
-                                                <Label Text="{Binding Type}"
-                                                       FontSize="10" FontAttributes="Bold"
-                                                       TextColor="{StaticResource Button_Font_Primary}"/>
-                                            </Border>
-
-                                            <Label Grid.Column="1"
-                                                   Text="{Binding RecordedAt, Converter={StaticResource UtcToLocalDateTimeConverter}}"
-                                                   FontSize="11"
-                                                   TextColor="{StaticResource Observation_Font_Secondary}"
-                                                   VerticalOptions="Center"/>
+                                            <VerticalStackLayout Spacing="1" VerticalOptions="Center">
+                                                <Label Text="{Binding RecordedAt, Converter={StaticResource UtcToLocalDateTimeConverter}}"
+                                                       FontSize="12" FontAttributes="Bold"
+                                                       TextColor="{StaticResource Observation_Font_Primary}"/>
+                                                <Label Text="{Binding RecordedBy, StringFormat='By: {0}'}"
+                                                       FontSize="10"
+                                                       TextColor="{StaticResource Observation_Font_Secondary}"/>
+                                            </VerticalStackLayout>
 
                                             <!-- EDIT -->
-                                            <Border Grid.Column="2" StrokeThickness="0" HeightRequest="24"
+                                            <Border Grid.Column="1" StrokeThickness="0" HeightRequest="24"
                                                     BackgroundColor="{StaticResource Button_Icon_Background}"
                                                     VerticalOptions="Center">
                                                 <Border.StrokeShape><RoundRectangle CornerRadius="3"/></Border.StrokeShape>
@@ -273,7 +248,7 @@
                                             </Border>
 
                                             <!-- DELETE -->
-                                            <Border Grid.Column="3" StrokeThickness="0" HeightRequest="24"
+                                            <Border Grid.Column="2" StrokeThickness="0" HeightRequest="24"
                                                     BackgroundColor="{StaticResource Button_Icon_Background}"
                                                     VerticalOptions="Center">
                                                 <Border.StrokeShape><RoundRectangle CornerRadius="3"/></Border.StrokeShape>
@@ -288,21 +263,113 @@
                                                                           CommandParameter="{Binding .}"/>
                                                 </Border.GestureRecognizers>
                                             </Border>
-
                                         </Grid>
 
-                                        <!-- Value -->
-                                        <Label Grid.Row="1"
-                                               Text="{Binding Value}"
-                                               FontSize="13"
-                                               TextColor="{StaticResource Observation_Font_Primary}"
-                                               LineBreakMode="WordWrap"/>
+                                        <BoxView Grid.Row="1" HeightRequest="1"
+                                                 Color="{StaticResource Observation_Card_Border}"
+                                                 Margin="0,0,0,0"/>
 
-                                        <!-- Recorded by -->
-                                        <Label Grid.Row="2"
-                                               Text="{Binding RecordedBy, StringFormat='By: {0}'}"
-                                               FontSize="11"
-                                               TextColor="{StaticResource Observation_Font_Secondary}"/>
+                                        <!-- Vitals grid (for Vitals type) -->
+                                        <VerticalStackLayout Grid.Row="2" Spacing="5"
+                                                             IsVisible="{Binding IsVitals}">
+
+                                            <!-- Vitals badges row -->
+                                            <FlexLayout Wrap="Wrap" Direction="Row"
+                                                        JustifyContent="Start" AlignItems="Center">
+
+                                                <!-- TEMP badge -->
+                                                <Border Padding="10,6" StrokeThickness="0" Margin="0,0,6,4"
+                                                        BackgroundColor="{StaticResource Badge_Temp}"
+                                                        IsVisible="{Binding HasTemp}">
+                                                    <Border.StrokeShape><RoundRectangle CornerRadius="0"/></Border.StrokeShape>
+                                                    <HorizontalStackLayout Spacing="8">
+                                                        <Label Text="TEMP" FontSize="11" FontAttributes="Bold"
+                                                               TextColor="{StaticResource Button_Font_Primary}"
+                                                               VerticalOptions="Center"/>
+                                                        <Label Text="{Binding DisplayTemp}" FontSize="12" FontAttributes="Bold"
+                                                               TextColor="{StaticResource Button_Font_Primary}"
+                                                               VerticalOptions="Center"/>
+                                                    </HorizontalStackLayout>
+                                                </Border>
+
+                                                <!-- BP badge -->
+                                                <Border Padding="10,6" StrokeThickness="0" Margin="0,0,6,4"
+                                                        BackgroundColor="{StaticResource Badge_BP}"
+                                                        IsVisible="{Binding HasBp}">
+                                                    <Border.StrokeShape><RoundRectangle CornerRadius="0"/></Border.StrokeShape>
+                                                    <HorizontalStackLayout Spacing="8">
+                                                        <Label Text="BP" FontSize="11" FontAttributes="Bold"
+                                                               TextColor="{StaticResource Button_Font_Primary}"
+                                                               VerticalOptions="Center"/>
+                                                        <Label Text="{Binding DisplayBp}" FontSize="12" FontAttributes="Bold"
+                                                               TextColor="{StaticResource Button_Font_Primary}"
+                                                               VerticalOptions="Center"/>
+                                                    </HorizontalStackLayout>
+                                                </Border>
+
+                                                <!-- PULSE badge -->
+                                                <Border Padding="10,6" StrokeThickness="0" Margin="0,0,6,4"
+                                                        BackgroundColor="{StaticResource Badge_Pulse}"
+                                                        IsVisible="{Binding HasPulse}">
+                                                    <Border.StrokeShape><RoundRectangle CornerRadius="0"/></Border.StrokeShape>
+                                                    <HorizontalStackLayout Spacing="8">
+                                                        <Label Text="PULSE" FontSize="11" FontAttributes="Bold"
+                                                               TextColor="{StaticResource Button_Font_Primary}"
+                                                               VerticalOptions="Center"/>
+                                                        <Label Text="{Binding DisplayPulse}" FontSize="12" FontAttributes="Bold"
+                                                               TextColor="{StaticResource Button_Font_Primary}"
+                                                               VerticalOptions="Center"/>
+                                                    </HorizontalStackLayout>
+                                                </Border>
+
+                                                <!-- SPO2 badge -->
+                                                <Border Padding="10,6" StrokeThickness="0" Margin="0,0,6,4"
+                                                        BackgroundColor="{StaticResource Badge_SPO2}"
+                                                        IsVisible="{Binding HasSpo2}">
+                                                    <Border.StrokeShape><RoundRectangle CornerRadius="0"/></Border.StrokeShape>
+                                                    <HorizontalStackLayout Spacing="8">
+                                                        <Label Text="SPO2" FontSize="11" FontAttributes="Bold"
+                                                               TextColor="{StaticResource Button_Font_Primary}"
+                                                               VerticalOptions="Center"/>
+                                                        <Label Text="{Binding DisplaySpo2}" FontSize="12" FontAttributes="Bold"
+                                                               TextColor="{StaticResource Button_Font_Primary}"
+                                                               VerticalOptions="Center"/>
+                                                    </HorizontalStackLayout>
+                                                </Border>
+                                            </FlexLayout>
+
+                                            <!-- Notes (if present) -->
+                                            <Border Padding="10,6" StrokeThickness="0" Margin="0,0,6,0"
+                                                    BackgroundColor="{StaticResource Badge_Note}"
+                                                    IsVisible="{Binding HasNotes}"
+                                                    HorizontalOptions="Start">
+                                                <Border.StrokeShape><RoundRectangle CornerRadius="0"/></Border.StrokeShape>
+                                                <HorizontalStackLayout Spacing="8">
+                                                    <Label Text="NOTE" FontSize="11" FontAttributes="Bold"
+                                                           TextColor="{StaticResource Button_Font_Primary}"
+                                                           VerticalOptions="Center"/>
+                                                    <Label Text="{Binding DisplayNotes}" FontSize="12" FontAttributes="Bold"
+                                                           TextColor="{StaticResource Button_Font_Primary}" 
+                                                           LineBreakMode="WordWrap" MaximumWidthRequest="300" VerticalOptions="Center"/>
+                                                </HorizontalStackLayout>
+                                            </Border>
+                                        </VerticalStackLayout>
+
+                                        <!-- Legacy single-type display -->
+                                        <HorizontalStackLayout Grid.Row="2" Spacing="8"
+                                                               IsVisible="{Binding IsLegacy}">
+                                            <Border Padding="6,2" StrokeThickness="0"
+                                                    BackgroundColor="{StaticResource Observation_Card_Border}"
+                                                    VerticalOptions="Center">
+                                                <Border.StrokeShape><RoundRectangle CornerRadius="3"/></Border.StrokeShape>
+                                                <Label Text="{Binding Type}"
+                                                       FontSize="10" FontAttributes="Bold"
+                                                       TextColor="{StaticResource Button_Font_Primary}"/>
+                                            </Border>
+                                            <Label Text="{Binding Value}" FontSize="13"
+                                                   TextColor="{StaticResource Observation_Font_Primary}"
+                                                   VerticalOptions="Center" LineBreakMode="WordWrap"/>
+                                        </HorizontalStackLayout>
 
                                     </Grid>
                                 </Border>

@@ -12,9 +12,30 @@ namespace MedReminder.Pages.Desktop
     [QueryProperty(nameof(RoomNumber), "roomNumber")]
     [QueryProperty(nameof(RoomType), "roomType")]
     [QueryProperty(nameof(ReturnTo), "returnTo")]
-    public partial class EditResidentPage : ContentPage
+    public partial class EditResidentPage : ContentPage, IUnsavedChangesPage
     {
         private readonly IResidentService _residentService;
+        private bool _isDirty;
+
+        public bool HasUnsavedChanges => _isDirty;
+
+        public async Task SaveAsync()
+        {
+            if (!ValidateForm())
+                return;
+
+            CleanRelationshipPlaceholders();
+
+            try
+            {
+                await _residentService.UpsertAsync(WorkingCopy);
+                _isDirty = false;
+            }
+            catch
+            {
+                // Queued offline
+            }
+        }
 
         private Guid _residentId = Guid.Empty;
         public string? ResidentId
@@ -32,6 +53,7 @@ namespace MedReminder.Pages.Desktop
         public Resident WorkingCopy { get; private set; } = new();
 
         private bool _isNew;
+        private bool _updatingAllergies;
 
         public EditResidentPage(IResidentService residentService)
         {
@@ -56,7 +78,17 @@ namespace MedReminder.Pages.Desktop
 
             if (_residentId != Guid.Empty)
             {
-                var list = await _residentService.LoadAsync();
+                List<Resident> list;
+                try
+                {
+                    list = await _residentService.LoadAsync();
+                }
+                catch
+                {
+                    await DisplayAlert("Offline", "Cannot load resident data while offline.", "OK");
+                    await Shell.Current.GoToAsync(GetReturnTarget());
+                    return;
+                }
                 var existing = list.FirstOrDefault(r => r.Id == _residentId);
 
                 if (existing is null)
@@ -78,7 +110,7 @@ namespace MedReminder.Pages.Desktop
                         // Personal Info
                         ResidentFName = existing.ResidentFName,
                         ResidentLName = existing.ResidentLName,
-                        DOB = existing.DOB,
+                        DateOfBirth = existing.DateOfBirth,
                         SIN = existing.SIN,
                         Gender = existing.Gender,
 
@@ -146,45 +178,86 @@ namespace MedReminder.Pages.Desktop
                 ApplyRoomPrefillIfProvided();
             }
 
+            // Auto-assign room for new residents when no room was prefilled
+            if (_isNew && string.IsNullOrWhiteSpace(WorkingCopy.RoomNumber))
+            {
+                try
+                {
+                    var allResidents = await _residentService.LoadAsync();
+                    await AutoAssignRoomAsync(allResidents);
+                }
+                catch
+                {
+                    // Offline — skip auto-assign
+                }
+            }
+
             BindingContext = WorkingCopy;
             RefreshAllergyUI();
+
+            // Track changes — mark dirty on any property change after initial load
+            _isDirty = false;
+            WorkingCopy.PropertyChanged += (_, _) => _isDirty = true;
+
+            // Show DELETE only for existing residents
+            if (DeleteAction != null)
+                DeleteAction.IsVisible = !_isNew;
         }
 
         private void OnNoneCheckedChanged(object sender, CheckedChangedEventArgs e)
         {
-            // When "None" is checked (e.Value == true)
-            if (WorkingCopy == null) return;
+            if (WorkingCopy == null || _updatingAllergies) return;
 
-            // When "None" is checked: clear all other allergy fields and disable inputs
-            if (e.Value)
+            _updatingAllergies = true;
+            try
             {
-                ClearAllAllergies();
+                if (e.Value)
+                {
+                    ClearAllAllergies();
+                }
+                RefreshAllergyUI();
             }
-
-            RefreshAllergyUI();
+            finally
+            {
+                _updatingAllergies = false;
+            }
         }
 
         private void OnSpecificAllergyCheckedChanged(object sender, CheckedChangedEventArgs e)
         {
-            if (WorkingCopy == null) return;
+            if (WorkingCopy == null || _updatingAllergies) return;
 
             if (e.Value && WorkingCopy.AllergyNone)
             {
-                WorkingCopy.AllergyNone = false;
-                RefreshAllergyUI();
+                _updatingAllergies = true;
+                try
+                {
+                    WorkingCopy.AllergyNone = false;
+                    RefreshAllergyUI();
+                }
+                finally
+                {
+                    _updatingAllergies = false;
+                }
             }
         }
 
-        // OPTIONAL BUT RECOMMENDED:
-        // Hook this to "Other" Entry TextChanged so typing auto turns off "None".
         private void OnOtherAllergyTextChanged(object sender, TextChangedEventArgs e)
         {
-            if (WorkingCopy == null) return;
+            if (WorkingCopy == null || _updatingAllergies) return;
 
             if (!string.IsNullOrWhiteSpace(e.NewTextValue) && WorkingCopy.AllergyNone)
             {
-                WorkingCopy.AllergyNone = false;
-                RefreshAllergyUI();
+                _updatingAllergies = true;
+                try
+                {
+                    WorkingCopy.AllergyNone = false;
+                    RefreshAllergyUI();
+                }
+                finally
+                {
+                    _updatingAllergies = false;
+                }
             }
         }
 
@@ -209,10 +282,9 @@ namespace MedReminder.Pages.Desktop
 
         private void RefreshAllergyUI()
         {
-            // Re-bind to ensure the checkboxes update their Enabled/Disabled states
-            var temp = BindingContext;
-            BindingContext = null;
-            BindingContext = temp;
+            // Properties now fire PropertyChanged, so bindings update automatically.
+            // IsEnabled bindings reference NoneCheck.IsChecked directly via x:Reference,
+            // so they re-evaluate when AllergyNone changes.
         }
 
         private Resident CreateNewResidentWithDefaults()
@@ -223,7 +295,7 @@ namespace MedReminder.Pages.Desktop
                 RoomNumber = "",
                 RoomType = "",
                 EmergencyRelationship1 = "Select Relationship",
-                EmergencyRelationship2 = "Select Relationship"
+                EmergencyRelationship2 = null
             };
         }
 
@@ -240,6 +312,75 @@ namespace MedReminder.Pages.Desktop
                 WorkingCopy.RoomType = RoomType;
 
             EnsureRelationshipDefaults();
+        }
+
+        private async Task AutoAssignRoomAsync(List<Resident> allResidents)
+        {
+            // Room layout: 12 rooms per floor, 1-based index positions 3,4,6,8,9 are Double
+            bool IsDouble(int oneBasedIndex) => oneBasedIndex is 3 or 4 or 6 or 8 or 9;
+
+            var occupancy = allResidents
+                .Where(r => !string.IsNullOrWhiteSpace(r.RoomNumber))
+                .GroupBy(r => r.RoomNumber!)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            // Try both floors
+            foreach (int floorStart in new[] { 101, 201 })
+            {
+                var roomNumbers = Enumerable.Range(floorStart, 12).ToList();
+
+                // Pass 1: find the first empty Single room
+                for (int i = 0; i < roomNumbers.Count; i++)
+                {
+                    if (IsDouble(i + 1)) continue; // skip double rooms
+                    var roomStr = roomNumbers[i].ToString();
+                    occupancy.TryGetValue(roomStr, out var occ);
+                    if (occ == null || occ.Count == 0)
+                    {
+                        WorkingCopy.RoomNumber = roomStr;
+                        WorkingCopy.RoomType = "Single";
+                        WorkingCopy.BedLabel = "None";
+                        return;
+                    }
+                }
+
+                // Pass 2: find a Double room with an open bed and matching gender
+                for (int i = 0; i < roomNumbers.Count; i++)
+                {
+                    if (!IsDouble(i + 1)) continue; // only double rooms
+                    var roomStr = roomNumbers[i].ToString();
+                    occupancy.TryGetValue(roomStr, out var occ);
+
+                    if (occ == null || occ.Count == 0)
+                    {
+                        // Empty double room — assign bed A
+                        WorkingCopy.RoomNumber = roomStr;
+                        WorkingCopy.RoomType = "Couple";
+                        WorkingCopy.BedLabel = "A";
+                        return;
+                    }
+
+                    if (occ.Count < 2)
+                    {
+                        // One occupant — check gender match
+                        var existingGender = occ[0].Gender;
+                        var newGender = WorkingCopy.Gender;
+
+                        if (!string.IsNullOrWhiteSpace(existingGender) &&
+                            !string.IsNullOrWhiteSpace(newGender) &&
+                            string.Equals(existingGender, newGender, StringComparison.OrdinalIgnoreCase))
+                        {
+                            var takenBed = occ[0].BedLabel ?? "A";
+                            WorkingCopy.RoomNumber = roomStr;
+                            WorkingCopy.RoomType = "Couple";
+                            WorkingCopy.BedLabel = takenBed == "A" ? "B" : "A";
+                            return;
+                        }
+                    }
+                }
+            }
+
+            // No room available — leave fields empty
         }
 
         private void EnsureRelationshipDefaults()
@@ -261,7 +402,7 @@ namespace MedReminder.Pages.Desktop
             if (string.IsNullOrWhiteSpace(WorkingCopy.ResidentLName))
                 errors.Add("Last Name");
 
-            if (string.IsNullOrWhiteSpace(WorkingCopy.DOB))
+            if (string.IsNullOrWhiteSpace(WorkingCopy.DateOfBirth))
                 errors.Add("Date of Birth (DOB)");
 
             if (string.IsNullOrWhiteSpace(WorkingCopy.EmergencyContactName1))
@@ -314,6 +455,17 @@ namespace MedReminder.Pages.Desktop
                 : ReturnTo;
         }
 
+        private void CleanRelationshipPlaceholders()
+        {
+            if (string.IsNullOrWhiteSpace(WorkingCopy.EmergencyContactName2))
+                WorkingCopy.EmergencyRelationship2 = null;
+            else if (WorkingCopy.EmergencyRelationship2 == "Select Relationship")
+                WorkingCopy.EmergencyRelationship2 = null;
+
+            if (WorkingCopy.EmergencyRelationship1 == "Select Relationship")
+                WorkingCopy.EmergencyRelationship1 = "";
+        }
+
         private async void OnSaveClicked(object sender, TappedEventArgs e)
         {
             // Re-check RBAC at save time (extra safety)
@@ -328,10 +480,47 @@ namespace MedReminder.Pages.Desktop
             if (!ValidateForm())
                 return;
 
-            await _residentService.UpsertAsync(WorkingCopy);
-            await DisplayAlert("Saved", "Resident information saved.", "OK");
+            CleanRelationshipPlaceholders();
 
-            await Shell.Current.GoToAsync(GetReturnTarget());
+            try
+            {
+                await _residentService.UpsertAsync(WorkingCopy);
+                _isDirty = false;
+            }
+            catch
+            {
+                // Queued offline by wrapper
+            }
+
+            // Resolve the resident ID for navigation (new residents may not have one yet)
+            if (WorkingCopy.Id == Guid.Empty)
+            {
+                try
+                {
+                    var list = await _residentService.LoadAsync();
+                    var latest = list.OrderByDescending(r => r.Id).FirstOrDefault();
+                    if (latest != null)
+                        WorkingCopy.Id = latest.Id;
+                }
+                catch { }
+            }
+
+            bool addMed = await DisplayAlert("Record Saved", "Do you want to add medication?", "Yes", "No");
+
+            if (addMed)
+            {
+                var parameters = new Dictionary<string, object?>
+                {
+                    ["Item"] = null,
+                    ["residentId"] = WorkingCopy.Id,
+                    ["residentName"] = WorkingCopy.ResidentName
+                };
+                await Shell.Current.GoToAsync(nameof(EditMedicationPage), true, parameters);
+            }
+            else
+            {
+                await Shell.Current.GoToAsync($"{nameof(ViewResidentPage)}?id={WorkingCopy.Id}");
+            }
         }
 
         private async void OnSaveAndAddMedClicked(object sender, TappedEventArgs e)
@@ -348,14 +537,30 @@ namespace MedReminder.Pages.Desktop
             if (!ValidateForm())
                 return;
 
-            await _residentService.UpsertAsync(WorkingCopy);
+            CleanRelationshipPlaceholders();
 
-            if (WorkingCopy.Id <= Guid.Empty)
+            try
             {
-                var list = await _residentService.LoadAsync();
-                var latest = list.OrderByDescending(r => r.Id).FirstOrDefault();
-                if (latest != null)
-                    WorkingCopy.Id = latest.Id;
+                await _residentService.UpsertAsync(WorkingCopy);
+            }
+            catch
+            {
+                // Queued offline by wrapper
+            }
+
+            if (WorkingCopy.Id == Guid.Empty)
+            {
+                try
+                {
+                    var list = await _residentService.LoadAsync();
+                    var latest = list.OrderByDescending(r => r.Id).FirstOrDefault();
+                    if (latest != null)
+                        WorkingCopy.Id = latest.Id;
+                }
+                catch
+                {
+                    // Offline — use local ID
+                }
             }
 
             try
@@ -375,16 +580,48 @@ namespace MedReminder.Pages.Desktop
             }
         }
 
+        private async void OnDeleteClicked(object sender, TappedEventArgs e)
+        {
+            if (_isNew || WorkingCopy == null)
+                return;
+
+            var auth = MauiProgram.Services.GetService<AuthService>();
+            if (!(auth?.HasRole(StaffRole.Admin, StaffRole.Nurse) ?? false))
+            {
+                await DisplayAlert("Access denied", "You don't have permission to delete residents.", "OK");
+                return;
+            }
+
+            bool confirm = await DisplayAlert(
+                "Delete resident",
+                $"Are you sure you want to delete {WorkingCopy.ResidentName}?",
+                "Delete", "Cancel");
+
+            if (!confirm)
+                return;
+
+            try
+            {
+                await _residentService.DeleteAsync(WorkingCopy);
+
+                if (!MedReminder.Desktop.Services.Sync.ConnectivityHelper.IsOnline())
+                    await DisplayAlert("Deleted offline", "Delete queued — sync when online.", "OK");
+                else
+                    await DisplayAlert("Deleted", "Resident has been deleted.", "OK");
+            }
+            catch
+            {
+                await DisplayAlert("Deleted offline", "Delete queued — sync when online.", "OK");
+            }
+
+            await Shell.Current.GoToAsync(GetReturnTarget());
+        }
+
         private async void OnCancelClicked(object sender, TappedEventArgs e)
         {
             await Shell.Current.GoToAsync(GetReturnTarget());
         }
 
-        private async void OnLogoutClicked(object sender, EventArgs e)
-        {
-            if (Shell.Current is AppShell shell)
-                await shell.LogoutAsync();
-        }
     }
 }
 

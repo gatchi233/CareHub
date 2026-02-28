@@ -7,10 +7,6 @@
     xmlns:model="clr-namespace:MedReminder.Models"
     Title="Staff Management"
     BackgroundColor="{StaticResource Staff_Main_Background}">
-    <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Logout" Clicked="OnLogoutClicked" Priority="1" Order="Primary" />
-    </ContentPage.ToolbarItems>
-
     <Grid Padding="16" RowDefinitions="Auto,*" RowSpacing="12">
 
         <!-- ── Top action bar ─────────────────────────────────────────────── -->

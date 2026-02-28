@@ -7,6 +7,7 @@ namespace MedReminder.Services.Abstractions
         Task<List<Medication>> LoadAsync();
         Task UpsertAsync(Medication item);
         Task DeleteAsync(Medication item);
+        Task ReplaceAllAsync(List<Medication> items);
 
         // Inventory helpers
         Task<List<Medication>> GetLowStockAsync();

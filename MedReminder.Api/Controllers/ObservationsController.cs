@@ -78,11 +78,17 @@ public sealed class ObservationsController : ControllerBase
 
         var existing = await _db.Observations.FindAsync(id);
         if (existing is null)
-            return NotFound();
-
-        existing.Type = updated.Type;
-        existing.Value = updated.Value;
-        existing.RecordedBy = updated.RecordedBy;
+        {
+            updated.Id = id;
+            _db.Observations.Add(updated);
+        }
+        else
+        {
+            existing.Type = updated.Type;
+            existing.Value = updated.Value;
+            existing.RecordedBy = updated.RecordedBy;
+            existing.ResidentName = updated.ResidentName;
+        }
 
         await _db.SaveChangesAsync();
         return NoContent();

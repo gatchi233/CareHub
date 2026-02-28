@@ -68,9 +68,16 @@ namespace MedReminder.ViewModels
             // "All Residents" special item (ResidentName is computed from ResidentFName + ResidentLName)
             Residents.Add(new Resident { Id = Guid.Empty, ResidentFName = "All", ResidentLName = "residents" });
 
-            var items = await _residentService.LoadAsync();
-            foreach (var r in items)
-                Residents.Add(r);
+            try
+            {
+                var items = await _residentService.LoadAsync();
+                foreach (var r in items)
+                    Residents.Add(r);
+            }
+            catch
+            {
+                // Offline — keep just the "All residents" placeholder
+            }
 
             if (SelectedResident == null)
                 SelectedResident = Residents.FirstOrDefault();
@@ -103,6 +110,11 @@ namespace MedReminder.ViewModels
                     }
                 }
 
+                ApplyFilters();
+            }
+            catch
+            {
+                // Offline — show whatever we have
                 ApplyFilters();
             }
             finally

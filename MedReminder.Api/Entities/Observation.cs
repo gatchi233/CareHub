@@ -10,4 +10,5 @@ public sealed class Observation
     public string Type { get; set; } = "";   // e.g. "BP", "Temp", "Note"
     public string Value { get; set; } = "";  // e.g. "120/80", "37.1", "..."
     public string RecordedBy { get; set; } = ""; // staff name/id later
+    public string ResidentName { get; set; } = "";
 }

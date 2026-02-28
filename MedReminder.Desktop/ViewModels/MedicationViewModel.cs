@@ -92,7 +92,10 @@ namespace MedReminder.ViewModels
             }
             catch (Exception ex)
             {
-                await ShowAlertAsync("Load Error", ex.Message);
+                var msg = MedReminder.Desktop.Services.Sync.OfflineException.IsOffline(ex)
+                    ? "Offline — showing cached data"
+                    : ex.Message;
+                await ShowAlertAsync("Load", msg);
             }
             finally
             {
@@ -100,22 +103,26 @@ namespace MedReminder.ViewModels
             }
         }
 
-        public async Task SaveAsync(Medication? med)
+        /// <summary>
+        /// Saves the medication data without navigating away.
+        /// Returns true if save succeeded, false otherwise.
+        /// </summary>
+        public async Task<bool> SaveDataAsync(Medication? med)
         {
             try
             {
-                if (med is null) return;
+                if (med is null) return false;
 
                 if (string.IsNullOrWhiteSpace(med.MedName))
                 {
                     await ShowAlertAsync("Validation", "Name is required.");
-                    return;
+                    return false;
                 }
 
                 if (med.ExpiryDate.Date < DateTime.Today)
                 {
                     await ShowAlertAsync("Validation", "Expiry date cannot be in the past.");
-                    return;
+                    return false;
                 }
 
                 await _service.UpsertAsync(med);
@@ -126,13 +133,25 @@ namespace MedReminder.ViewModels
 
                 ApplyFilter();
 
-                // Shell-safe back navigation
-                await Shell.Current.GoToAsync("..");
+                if (!MedReminder.Desktop.Services.Sync.ConnectivityHelper.IsOnline())
+                    await ShowAlertAsync("Saved offline", "Saved offline (queued) — sync when online");
+
+                return true;
             }
             catch (Exception ex)
             {
-                await ShowAlertAsync("Save Error", ex.Message);
+                var msg = MedReminder.Desktop.Services.Sync.OfflineException.IsOffline(ex)
+                    ? "Saved offline (queued) — sync when online"
+                    : ex.Message;
+                await ShowAlertAsync("Save", msg);
+                return false;
             }
+        }
+
+        public async Task SaveAsync(Medication? med)
+        {
+            if (await SaveDataAsync(med))
+                await Shell.Current.GoToAsync("..");
         }
 
         public async Task DeleteAsync(Medication? med)
@@ -144,10 +163,16 @@ namespace MedReminder.ViewModels
                 await _service.DeleteAsync(med);
                 _allMedications = (await _service.LoadAsync()).ToList();
                 ApplyFilter();
+
+                if (!MedReminder.Desktop.Services.Sync.ConnectivityHelper.IsOnline())
+                    await ShowAlertAsync("Saved offline", "Saved offline (queued) — sync when online");
             }
             catch (Exception ex)
             {
-                await ShowAlertAsync("Delete Error", ex.Message);
+                var msg = MedReminder.Desktop.Services.Sync.OfflineException.IsOffline(ex)
+                    ? "Saved offline (queued) — sync when online"
+                    : ex.Message;
+                await ShowAlertAsync("Delete", msg);
             }
         }
 

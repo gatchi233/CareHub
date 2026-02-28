@@ -10,16 +10,41 @@ namespace MedReminder.Services.Local
 
         public MedicationJsonService()
         {
-            // This is the real persistent store for inventory
             _filePath = Path.Combine(FileSystem.AppDataDirectory, "Medications.json");
         }
 
         private async Task EnsureInitialInventoryAsync()
         {
-            if (File.Exists(_filePath))
+            if (!File.Exists(_filePath))
+            {
+                await ResetInventoryFromPackageAsync();
                 return;
+            }
 
-            await ResetInventoryFromPackageAsync();
+            // File exists — check if inventory items are already present
+            try
+            {
+                await using var stream = File.OpenRead(_filePath);
+                var items = await JsonSerializer.DeserializeAsync<List<Medication>>(stream)
+                            ?? new List<Medication>();
+
+                bool hasInventory = items.Any(m => m.ResidentId == null || m.ResidentId == Guid.Empty);
+                if (hasInventory)
+                    return;
+
+                // No inventory items — merge seed data into existing medications
+                await using var seedStream = await FileSystem.OpenAppPackageFileAsync("Inventory.json");
+                var seedItems = await JsonSerializer.DeserializeAsync<List<Medication>>(seedStream)
+                                ?? new List<Medication>();
+
+                items.AddRange(seedItems);
+                await SaveAsync(items);
+            }
+            catch
+            {
+                // Corrupt file — full reset
+                await ResetInventoryFromPackageAsync();
+            }
         }
 
         public async Task<List<Medication>> LoadAsync()
@@ -95,7 +120,6 @@ namespace MedReminder.Services.Local
         {
             var list = await LoadAsync();
 
-            // Global inventory (whole retirement home): ResidentId is null (or 0 for older data)
             var inventory = list.Where(m => m.ResidentId == null || m.ResidentId == Guid.Empty);
 
             return inventory
@@ -116,6 +140,11 @@ namespace MedReminder.Services.Local
                 med.StockQuantity = 0;
 
             await SaveAsync(list);
+        }
+        public async Task ReplaceAllAsync(List<Medication> items)
+        {
+            items ??= new List<Medication>();
+            await SaveAsync(items);
         }
     }
 }

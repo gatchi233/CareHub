@@ -56,20 +56,35 @@ namespace MedReminder.ViewModels
             {
                 if (tuple?.Item1 == null) return;
 
-                await _medService.AdjustStockAsync(tuple.Item1.Id, tuple.Item2);
-                await LoadAsync();
+                try
+                {
+                    await _medService.AdjustStockAsync(tuple.Item1.Id, tuple.Item2);
+                    await LoadAsync();
+                }
+                catch
+                {
+                    // Offline — adjustment queued by wrapper
+                    await LoadAsync();
+                }
             });
 
             CreateOrderCommand = new Command<Tuple<Medication, int, string?>>(async tuple =>
             {
                 if (tuple?.Item1 == null) return;
 
-                var med = tuple.Item1;
-                var qty = tuple.Item2;
-                var notes = tuple.Item3;
+                try
+                {
+                    var med = tuple.Item1;
+                    var qty = tuple.Item2;
+                    var notes = tuple.Item3;
 
-                await _orderService.CreateAsync(med.Id, qty, "Staff", notes);
-                await LoadAsync();
+                    await _orderService.CreateAsync(med.Id, qty, "Staff", notes);
+                    await LoadAsync();
+                }
+                catch
+                {
+                    // Offline — order service is local-only, shouldn't fail
+                }
             });
         }
 
@@ -117,6 +132,10 @@ namespace MedReminder.ViewModels
                 foreach (var row in sorted)
                     Items.Add(row);
             }
+            catch
+            {
+                // Offline — Items remains empty or stale, no crash
+            }
             finally
             {
                 IsBusy = false;
@@ -142,6 +161,7 @@ namespace MedReminder.ViewModels
         public int StockQuantity => Med.StockQuantity;
         public int ReorderLevel => Med.ReorderLevel;
         public string? Usage => Med.Usage;
+        public string? QuantityUnit => Med.QuantityUnit;
 
         public bool IsLowStock => StockQuantity <= ReorderLevel;
     }

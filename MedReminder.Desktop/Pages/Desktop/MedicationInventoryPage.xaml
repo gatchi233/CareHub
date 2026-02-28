@@ -7,11 +7,7 @@
     xmlns:pages="clr-namespace:MedReminder.Pages"
     Title="Medication Inventory"
     BackgroundColor="{StaticResource Medication_Main_Background}">
-    
-    <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Refresh" Clicked="OnRefreshClicked" Priority="0" Order="Primary" />
-        <ToolbarItem Text="Logout" Clicked="OnLogoutClicked" Priority="1" Order="Primary" />
-    </ContentPage.ToolbarItems>
+
 
     <Grid Padding="16" RowDefinitions="Auto,*" RowSpacing="12">
 
@@ -37,7 +33,7 @@
 
                         <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Create}"
                                 Padding="10,0" StrokeThickness="0">
-                            <Label Text="ORDERS"
+                            <Label Text="NEW ORDER"
                                    TextColor="{StaticResource Button_Font_Primary}" FontSize="11"
                                    VerticalOptions="Center" FontAttributes="Bold"/>
                         </Border>
@@ -97,7 +93,7 @@
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <Border Padding="12"
-                            BackgroundColor="{StaticResource Medication_Background}"
+                            BackgroundColor="{StaticResource Medication_Main_Background}"
                             Stroke="{StaticResource Medication_Font_Primary}"
                             StrokeThickness="1">
 
@@ -114,6 +110,8 @@
                                 <Label Text="{Binding MedName}" FontSize="18" FontAttributes="Bold" TextColor="{StaticResource Medication_Font_Primary}" />
                                 <BoxView WidthRequest="1" HeightRequest="20" Color="{StaticResource Medication_Font_Secondary}" VerticalOptions="Center"/>
 
+                                <Label Text="{Binding QuantityUnit}" FontSize="13" TextColor="{StaticResource Medication_Font_Secondary}" VerticalOptions="Center"/>
+                                <BoxView WidthRequest="1" HeightRequest="20" Color="{StaticResource Medication_Font_Secondary}" VerticalOptions="Center"/>
                                 <Label Text="{Binding Usage}" FontSize="13" TextColor="{StaticResource Medication_Font_Secondary}" VerticalOptions="Center"/>
                                 <BoxView WidthRequest="1" HeightRequest="20" Color="{StaticResource Medication_Font_Secondary}" VerticalOptions="Center"/>
 
@@ -157,7 +155,7 @@
                                     </Border.GestureRecognizers>
                                 </Border>
 
-                                <!-- Edit -->
+                                <!-- Orders -->
                                 <Border StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
                                     <Border.StrokeShape>
                                         <RoundRectangle CornerRadius="4"/>

@@ -52,7 +52,7 @@ namespace MedReminder.Models
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
         public string? SIN { get; set; }
-        public string DOB { get; set; } = string.Empty;
+        public string DateOfBirth { get; set; } = string.Empty;
         public string? Gender { get; set; } // "Male" / "Female" / "Other"
 
         // Address information
@@ -74,23 +74,28 @@ namespace MedReminder.Models
         public string DoctorContact { get; set; } = string.Empty;
 
         // Allergies & Remarks
-        [JsonIgnore]
-        public bool AllergyNone { get; set; }
+        bool _allergyNone;
+        bool _allergyPeanuts, _allergyTreeNuts, _allergyMilk, _allergyEggs;
+        bool _allergyShellfish, _allergyFish, _allergyWheat, _allergySoy;
+        bool _allergyLatex, _allergyPenicillin, _allergySulfa, _allergyAspirin;
+        string? _allergyOtherItems;
 
-        // Stored allergy flags
-        public bool AllergyPeanuts { get; set; }
-        public bool AllergyTreeNuts { get; set; }
-        public bool AllergyMilk { get; set; }
-        public bool AllergyEggs { get; set; }
-        public bool AllergyShellfish { get; set; }
-        public bool AllergyFish { get; set; }
-        public bool AllergyWheat { get; set; }
-        public bool AllergySoy { get; set; }
-        public bool AllergyLatex { get; set; }
-        public bool AllergyPenicillin { get; set; }
-        public bool AllergySulfa { get; set; }
-        public bool AllergyAspirin { get; set; }
-        public string? AllergyOtherItems { get; set; }    // e.g. "Pollen..."
+        [JsonIgnore]
+        public bool AllergyNone { get => _allergyNone; set { if (_allergyNone == value) return; _allergyNone = value; OnPropertyChanged(); } }
+
+        public bool AllergyPeanuts { get => _allergyPeanuts; set { if (_allergyPeanuts == value) return; _allergyPeanuts = value; OnPropertyChanged(); } }
+        public bool AllergyTreeNuts { get => _allergyTreeNuts; set { if (_allergyTreeNuts == value) return; _allergyTreeNuts = value; OnPropertyChanged(); } }
+        public bool AllergyMilk { get => _allergyMilk; set { if (_allergyMilk == value) return; _allergyMilk = value; OnPropertyChanged(); } }
+        public bool AllergyEggs { get => _allergyEggs; set { if (_allergyEggs == value) return; _allergyEggs = value; OnPropertyChanged(); } }
+        public bool AllergyShellfish { get => _allergyShellfish; set { if (_allergyShellfish == value) return; _allergyShellfish = value; OnPropertyChanged(); } }
+        public bool AllergyFish { get => _allergyFish; set { if (_allergyFish == value) return; _allergyFish = value; OnPropertyChanged(); } }
+        public bool AllergyWheat { get => _allergyWheat; set { if (_allergyWheat == value) return; _allergyWheat = value; OnPropertyChanged(); } }
+        public bool AllergySoy { get => _allergySoy; set { if (_allergySoy == value) return; _allergySoy = value; OnPropertyChanged(); } }
+        public bool AllergyLatex { get => _allergyLatex; set { if (_allergyLatex == value) return; _allergyLatex = value; OnPropertyChanged(); } }
+        public bool AllergyPenicillin { get => _allergyPenicillin; set { if (_allergyPenicillin == value) return; _allergyPenicillin = value; OnPropertyChanged(); } }
+        public bool AllergySulfa { get => _allergySulfa; set { if (_allergySulfa == value) return; _allergySulfa = value; OnPropertyChanged(); } }
+        public bool AllergyAspirin { get => _allergyAspirin; set { if (_allergyAspirin == value) return; _allergyAspirin = value; OnPropertyChanged(); } }
+        public string? AllergyOtherItems { get => _allergyOtherItems; set { if (_allergyOtherItems == value) return; _allergyOtherItems = value; OnPropertyChanged(); } }    // e.g. "Pollen..."
         public string? Remarks { get; set; }
 
         // --- Room placement ---

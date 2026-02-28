@@ -353,6 +353,291 @@
                     </VerticalStackLayout>
                 </ScrollView>
 
+                <!-- New Med Order mode -->
+                <ScrollView x:Name="NewMedOrderContainer" IsVisible="False">
+                    <VerticalStackLayout Spacing="14">
+
+                        <!-- Medication name -->
+                        <VerticalStackLayout Spacing="5">
+                            <Label Text="MEDICATION NAME *" FontSize="10" FontAttributes="Bold"
+                                   CharacterSpacing="1.2"
+                                   TextColor="{StaticResource Popup_Font_Secondary}"/>
+                            <Entry x:Name="NmoMedNameEntry"
+                                   Placeholder="e.g. Amoxicillin 500mg"
+                                   BackgroundColor="{StaticResource Popup_Card_Background}"
+                                   TextColor="{StaticResource Popup_Font_Primary}"
+                                   PlaceholderColor="{StaticResource Placeholder_Font_Primary}"/>
+                        </VerticalStackLayout>
+
+                        <!-- Unit type + Indication side by side -->
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                            <VerticalStackLayout Spacing="5">
+                                <Label Text="UNIT TYPE" FontSize="10" FontAttributes="Bold"
+                                       CharacterSpacing="1.2"
+                                       TextColor="{StaticResource Popup_Font_Secondary}"/>
+                                <Picker x:Name="NmoUnitPicker"
+                                        TextColor="{StaticResource Popup_Font_Primary}">
+                                    <Picker.Items>
+                                        <x:String>Select unit</x:String>
+                                        <x:String>tablet</x:String>
+                                        <x:String>capsule</x:String>
+                                        <x:String>mL</x:String>
+                                        <x:String>drop</x:String>
+                                        <x:String>puff</x:String>
+                                        <x:String>patch</x:String>
+                                        <x:String>other</x:String>
+                                    </Picker.Items>
+                                </Picker>
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="1" Spacing="5">
+                                <Label Text="INDICATION" FontSize="10" FontAttributes="Bold"
+                                       CharacterSpacing="1.2"
+                                       TextColor="{StaticResource Popup_Font_Secondary}"/>
+                                <Entry x:Name="NmoIndicationEntry"
+                                       Placeholder="e.g. infection"
+                                       BackgroundColor="{StaticResource Popup_Card_Background}"
+                                       TextColor="{StaticResource Popup_Font_Primary}"
+                                       PlaceholderColor="{StaticResource Placeholder_Font_Primary}"/>
+                            </VerticalStackLayout>
+                        </Grid>
+
+                        <!-- Quick quantity buttons -->
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="QUICK QUANTITY" FontSize="10" FontAttributes="Bold"
+                                   CharacterSpacing="1.2"
+                                   TextColor="{StaticResource Popup_Font_Secondary}"/>
+                            <HorizontalStackLayout x:Name="NmoQuickButtonsRow" Spacing="6"/>
+                        </VerticalStackLayout>
+
+                        <!-- Quantity -->
+                        <VerticalStackLayout Spacing="5">
+                            <Label Text="QUANTITY *" FontSize="10" FontAttributes="Bold"
+                                   CharacterSpacing="1.2"
+                                   TextColor="{StaticResource Popup_Font_Secondary}"/>
+                            <Entry x:Name="NmoQtyEntry"
+                                   Placeholder="e.g. 30"
+                                   Keyboard="Numeric"
+                                   BackgroundColor="{StaticResource Popup_Card_Background}"
+                                   TextColor="{StaticResource Popup_Font_Primary}"
+                                   PlaceholderColor="{StaticResource Placeholder_Font_Primary}"/>
+                        </VerticalStackLayout>
+
+                        <!-- Reorder level -->
+                        <VerticalStackLayout Spacing="5">
+                            <Label Text="MINIMUM REORDER LEVEL  (OPTIONAL)" FontSize="10" FontAttributes="Bold"
+                                   CharacterSpacing="1.2"
+                                   TextColor="{StaticResource Popup_Font_Secondary}"/>
+                            <Entry x:Name="NmoReorderEntry"
+                                   Placeholder="e.g. 20"
+                                   Keyboard="Numeric"
+                                   BackgroundColor="{StaticResource Popup_Card_Background}"
+                                   TextColor="{StaticResource Popup_Font_Primary}"
+                                   PlaceholderColor="{StaticResource Placeholder_Font_Primary}"/>
+                        </VerticalStackLayout>
+
+                        <!-- Notes -->
+                        <VerticalStackLayout Spacing="5">
+                            <Label Text="NOTES  (OPTIONAL)" FontSize="10" FontAttributes="Bold"
+                                   CharacterSpacing="1.2"
+                                   TextColor="{StaticResource Popup_Font_Secondary}"/>
+                            <Entry x:Name="NmoNotesEntry"
+                                   Placeholder="e.g. urgent / call pharmacy"
+                                   BackgroundColor="{StaticResource Popup_Card_Background}"
+                                   TextColor="{StaticResource Popup_Font_Primary}"
+                                   PlaceholderColor="{StaticResource Placeholder_Font_Primary}"/>
+                        </VerticalStackLayout>
+
+                        <!-- Action buttons -->
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,4,0,0">
+                            <Border StrokeThickness="0" HeightRequest="34"
+                                    BackgroundColor="{StaticResource Button_Cancel}">
+                                <Border.StrokeShape><RoundRectangle CornerRadius="6"/></Border.StrokeShape>
+                                <Label Text="CANCEL" FontSize="11" FontAttributes="Bold"
+                                       TextColor="{StaticResource Button_Font_Secondary}"
+                                       VerticalOptions="Center" HorizontalOptions="Center"/>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnNmoCancelTapped"/>
+                                </Border.GestureRecognizers>
+                            </Border>
+                            <Border Grid.Column="1" StrokeThickness="0" HeightRequest="34"
+                                    BackgroundColor="{StaticResource Button_Create}">
+                                <Border.StrokeShape><RoundRectangle CornerRadius="6"/></Border.StrokeShape>
+                                <Label Text="CREATE" FontSize="11" FontAttributes="Bold"
+                                       TextColor="{StaticResource Button_Font_Primary}"
+                                       VerticalOptions="Center" HorizontalOptions="Center"/>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnNmoCreateTapped"/>
+                                </Border.GestureRecognizers>
+                            </Border>
+                        </Grid>
+
+                    </VerticalStackLayout>
+                </ScrollView>
+
+                <!-- Observation mode -->
+                <ScrollView x:Name="ObservationContainer" IsVisible="False">
+                    <VerticalStackLayout Spacing="14">
+
+                        <!-- Body Temperature -->
+                        <VerticalStackLayout Spacing="5">
+                            <Label Text="BODY TEMPERATURE" FontSize="10" FontAttributes="Bold"
+                                   CharacterSpacing="1.2"
+                                   TextColor="{StaticResource Popup_Font_Secondary}"/>
+                            <Border BackgroundColor="{StaticResource Popup_Card_Background}"
+                                    Stroke="{StaticResource Popup_Card_Border}"
+                                    StrokeThickness="1" Padding="0">
+                                <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <Entry x:Name="ObsTempEntry"
+                                           Placeholder="e.g. 36.5"
+                                           Keyboard="Numeric"
+                                           BackgroundColor="{StaticResource Popup_Card_Background}"
+                                           TextColor="{StaticResource Popup_Font_Primary}"
+                                           PlaceholderColor="{StaticResource Placeholder_Font_Primary}"
+                                           Margin="8,0,0,0"/>
+                                    <Label Grid.Column="1" Text="°C" FontSize="13" FontAttributes="Bold"
+                                           TextColor="{StaticResource Popup_Font_Secondary}"
+                                           VerticalOptions="Center" Margin="0,0,12,0"/>
+                                </Grid>
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <!-- Blood Pressure -->
+                        <VerticalStackLayout Spacing="5">
+                            <Label Text="BLOOD PRESSURE" FontSize="10" FontAttributes="Bold"
+                                   CharacterSpacing="1.2"
+                                   TextColor="{StaticResource Popup_Font_Secondary}"/>
+                            <Grid ColumnDefinitions="*,Auto,*" ColumnSpacing="8">
+                                <Border BackgroundColor="{StaticResource Popup_Card_Background}"
+                                        Stroke="{StaticResource Popup_Card_Border}"
+                                        StrokeThickness="1" Padding="0">
+                                    <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                                    <VerticalStackLayout Spacing="0" Padding="8,4">
+                                        <Label Text="SYSTOLIC (HIGH)" FontSize="8" FontAttributes="Bold"
+                                               CharacterSpacing="0.8"
+                                               TextColor="{StaticResource Popup_Font_Secondary}"/>
+                                        <Entry x:Name="ObsBpHighEntry"
+                                               Placeholder="e.g. 120"
+                                               Keyboard="Numeric"
+                                               BackgroundColor="{StaticResource Popup_Card_Background}"
+                                               TextColor="{StaticResource Popup_Font_Primary}"
+                                               PlaceholderColor="{StaticResource Placeholder_Font_Primary}"/>
+                                    </VerticalStackLayout>
+                                </Border>
+
+                                <Label Grid.Column="1" Text="/" FontSize="22" FontAttributes="Bold"
+                                       TextColor="{StaticResource Popup_Font_Secondary}"
+                                       VerticalOptions="Center"/>
+
+                                <Border Grid.Column="2"
+                                        BackgroundColor="{StaticResource Popup_Card_Background}"
+                                        Stroke="{StaticResource Popup_Card_Border}"
+                                        StrokeThickness="1" Padding="0">
+                                    <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                                    <VerticalStackLayout Spacing="0" Padding="8,4">
+                                        <Label Text="DIASTOLIC (LOW)" FontSize="8" FontAttributes="Bold"
+                                               CharacterSpacing="0.8"
+                                               TextColor="{StaticResource Popup_Font_Secondary}"/>
+                                        <Entry x:Name="ObsBpLowEntry"
+                                               Placeholder="e.g. 80"
+                                               Keyboard="Numeric"
+                                               BackgroundColor="{StaticResource Popup_Card_Background}"
+                                               TextColor="{StaticResource Popup_Font_Primary}"
+                                               PlaceholderColor="{StaticResource Placeholder_Font_Primary}"/>
+                                    </VerticalStackLayout>
+                                </Border>
+                            </Grid>
+                        </VerticalStackLayout>
+
+                        <!-- Pulse & SPO2 -->
+                        <VerticalStackLayout Spacing="5">
+                            <Label Text="PULSE &amp; SPO2" FontSize="10" FontAttributes="Bold"
+                                   CharacterSpacing="1.2"
+                                   TextColor="{StaticResource Popup_Font_Secondary}"/>
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                                <Border BackgroundColor="{StaticResource Popup_Card_Background}"
+                                        Stroke="{StaticResource Popup_Card_Border}"
+                                        StrokeThickness="1" Padding="0">
+                                    <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                                    <VerticalStackLayout Spacing="0" Padding="8,4">
+                                        <Label Text="PULSE (BPM)" FontSize="8" FontAttributes="Bold"
+                                               CharacterSpacing="0.8"
+                                               TextColor="{StaticResource Popup_Font_Secondary}"/>
+                                        <Entry x:Name="ObsPulseEntry"
+                                               Placeholder="e.g. 72"
+                                               Keyboard="Numeric"
+                                               BackgroundColor="{StaticResource Popup_Card_Background}"
+                                               TextColor="{StaticResource Popup_Font_Primary}"
+                                               PlaceholderColor="{StaticResource Placeholder_Font_Primary}"/>
+                                    </VerticalStackLayout>
+                                </Border>
+
+                                <Border Grid.Column="1"
+                                        BackgroundColor="{StaticResource Popup_Card_Background}"
+                                        Stroke="{StaticResource Popup_Card_Border}"
+                                        StrokeThickness="1" Padding="0">
+                                    <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                                    <VerticalStackLayout Spacing="0" Padding="8,4">
+                                        <Label Text="SPO2 (%)" FontSize="8" FontAttributes="Bold"
+                                               CharacterSpacing="0.8"
+                                               TextColor="{StaticResource Popup_Font_Secondary}"/>
+                                        <Entry x:Name="ObsSpo2Entry"
+                                               Placeholder="e.g. 98"
+                                               Keyboard="Numeric"
+                                               BackgroundColor="{StaticResource Popup_Card_Background}"
+                                               TextColor="{StaticResource Popup_Font_Primary}"
+                                               PlaceholderColor="{StaticResource Placeholder_Font_Primary}"/>
+                                    </VerticalStackLayout>
+                                </Border>
+                            </Grid>
+                        </VerticalStackLayout>
+
+                        <!-- Notes -->
+                        <VerticalStackLayout Spacing="5">
+                            <Label Text="NOTES  (OPTIONAL)" FontSize="10" FontAttributes="Bold"
+                                   CharacterSpacing="1.2"
+                                   TextColor="{StaticResource Popup_Font_Secondary}"/>
+                            <Border BackgroundColor="{StaticResource Popup_Card_Background}"
+                                    Stroke="{StaticResource Popup_Card_Border}"
+                                    StrokeThickness="1" Padding="0">
+                                <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                                <Editor x:Name="ObsNotesEditor"
+                                        Placeholder="Additional information..."
+                                        HeightRequest="70"
+                                        BackgroundColor="{StaticResource Popup_Card_Background}"
+                                        TextColor="{StaticResource Popup_Font_Primary}"
+                                        PlaceholderColor="{StaticResource Placeholder_Font_Primary}"
+                                        Margin="8,4"/>
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <!-- Action buttons -->
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,4,0,0">
+                            <Border StrokeThickness="0" HeightRequest="34"
+                                    BackgroundColor="{StaticResource Button_Cancel}">
+                                <Border.StrokeShape><RoundRectangle CornerRadius="6"/></Border.StrokeShape>
+                                <Label Text="CANCEL" FontSize="11" FontAttributes="Bold"
+                                       TextColor="{StaticResource Button_Font_Secondary}"
+                                       VerticalOptions="Center" HorizontalOptions="Center"/>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnObservationCancelTapped"/>
+                                </Border.GestureRecognizers>
+                            </Border>
+                            <Border Grid.Column="1" StrokeThickness="0" HeightRequest="34"
+                                    BackgroundColor="{StaticResource Button_Save}">
+                                <Border.StrokeShape><RoundRectangle CornerRadius="6"/></Border.StrokeShape>
+                                <Label Text="SAVE" FontSize="11" FontAttributes="Bold"
+                                       TextColor="{StaticResource Button_Font_Primary}"
+                                       VerticalOptions="Center" HorizontalOptions="Center"/>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnObservationSaveTapped"/>
+                                </Border.GestureRecognizers>
+                            </Border>
+                        </Grid>
+
+                    </VerticalStackLayout>
+                </ScrollView>
+
                 <!-- Form mode -->
                 <ScrollView x:Name="FormContainer" IsVisible="False">
                     <VerticalStackLayout Spacing="14">

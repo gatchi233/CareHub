@@ -1,13 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using MedReminder.Desktop.Services.Sync;
 using MedReminder.Models;
 using MedReminder.Services.Abstractions;
 
 namespace MedReminder.ViewModels
 {
-    public class ResidentsPageViewModel
+    public class ResidentsPageViewModel : INotifyPropertyChanged
     {
         private readonly IResidentService _residentService;
 
@@ -16,6 +19,22 @@ namespace MedReminder.ViewModels
         public string NameFilter { get; private set; } = string.Empty;
 
         public ObservableCollection<Resident> Residents { get; } = new();
+
+        private string _statusMessage = "";
+        public string StatusMessage
+        {
+            get => _statusMessage;
+            set
+            {
+                if (_statusMessage == value) return;
+                _statusMessage = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+        private void OnPropertyChanged([CallerMemberName] string? name = null)
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
         public ResidentsPageViewModel(IResidentService residentService)
         {
@@ -28,24 +47,15 @@ namespace MedReminder.ViewModels
             {
                 var list = await _residentService.LoadAsync();
 
-                // ✅ IMPORTANT: keep master list for filtering/sorting
                 _allResidents = list?.ToList() ?? new List<Resident>();
 
-                // ✅ Apply current filter to populate the UI list
                 ApplyFilters();
+                StatusMessage = "";
             }
-            catch (HttpRequestException)
+            catch (Exception)
             {
-                await Shell.Current.DisplayAlert(
-                    "Server not running",
-                    "Cannot reach the API. Start MedReminder.Api and try again.",
-                    "OK");
-
-                // optional: keep current UI list as-is
-            }
-            catch (Exception ex)
-            {
-                await Shell.Current.DisplayAlert("Error", ex.Message, "OK");
+                StatusMessage = "Offline — showing cached data";
+                // keep current UI list as-is
             }
         }
 
@@ -54,13 +64,29 @@ namespace MedReminder.ViewModels
             if (resident == null)
                 return;
 
-            await _residentService.DeleteAsync(resident);
+            try
+            {
+                await _residentService.DeleteAsync(resident);
 
-            _allResidents = _allResidents
-                .Where(r => r.Id != resident.Id)
-                .ToList();
+                _allResidents = _allResidents
+                    .Where(r => r.Id != resident.Id)
+                    .ToList();
 
-            ApplyFilters();
+                ApplyFilters();
+
+                if (!ConnectivityHelper.IsOnline())
+                    StatusMessage = "Saved offline (queued) — sync when online";
+            }
+            catch (Exception)
+            {
+                StatusMessage = "Saved offline (queued) — sync when online";
+
+                _allResidents = _allResidents
+                    .Where(r => r.Id != resident.Id)
+                    .ToList();
+
+                ApplyFilters();
+            }
         }
 
         public void UpdateFilters(string nameFilter)
@@ -93,7 +119,7 @@ namespace MedReminder.ViewModels
             }
 
             query = query
-                .OrderBy(r => DateTime.TryParse(r.DOB, out var d) ? d : DateTime.MinValue)
+                .OrderBy(r => DateTime.TryParse(r.DateOfBirth, out var d) ? d : DateTime.MinValue)
                 .ThenBy(r => r.ResidentName);
 
             Residents.Clear();

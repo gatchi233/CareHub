@@ -141,6 +141,12 @@ namespace MedReminder.Services.Local
             await SaveAsync(list);
         }
 
+        public async Task ReplaceAllAsync(List<Observation> items)
+        {
+            items ??= new List<Observation>();
+            await SaveAsync(items);
+        }
+
         public async Task<List<Observation>> LoadByResidentIdAsync(Guid residentId)
         {
             var list = await LoadAsync();

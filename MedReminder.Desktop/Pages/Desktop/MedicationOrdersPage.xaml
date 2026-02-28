@@ -8,10 +8,6 @@
     Title="Orders"
     BackgroundColor="{StaticResource Medication_Main_Background}">
 
-    <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Logout" Clicked="OnLogoutClicked" Priority="1" Order="Primary" />
-    </ContentPage.ToolbarItems>
-
     <Grid Padding="16" RowDefinitions="Auto,Auto,*" RowSpacing="12">
 
         <!-- ── Page header ─────────────────────────────────────────────────── -->

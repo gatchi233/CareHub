@@ -8,10 +8,6 @@
     Title="Medications"
     BackgroundColor="{StaticResource Medication_Main_Background}">
 
-    <pages:AuthPage.ToolbarItems>
-        <ToolbarItem Text="Logout" Clicked="OnLogoutClicked" Priority="1" Order="Primary" />
-    </pages:AuthPage.ToolbarItems>
-
     <Grid Padding="16" RowDefinitions="Auto,Auto,*" RowSpacing="12">
 
         <!-- ── Page header ─────────────────────────────────────────────────── -->
@@ -111,16 +107,25 @@
 
                                     <!-- Medication info -->
                                     <VerticalStackLayout Spacing="2" VerticalOptions="Center">
-                                        <Label Text="{Binding MedName}"
-                                               FontSize="13" FontAttributes="Bold"
-                                               TextColor="{StaticResource Medication_Font_Primary}"/>
-                                        <Label Text="{Binding Dosage, StringFormat='Dosage: {0}'}"
+                                        <Label FontSize="13"
+                                               TextColor="{StaticResource Medication_Font_Primary}">
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span Text="{Binding MedName}" FontAttributes="Bold"/>
+                                                    <Span Text="  "/>
+                                                    <Span Text="{Binding Quantity, StringFormat='{0}'}" FontSize="11"
+                                                          TextColor="{StaticResource Medication_Font_Secondary}"/>
+                                                    <Span Text=" " FontSize="11"/>
+                                                    <Span Text="{Binding QuantityUnit}" FontSize="11"
+                                                          TextColor="{StaticResource Medication_Font_Secondary}"/>
+                                                    <Span Text="{Binding TimesPerDay, StringFormat=' x {0}/day'}" FontSize="11"
+                                                          TextColor="{StaticResource Medication_Font_Secondary}"/>
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                        <Label Text="{Binding ScheduleSummary}"
                                                FontSize="11"
                                                TextColor="{StaticResource Medication_Font_Secondary}"/>
-                                        <Label Text="{Binding Usage, StringFormat='Condition: {0}'}"
-                                               FontSize="11"
-                                               TextColor="{StaticResource Medication_Font_Secondary}"
-                                               IsVisible="{Binding Usage, Converter={StaticResource StringNotEmptyConverter}}"/>
                                     </VerticalStackLayout>
 
                                     <!-- EDIT -->

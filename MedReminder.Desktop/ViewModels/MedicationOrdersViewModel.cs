@@ -37,22 +37,34 @@ namespace MedReminder.ViewModels
             MarkOrderedCommand = new Command<MedicationOrderRow>(async row =>
             {
                 if (row == null) return;
-                await _orderService.UpdateStatusAsync(row.OrderId, MedicationOrderStatus.Ordered);
-                await LoadAsync();
+                try
+                {
+                    await _orderService.UpdateStatusAsync(row.OrderId, MedicationOrderStatus.Ordered);
+                    await LoadAsync();
+                }
+                catch { /* order service is local-only */ }
             });
 
             MarkReceivedCommand = new Command<MedicationOrderRow>(async row =>
             {
                 if (row == null) return;
-                await _orderService.UpdateStatusAsync(row.OrderId, MedicationOrderStatus.Received);
-                await LoadAsync();
+                try
+                {
+                    await _orderService.UpdateStatusAsync(row.OrderId, MedicationOrderStatus.Received);
+                    await LoadAsync();
+                }
+                catch { /* order service is local-only */ }
             });
 
             CancelCommand = new Command<MedicationOrderRow>(async row =>
             {
                 if (row == null) return;
-                await _orderService.UpdateStatusAsync(row.OrderId, MedicationOrderStatus.Cancelled);
-                await LoadAsync();
+                try
+                {
+                    await _orderService.UpdateStatusAsync(row.OrderId, MedicationOrderStatus.Cancelled);
+                    await LoadAsync();
+                }
+                catch { /* order service is local-only */ }
             });
         }
 
@@ -91,6 +103,10 @@ namespace MedReminder.ViewModels
                     Orders.Add(new MedicationOrderRow(o, medName));
                 }
             }
+            catch
+            {
+                // Offline — keep whatever's in the lists, no crash
+            }
             finally
             {
                 IsBusy = false;
@@ -100,36 +116,52 @@ namespace MedReminder.ViewModels
         public async Task CreateOrderAsync(Guid medicationId, int qty, string? requestedBy, string? notes)
         {
             if (qty <= 0) return;
-            await _orderService.CreateAsync(medicationId, qty, requestedBy, notes);
-            await LoadAsync();
+            try
+            {
+                await _orderService.CreateAsync(medicationId, qty, requestedBy, notes);
+                await LoadAsync();
+            }
+            catch
+            {
+                // Order service is local-only, shouldn't fail
+            }
         }
 
         // Create a new GLOBAL inventory medication item (without using resident schedule edit page)
-        public async Task<Guid> CreateInventoryMedicationAsync(string medName, int reorderLevel)
+        public async Task<Guid> CreateInventoryMedicationAsync(string medName, int reorderLevel, string? quantityUnit = null, string? usage = null)
         {
             medName = (medName ?? "").Trim();
             if (string.IsNullOrWhiteSpace(medName))
                 throw new ArgumentException("Medication name is required.", nameof(medName));
 
-            var list = await _medicationService.LoadAsync();
-
-            var existing = list.FirstOrDefault(m => IsInventoryMedication(m) &&
-                string.Equals((m.MedName ?? "").Trim(), medName, StringComparison.OrdinalIgnoreCase));
-
-            if (existing != null)
-                return existing.Id;
-
-            var item = new Medication
+            try
             {
-                ResidentId = null,
-                MedName = medName,
-                ReorderLevel = reorderLevel,
-                StockQuantity = 0,
-                Usage = null
-            };
+                var list = await _medicationService.LoadAsync();
 
-            await _medicationService.UpsertAsync(item);
-            return item.Id;
+                var existing = list.FirstOrDefault(m => IsInventoryMedication(m) &&
+                    string.Equals((m.MedName ?? "").Trim(), medName, StringComparison.OrdinalIgnoreCase));
+
+                if (existing != null)
+                    return existing.Id;
+
+                var item = new Medication
+                {
+                    ResidentId = null,
+                    MedName = medName,
+                    ReorderLevel = reorderLevel,
+                    StockQuantity = 0,
+                    QuantityUnit = quantityUnit ?? "",
+                    Usage = usage
+                };
+
+                await _medicationService.UpsertAsync(item);
+                return item.Id;
+            }
+            catch
+            {
+                // Offline — return empty guid, order won't proceed
+                return Guid.Empty;
+            }
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
