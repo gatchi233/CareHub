@@ -512,6 +512,27 @@ function App() {
     setResidents(Array.isArray(refreshed) ? refreshed : []);
   }
 
+  async function handleSaveMedication(nextMedication) {
+    const id = nextMedication?.id || nextMedication?.Id;
+    if (!id) {
+      throw new Error("Medication id is required.");
+    }
+
+    await api.put(`/medications/${id}`, nextMedication);
+    const refreshed = await api.get("/medications");
+    setMedications(Array.isArray(refreshed) ? refreshed : []);
+  }
+
+  async function handleSaveStaff(username, nextStaff) {
+    if (!username) {
+      throw new Error("Staff username is required.");
+    }
+
+    await api.put(`/staff/${encodeURIComponent(username)}`, nextStaff);
+    const refreshed = await api.get("/staff");
+    setStaffMembers(Array.isArray(refreshed) ? refreshed : []);
+  }
+
   function renderActivePage() {
     if (!visibleSectionKeys.includes(activeSection)) {
       return <article className="card error">Access denied for your role.</article>;
@@ -562,6 +583,8 @@ function App() {
         <InventoryPage
           loading={loading}
           error={error}
+          canEditInventory={authSession?.role === "Admin"}
+          onSaveMedication={handleSaveMedication}
           displayedInventory={displayedInventory}
           pagedInventory={pagedInventory}
           lowStock={lowStock}
@@ -596,6 +619,8 @@ function App() {
         error={error}
         authRole={authSession?.role}
         currentResident={currentResident}
+        canEditStaff={authSession?.role === "Admin"}
+        onSaveStaff={handleSaveStaff}
         staffMembers={staffMembers}
       />
     );

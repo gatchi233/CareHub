@@ -7,8 +7,24 @@ const STAFF_TABS = [
   { key: "assignments", label: "Assignments" }
 ];
 
-function StaffPage({ loading, error, authRole, currentResident, staffMembers = [] }) {
+function StaffPage({
+  loading,
+  error,
+  authRole,
+  currentResident,
+  canEditStaff,
+  onSaveStaff,
+  staffMembers = []
+}) {
   const [activeTab, setActiveTab] = useState("directory");
+  const [editingUsername, setEditingUsername] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
+  const [editForm, setEditForm] = useState({
+    displayName: "",
+    role: "",
+    password: ""
+  });
 
   if (loading) {
     return (
@@ -42,6 +58,42 @@ function StaffPage({ loading, error, authRole, currentResident, staffMembers = [
     );
   }
 
+  const editingMember = staffMembers.find((member) => member.username === editingUsername);
+
+  function startEdit(member) {
+    setSaveError("");
+    setEditingUsername(member.username);
+    setEditForm({
+      displayName: member.displayName || "",
+      role: member.role || "",
+      password: ""
+    });
+  }
+
+  async function handleSave(event) {
+    event.preventDefault();
+    if (!editingMember || !onSaveStaff) {
+      return;
+    }
+
+    setSaving(true);
+    setSaveError("");
+
+    try {
+      const payload = {
+        displayName: editForm.displayName,
+        role: editForm.role,
+        password: editForm.password
+      };
+      await onSaveStaff(editingMember.username, payload);
+      setEditingUsername("");
+    } catch (err) {
+      setSaveError(err?.message || "Failed to save staff.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
   return (
     <section className="page-shell">
       <PageTabs tabs={STAFF_TABS} activeTab={activeTab} onChange={setActiveTab} />
@@ -54,9 +106,67 @@ function StaffPage({ loading, error, authRole, currentResident, staffMembers = [
             {staffMembers.map((member) => (
               <div className="list-row" key={member.username}>
                 <span>{member.displayName || member.username}</span>
-                <small>{member.role}</small>
+                <span className="list-row-actions">
+                  <small>{member.role}</small>
+                  {canEditStaff && (
+                    <button type="button" className="ghost-button" onClick={() => startEdit(member)}>
+                      Edit
+                    </button>
+                  )}
+                </span>
               </div>
             ))}
+            {canEditStaff && editingMember && (
+              <form className="resident-edit-form" onSubmit={handleSave}>
+                <h4>Edit Staff Account</h4>
+                <label>
+                  Display Name
+                  <input
+                    value={editForm.displayName}
+                    onChange={(event) =>
+                      setEditForm((current) => ({ ...current, displayName: event.target.value }))
+                    }
+                  />
+                </label>
+                <label>
+                  Role
+                  <select
+                    value={editForm.role}
+                    onChange={(event) =>
+                      setEditForm((current) => ({ ...current, role: event.target.value }))
+                    }
+                  >
+                    <option value="Admin">Admin</option>
+                    <option value="Staff">Staff</option>
+                    <option value="Observer">Observer</option>
+                  </select>
+                </label>
+                <label>
+                  New Password (optional)
+                  <input
+                    type="password"
+                    value={editForm.password}
+                    onChange={(event) =>
+                      setEditForm((current) => ({ ...current, password: event.target.value }))
+                    }
+                  />
+                </label>
+                {saveError ? <p className="auth-error">{saveError}</p> : null}
+                <div className="action-row">
+                  <button type="submit" className="ghost-button" disabled={saving}>
+                    {saving ? "Saving..." : "Save Changes"}
+                  </button>
+                  <button
+                    type="button"
+                    className="ghost-button"
+                    onClick={() => setEditingUsername("")}
+                    disabled={saving}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            )}
           </article>
         </section>
       )}

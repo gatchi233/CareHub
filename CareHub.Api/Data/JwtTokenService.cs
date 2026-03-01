@@ -1,7 +1,9 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using CareHub.Api.Entities;
 using Microsoft.Extensions.Options;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace CareHub.Api.Data;
@@ -9,18 +11,37 @@ namespace CareHub.Api.Data;
 public sealed class JwtTokenService
 {
     private readonly AuthOptions _options;
+    private readonly CareHubDbContext _db;
 
-    public JwtTokenService(IOptions<AuthOptions> options)
+    public JwtTokenService(IOptions<AuthOptions> options, CareHubDbContext db)
     {
         _options = options.Value;
+        _db = db;
     }
 
-    public bool TryValidateCredentials(string username, string password, out AuthUser? user)
+    public async Task<AuthUser?> TryValidateCredentialsAsync(string username, string password, CancellationToken ct = default)
     {
-        user = _options.Users.FirstOrDefault(u =>
+        var dbUser = await _db.AppUsers
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u =>
+                u.Username.ToLower() == username.ToLower() &&
+                u.Password == password, ct);
+
+        if (dbUser is not null)
+        {
+            return new AuthUser
+            {
+                Username = dbUser.Username,
+                Password = dbUser.Password,
+                Role = dbUser.Role,
+                DisplayName = dbUser.DisplayName,
+                ResidentId = dbUser.ResidentId
+            };
+        }
+
+        return _options.Users.FirstOrDefault(u =>
             string.Equals(u.Username, username, StringComparison.OrdinalIgnoreCase) &&
             u.Password == password);
-        return user is not null;
     }
 
     public (string token, DateTimeOffset expiresAtUtc) CreateToken(AuthUser user)

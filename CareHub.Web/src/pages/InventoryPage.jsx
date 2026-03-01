@@ -10,6 +10,8 @@ const INVENTORY_TABS = [
 function InventoryPage({
   loading,
   error,
+  canEditInventory,
+  onSaveMedication,
   displayedInventory,
   pagedInventory,
   lowStock,
@@ -19,6 +21,16 @@ function InventoryPage({
   renderSectionMeta
 }) {
   const [activeTab, setActiveTab] = useState("catalog");
+  const [editingMedicationId, setEditingMedicationId] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
+  const [editForm, setEditForm] = useState({
+    medName: "",
+    dosage: "",
+    usage: "",
+    stockQuantity: 0,
+    reorderLevel: 0
+  });
 
   if (loading) {
     return (
@@ -34,6 +46,49 @@ function InventoryPage({
         <p>{error}</p>
       </section>
     );
+  }
+
+  const editingMedication = displayedInventory.find(
+    (med) => (med.id || med.Id) === editingMedicationId
+  );
+
+  function startEditingMedication(med) {
+    setSaveError("");
+    setEditingMedicationId(med.id || med.Id);
+    setEditForm({
+      medName: med.medName || med.MedName || "",
+      dosage: med.dosage || med.Dosage || "",
+      usage: med.usage || med.Usage || "",
+      stockQuantity: Number(med.stockQuantity ?? med.StockQuantity ?? 0),
+      reorderLevel: Number(med.reorderLevel ?? med.ReorderLevel ?? 0)
+    });
+  }
+
+  async function handleSave(event) {
+    event.preventDefault();
+    if (!editingMedication || !onSaveMedication) {
+      return;
+    }
+
+    setSaving(true);
+    setSaveError("");
+    try {
+      const payload = {
+        ...editingMedication,
+        id: editingMedication.id || editingMedication.Id,
+        medName: editForm.medName,
+        dosage: editForm.dosage,
+        usage: editForm.usage,
+        stockQuantity: Number(editForm.stockQuantity),
+        reorderLevel: Number(editForm.reorderLevel)
+      };
+      await onSaveMedication(payload);
+      setEditingMedicationId("");
+    } catch (err) {
+      setSaveError(err?.message || "Failed to save medication.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -55,13 +110,87 @@ function InventoryPage({
                 <b className="row-index">{(currentPage - 1) * pageSize + index + 1}</b>
                 {med._name}
               </span>
-              <small>
-                {med._stock} in stock
-                {med.reorderLevel != null ? ` | Reorder at ${med._reorder}` : ""}
-                {med._isLow ? " | LOW" : ""}
-              </small>
+              <span className="list-row-actions">
+                <small>
+                  {med._stock} in stock
+                  {med.reorderLevel != null ? ` | Reorder at ${med._reorder}` : ""}
+                  {med._isLow ? " | LOW" : ""}
+                </small>
+                {canEditInventory && (
+                  <button type="button" className="ghost-button" onClick={() => startEditingMedication(med)}>
+                    Edit
+                  </button>
+                )}
+              </span>
             </div>
           ))}
+          {canEditInventory && editingMedication && (
+            <form className="resident-edit-form" onSubmit={handleSave}>
+              <h4>Edit Inventory Item</h4>
+              <label>
+                Medication
+                <input
+                  value={editForm.medName}
+                  onChange={(event) =>
+                    setEditForm((current) => ({ ...current, medName: event.target.value }))
+                  }
+                  required
+                />
+              </label>
+              <label>
+                Dosage
+                <input
+                  value={editForm.dosage}
+                  onChange={(event) =>
+                    setEditForm((current) => ({ ...current, dosage: event.target.value }))
+                  }
+                />
+              </label>
+              <label>
+                Usage
+                <input
+                  value={editForm.usage}
+                  onChange={(event) =>
+                    setEditForm((current) => ({ ...current, usage: event.target.value }))
+                  }
+                />
+              </label>
+              <label>
+                Stock Quantity
+                <input
+                  type="number"
+                  value={editForm.stockQuantity}
+                  onChange={(event) =>
+                    setEditForm((current) => ({ ...current, stockQuantity: event.target.value }))
+                  }
+                />
+              </label>
+              <label>
+                Reorder Level
+                <input
+                  type="number"
+                  value={editForm.reorderLevel}
+                  onChange={(event) =>
+                    setEditForm((current) => ({ ...current, reorderLevel: event.target.value }))
+                  }
+                />
+              </label>
+              {saveError ? <p className="auth-error">{saveError}</p> : null}
+              <div className="action-row">
+                <button type="submit" className="ghost-button" disabled={saving}>
+                  {saving ? "Saving..." : "Save Changes"}
+                </button>
+                <button
+                  type="button"
+                  className="ghost-button"
+                  onClick={() => setEditingMedicationId("")}
+                  disabled={saving}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          )}
         </section>
       )}
 

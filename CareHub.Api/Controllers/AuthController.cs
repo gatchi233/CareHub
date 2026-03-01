@@ -18,9 +18,10 @@ public sealed class AuthController : ControllerBase
 
     [AllowAnonymous]
     [HttpPost("login")]
-    public IActionResult Login([FromBody] LoginRequest request)
+    public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken ct)
     {
-        if (!_tokens.TryValidateCredentials(request.Username, request.Password, out var user) || user is null)
+        var user = await _tokens.TryValidateCredentialsAsync(request.Username, request.Password, ct);
+        if (user is null)
             return Unauthorized(new { message = "Invalid username or password." });
 
         var (token, expiresAtUtc) = _tokens.CreateToken(user);

@@ -316,12 +316,23 @@ function ResidentsPage({
         <section className="card">
           <h3>Room Map</h3>
           {roomGroups.length === 0 && <p>No room assignments available.</p>}
-          {roomGroups.map(([room, residents]) => (
-            <div key={room} className="list-row">
-              <span>{room}</span>
-              <small>{residents.length} resident(s)</small>
-            </div>
-          ))}
+          <section className="room-plan-grid">
+            {roomGroups.map(([room, residents]) => (
+              <article key={room} className="room-card">
+                <header>
+                  <strong>Room {room}</strong>
+                  <small>{residents.length} resident(s)</small>
+                </header>
+                <div className="room-occupants">
+                  {residents.map((resident) => (
+                    <span key={resident.id || resident.Id} className="room-occupant-pill">
+                      {resident._name}
+                    </span>
+                  ))}
+                </div>
+              </article>
+            ))}
+          </section>
         </section>
       )}
 

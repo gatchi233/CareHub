@@ -416,6 +416,50 @@ body {
   color: #15343f;
 }
 
+.resident-edit-form select {
+  border: 1px solid #cedfe6;
+  border-radius: 10px;
+  padding: 0.5rem 0.65rem;
+  background: #ffffff;
+  color: #15343f;
+}
+
+.room-plan-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.7rem;
+  margin-top: 0.6rem;
+}
+
+.room-card {
+  border: 1px solid #d9e7ed;
+  border-radius: 12px;
+  padding: 0.7rem;
+  background: #fbfdfe;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.room-card header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.room-occupants {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.room-occupant-pill {
+  border-radius: 999px;
+  padding: 0.25rem 0.55rem;
+  background: #e8f3f6;
+  color: #1a4753;
+  font-size: 0.82rem;
+}
+
 .staff-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));

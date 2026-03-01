@@ -15,10 +15,6 @@ public static class DataSeedService
         using var scope = services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CareHubDbContext>();
 
-        // If data already exists, do not reseed.
-        if (await db.Residents.AnyAsync(ct) || await db.Medications.AnyAsync(ct) || await db.Observations.AnyAsync(ct))
-            return;
-
         var seedDir = ResolveSeedDirectory(config, env);
         if (seedDir is null)
             return;
@@ -31,15 +27,89 @@ public static class DataSeedService
         var residents = await LoadListAsync<Resident>(Path.Combine(seedDir, "Residents.json"), jsonOptions, ct);
         var medications = await LoadListAsync<Medication>(Path.Combine(seedDir, "Medications.json"), jsonOptions, ct);
         var observations = await LoadListAsync<Observation>(Path.Combine(seedDir, "Observations.json"), jsonOptions, ct);
+        var auth = config.GetSection("Auth").Get<AuthOptions>() ?? new AuthOptions();
 
+        // Add only missing rows by id so partially-seeded databases get repaired
+        // without duplicating existing records.
         if (residents.Count > 0)
-            db.Residents.AddRange(residents);
-        if (medications.Count > 0)
-            db.Medications.AddRange(medications);
-        if (observations.Count > 0)
-            db.Observations.AddRange(observations);
+        {
+            var existingResidentIds = await db.Residents
+                .AsNoTracking()
+                .Select(x => x.Id)
+                .ToListAsync(ct);
+            var residentIdSet = existingResidentIds.ToHashSet();
 
-        if (residents.Count > 0 || medications.Count > 0 || observations.Count > 0)
+            var missingResidents = residents
+                .Where(x => x.Id != Guid.Empty && !residentIdSet.Contains(x.Id))
+                .ToList();
+
+            if (missingResidents.Count > 0)
+                db.Residents.AddRange(missingResidents);
+        }
+
+        if (medications.Count > 0)
+        {
+            var existingMedicationIds = await db.Medications
+                .AsNoTracking()
+                .Select(x => x.Id)
+                .ToListAsync(ct);
+            var medicationIdSet = existingMedicationIds.ToHashSet();
+
+            var missingMedications = medications
+                .Where(x => x.Id != Guid.Empty && !medicationIdSet.Contains(x.Id))
+                .ToList();
+
+            if (missingMedications.Count > 0)
+                db.Medications.AddRange(missingMedications);
+        }
+
+        if (observations.Count > 0)
+        {
+            var existingObservationIds = await db.Observations
+                .AsNoTracking()
+                .Select(x => x.Id)
+                .ToListAsync(ct);
+            var observationIdSet = existingObservationIds.ToHashSet();
+
+            var missingObservations = observations
+                .Where(x => x.Id != Guid.Empty && !observationIdSet.Contains(x.Id))
+                .ToList();
+
+            if (missingObservations.Count > 0)
+            {
+                foreach (var item in missingObservations)
+                    item.RecordedAt = NormalizeToUtc(item.RecordedAt);
+
+                db.Observations.AddRange(missingObservations);
+            }
+        }
+
+        if (auth.Users.Count > 0)
+        {
+            var existingUsernames = await db.AppUsers
+                .AsNoTracking()
+                .Select(x => x.Username)
+                .ToListAsync(ct);
+            var usernameSet = existingUsernames.ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            var missingUsers = auth.Users
+                .Where(x => !string.IsNullOrWhiteSpace(x.Username))
+                .Where(x => !usernameSet.Contains(x.Username))
+                .Select(x => new AppUser
+                {
+                    Username = x.Username,
+                    Password = x.Password,
+                    Role = x.Role,
+                    DisplayName = x.DisplayName,
+                    ResidentId = x.ResidentId
+                })
+                .ToList();
+
+            if (missingUsers.Count > 0)
+                db.AppUsers.AddRange(missingUsers);
+        }
+
+        if (db.ChangeTracker.HasChanges())
             await db.SaveChangesAsync(ct);
     }
 
@@ -74,5 +144,18 @@ public static class DataSeedService
         await using var stream = File.OpenRead(path);
         var items = await JsonSerializer.DeserializeAsync<List<T>>(stream, options, ct);
         return items ?? new List<T>();
+    }
+
+    private static DateTime NormalizeToUtc(DateTime value)
+    {
+        if (value == default)
+            return DateTime.UtcNow;
+
+        return value.Kind switch
+        {
+            DateTimeKind.Utc => value,
+            DateTimeKind.Local => value.ToUniversalTime(),
+            _ => DateTime.SpecifyKind(value, DateTimeKind.Utc)
+        };
     }
 }

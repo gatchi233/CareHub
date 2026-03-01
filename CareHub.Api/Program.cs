@@ -41,7 +41,7 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddDbContext<CareHubDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("CareHubDb")));
 builder.Services.Configure<AuthOptions>(builder.Configuration.GetSection("Auth"));
-builder.Services.AddSingleton<JwtTokenService>();
+builder.Services.AddScoped<JwtTokenService>();
 
 var auth = builder.Configuration.GetSection("Auth").Get<AuthOptions>() ?? new AuthOptions();
 var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(auth.SigningKey));
