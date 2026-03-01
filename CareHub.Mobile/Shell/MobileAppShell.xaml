@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Shell
+    x:Class="CareHub.Mobile.Shell.MobileAppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:pages="clr-namespace:CareHub.Mobile.Pages">
+
+    <ShellContent
+        Title="Residents"
+        ContentTemplate="{DataTemplate pages:ResidentsPage}"
+        Route="ResidentsPage" />
+</Shell>

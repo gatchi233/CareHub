@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:conv="clr-namespace:CareHub.Pages.UI.Converters"
+             xmlns:beh="clr-namespace:CareHub.Pages.UI.Behaviors"
+             x:Class="CareHub.App">
+
+    <Application.Resources>
+
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
+                <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- General Styles -->
+
+            <Style TargetType="ContentPage">
+                <Setter Property="Padding" Value="16" />
+            </Style>
+
+            <!-- Default Button style (safe, can be overridden per-page) -->
+            <Style TargetType="Button">
+                <Setter Property="CornerRadius" Value="12" />
+                <Setter Property="Padding" Value="12,10" />
+            </Style>
+
+            <!-- Converters -->
+            <conv:ReminderTimeToColorConverter x:Key="ReminderTimeToColorConverter" />
+            <conv:IntToDoubleConverter x:Key="IntToDoubleConverter" />
+            <conv:StringNotEmptyConverter x:Key="StringNotEmptyConverter" />
+            <conv:BoolToEnableDisableTextConverter x:Key="BoolToEnableDisableTextConverter" />
+            <conv:UtcToLocalDateTimeConverter x:Key="UtcToLocalDateTimeConverter" />
+            <conv:InvertedBoolConverter x:Key="InverseBoolConverter" />
+
+        </ResourceDictionary>
+
+    </Application.Resources>
+</Application>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="CareHub.Mobile.Pages.ResidentsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Residents"
+    BackgroundColor="#F5F5F5">
+
+    <CollectionView
+        ItemsSource="{Binding Residents}"
+        SelectionMode="Single"
+        SelectionChanged="OnSelectionChanged"
+        Margin="12">
+
+        <CollectionView.ItemTemplate>
+            <DataTemplate>
+                <Frame
+            BackgroundColor="White"
+            CornerRadius="12"
+            Padding="14"
+            Margin="0,0,0,10"
+            HasShadow="True">
+
+                    <VerticalStackLayout Spacing="4" VerticalOptions="Start">
+                        <Label
+                    Text="{Binding ResidentName}"
+                    FontSize="18"
+                    TextColor="Black" />
+
+                        <Label
+                    Text="{Binding Remarks}"
+                    FontSize="12"
+                    TextColor="Black"
+                    Opacity="0.7"
+                    LineBreakMode="TailTruncation"
+                    MaxLines="2" />
+                    </VerticalStackLayout>
+
+                </Frame>
+            </DataTemplate>
+        </CollectionView.ItemTemplate>
+
+    </CollectionView>
+
+</ContentPage>

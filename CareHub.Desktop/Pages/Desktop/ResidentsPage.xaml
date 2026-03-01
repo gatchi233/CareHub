@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<pages:AuthPage
+    x:Name="Root"
+    x:Class="CareHub.Pages.Desktop.ResidentsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:pages="clr-namespace:CareHub.Pages"
+    xmlns:model="clr-namespace:CareHub.Models"
+    Title="Residents"
+    BackgroundColor="{StaticResource Resident_Main_Background}">
+
+    <Grid Padding="16" RowDefinitions="Auto,*" RowSpacing="12">
+
+        <!-- Top bar -->
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+            <SearchBar x:Name="NameSearchBar" 
+                       Placeholder="Search resident..." 
+                       TextChanged="OnFilterChanged" />
+
+            <HorizontalStackLayout Grid.Column="1" Spacing="8">
+                <Border x:Name="AddAction"  StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="4"/>
+                    </Border.StrokeShape>
+                    <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
+                        <Image Grid.Column="0" Source="icons8_add_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
+                        <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Add}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
+                            <Label Text="ADD" TextColor="{StaticResource Button_Font_Primary}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
+                        </Border>
+                    </Grid>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnAddResidentClicked" />
+                    </Border.GestureRecognizers>
+                </Border>
+            </HorizontalStackLayout>
+        </Grid>
+
+        <!-- List -->
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Residents}" SelectionMode="Single" SelectionChanged="OnResidentClicked">
+
+            <CollectionView.EmptyView>
+                <Label Text="No residents found." TextColor="{StaticResource Resident_Font_Secondary}" />
+            </CollectionView.EmptyView>
+
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Vertical" ItemSpacing="6"/>
+            </CollectionView.ItemsLayout>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="model:Resident">
+                    <Border Padding="12" BackgroundColor="{StaticResource Resident_Card_Background}" Stroke="{StaticResource Resident_Card_Border}" StrokeThickness="1">
+                        <Border.StrokeShape >
+                            <RoundRectangle CornerRadius="8"/>
+                        </Border.StrokeShape>
+
+                        <HorizontalStackLayout Spacing="12" VerticalOptions="Center">
+                            <!-- Resident Name -->
+                            <Label Text="{Binding ResidentName}" FontAttributes="Bold" FontSize="20" TextColor="{StaticResource Resident_Font_Primary}" VerticalOptions="Center"/>
+                            <BoxView WidthRequest="1" HeightRequest="20" Color="{StaticResource Resident_Font_Secondary}" VerticalOptions="Center"/>
+
+                            <!-- Gender -->
+                            <Label Text="{Binding Gender}" FontSize="13" TextColor="{StaticResource Resident_Font_Secondary}" VerticalOptions="Center"/>
+                            <BoxView WidthRequest="1" HeightRequest="20" Color="{StaticResource Resident_Font_Secondary}" VerticalOptions="Center"/>
+
+                            <!-- Room & Bed -->
+                            <Label FontSize="13" TextColor="{StaticResource Resident_Font_Secondary}" VerticalOptions="Center">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="Room "/>
+                                        <Span Text="{Binding RoomNumber}"/>
+                                        <Span Text=" • "/>
+                                        <Span Text="{Binding BedLabel}"/>
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                        </HorizontalStackLayout>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+        </CollectionView>
+
+    </Grid>
+</pages:AuthPage>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="CareHub.Pages.LoginPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Staff Login"
+    BackgroundColor="{StaticResource Homepage_Main_Background}">
+
+    <Grid VerticalOptions="Center" HorizontalOptions="Center" ColumnSpacing="40" Padding="40">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Logo on the left -->
+        <Image
+            Grid.Column="0"
+            Source="carehub_logo.jpg"
+            HeightRequest="200"
+            WidthRequest="200"
+            Aspect="AspectFit"
+            VerticalOptions="Center" />
+
+        <!-- Login form on the right -->
+        <VerticalStackLayout Grid.Column="1" Spacing="16" VerticalOptions="Center" WidthRequest="300">
+
+            <Label
+                Text="Staff Login"
+                FontSize="22"
+                FontAttributes="Bold"
+                TextColor="{StaticResource Homepage_Font_Primary}" />
+
+            <Entry
+                Placeholder="Username"
+                PlaceholderColor="{StaticResource Placeholder_Font_Secondary}"
+                TextColor="{StaticResource Homepage_Font_Primary}"
+                BackgroundColor="{StaticResource Popup_Card_Background}"
+                Text="{Binding Username}" />
+
+            <Entry
+                Placeholder="Password"
+                PlaceholderColor="{StaticResource Placeholder_Font_Secondary}"
+                TextColor="{StaticResource Homepage_Font_Primary}"
+                BackgroundColor="{StaticResource Popup_Card_Background}"
+                IsPassword="True"
+                Text="{Binding Password}"
+                Completed="OnPasswordCompleted"/>
+
+            <Button
+                Text="Login"
+                BackgroundColor="{StaticResource Button_Login}"
+                TextColor="{StaticResource Button_Font_Primary}"
+                FontAttributes="Bold"
+                Command="{Binding LoginCommand}" />
+
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

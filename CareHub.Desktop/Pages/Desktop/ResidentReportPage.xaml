@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="CareHub.Pages.Desktop.ResidentReportPage"
+    Title="Resident Report"
+    BackgroundColor="{StaticResource Resident_Main_Background}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="12">
+
+            <!-- Top action buttons -->
+            <HorizontalStackLayout Spacing="8">
+
+                <!-- Share Report -->
+                <Border StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="4"/>
+                    </Border.StrokeShape>
+                    <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
+                        <Image Grid.Column="0" Source="icons8_report_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
+                        <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Export}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
+                            <Label Text="SHARE REPORT" TextColor="{StaticResource Button_Font_Primary}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
+                        </Border>
+                    </Grid>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ShareReportCommand}"/>
+                    </Border.GestureRecognizers>
+                </Border>
+
+                <!-- Close -->
+                <Border StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="4"/>
+                    </Border.StrokeShape>
+                    <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
+                        <Image Grid.Column="0" Source="icons8_close_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
+                        <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Close}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
+                            <Label Text="CLOSE" TextColor="{StaticResource Button_Font_Primary}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
+                        </Border>
+                    </Grid>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnCloseClicked"/>
+                    </Border.GestureRecognizers>
+                </Border>
+
+            </HorizontalStackLayout>
+
+            <Label Text="{Binding TitleText}"
+                   FontSize="22"
+                   FontAttributes="Bold"
+                   TextColor="{StaticResource Resident_Font_Primary}"/>
+
+            <Label Text="{Binding SubtitleText}"
+                   FontSize="12"
+                   TextColor="{StaticResource Resident_Font_Secondary}"/>
+
+            <Label Text="Preview (HTML):"
+                   FontAttributes="Bold"
+                   TextColor="{StaticResource Resident_Font_Primary}"/>
+
+            <Editor Text="{Binding HtmlPreview}"
+                    AutoSize="TextChanges"
+                    IsReadOnly="True"
+                    FontFamily="Consolas"
+                    TextColor="{StaticResource Resident_Font_Primary}"/>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

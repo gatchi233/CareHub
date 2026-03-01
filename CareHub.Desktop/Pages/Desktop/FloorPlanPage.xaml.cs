@@ -1,0 +1,43 @@
+using CareHub.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace CareHub.Pages.Desktop
+{
+    public partial class FloorPlanPage : AuthPage
+    {
+        public FloorPlanPage()
+        {
+            InitializeComponent();
+            BindingContext = Application.Current!.Handler!.MauiContext!
+                .Services.GetRequiredService<FloorPlanViewModel>();
+        }
+
+        protected override async void OnAppearing()
+        {
+            base.OnAppearing();
+            await ((FloorPlanViewModel)BindingContext).LoadAsync();
+        }
+
+        private async void OnResidentTapped(object sender, TappedEventArgs e)
+        {
+            if ((sender as BindableObject)?.BindingContext is ResidentPreview r)
+            {
+                var returnTo = Uri.EscapeDataString($"//{nameof(FloorPlanPage)}");
+                await Shell.Current.GoToAsync($"{nameof(ViewResidentPage)}?id={r.Id}&returnTo={returnTo}");
+            }
+        }
+
+        private void OnFloor1Clicked(object sender, EventArgs e)
+        {
+            if (BindingContext is FloorPlanViewModel vm)
+                vm.Floor = 1;
+        }
+
+        private void OnFloor2Clicked(object sender, EventArgs e)
+        {
+            if (BindingContext is FloorPlanViewModel vm)
+                vm.Floor = 2;
+        }
+
+    }
+}

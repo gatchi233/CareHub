@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="CareHub.Mobile.Pages.ResidentDetailPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Resident"
+    BackgroundColor="#F5F5F5">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="12">
+
+            <Frame BackgroundColor="White" CornerRadius="12" Padding="14" HasShadow="True">
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="{Binding Resident.ResidentName}" FontSize="22" TextColor="Black" />
+                    <Label Text="{Binding Resident.Remarks}" Opacity="0.7" TextColor="Black" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Label Text="Medications" FontSize="18" Margin="0,8,0,0" TextColor="Black"/>
+
+            <CollectionView ItemsSource="{Binding Medications}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame
+                            BackgroundColor="White"
+                            CornerRadius="12"
+                            Padding="12"
+                            Margin="0,0,0,10"
+                            HasShadow="True">
+
+                            <VerticalStackLayout Spacing="2">
+                                <Label Text="{Binding MedicationName}" FontSize="16" TextColor="Black" />
+                                <Label Text="{Binding Dosage}" FontSize="12" Opacity="0.7" TextColor="Black" />
+                            </VerticalStackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>
