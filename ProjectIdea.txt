@@ -1,0 +1,261 @@
+================================================================================
+                    DATS CAREHUB: AN AI-INTEGRATED
+                    DIGITAL CARE MANAGEMENT SYSTEM
+================================================================================
+
+  Team Members:
+    - Devi Madhusudanan       (000489919)
+    - Samuel Molla            (000499865)
+    - Tanvi Tanvi             (000489679)
+    - Alice Yu                (000488835)
+
+  Date: February 6, 2026
+
+================================================================================
+  TABLE OF CONTENTS
+================================================================================
+
+  1. Introduction
+  2. System Architecture and Core Design
+     2.1 The Data Layer
+     2.2 The Application Layer
+  3. Reporting and Care Documentation
+  4. AI Integration
+  5. Scalability & Development
+  6. Conclusion
+
+================================================================================
+  1. INTRODUCTION
+================================================================================
+
+  DATS CareHub is a modern healthcare management application designed for
+  desktop, web, and mobile platforms. Its primary purpose is to support the
+  high-pressure, daily operations found in assisted living facilities,
+  long-term care homes, and community care settings.
+
+  By centralizing resident information, medication records, and staff
+  observations into one user-friendly digital hub, the system aims to move
+  care providers away from outdated methods.
+
+  In many care environments today, staff still rely on a fragmented mix of
+  paper notes, complex spreadsheets, and disconnected software. This often
+  leads to "data silos" where important information is hard to find or easy
+  to lose.
+
+  DATS CareHub solves these issues by creating a single "source of truth".
+  The system provides three ways to access it:
+
+    - A .NET MAUI desktop app for Windows, which also supports offline use.
+    - A React-based web UI that staff can open in any browser without
+      installing anything.
+    - A React mobile app for phones and tablets, so staff can check things
+      on the go while walking around the facility.
+
+  All three front-ends connect to the same ASP.NET Core backend API with a
+  PostgreSQL database, so everyone is always looking at the same up-to-date
+  information. Whether a staff member is at the nursing station, on a shared
+  computer, or carrying a tablet in a resident's room, the experience is
+  smooth and consistent.
+
+  GOAL: Lift the heavy administrative weight off the shoulders of care
+  providers. By making data entry and retrieval easier, staff can spend less
+  time looking at screens or filling out forms and more time focusing on
+  providing high-quality care to their residents.
+
+================================================================================
+  2. SYSTEM ARCHITECTURE AND CORE DESIGN
+================================================================================
+
+  To ensure the app is reliable and easy to update, DATS CareHub uses a
+  layered architecture. The desktop app follows the MVVM (Model-View-
+  ViewModel) pattern, while the web and mobile apps are built with React.
+  Both approaches keep the "look" of the app (User Interface) completely
+  separate from the "brains" (business logic) and the "memory" (data).
+
+  --------------------------------------------------------------------------
+  2.1 The Data Layer
+  --------------------------------------------------------------------------
+
+  The desktop app supports two modes of data storage:
+
+    LOCAL JSON (OFFLINE MODE)
+      For early-stage development and offline scenarios, the desktop app
+      can store information in local JSON files. This allows for rapid
+      testing, easy debugging, and the ability to keep working even when
+      the server is unavailable.
+
+    POSTGRESQL DATABASE (ONLINE MODE)
+      The system uses a PostgreSQL database connected via an ASP.NET Core
+      Web API. This is the primary data source that all three front-ends
+      (desktop, web, and mobile) connect to.
+
+  We use "service interfaces" -- essentially digital placeholders -- to
+  handle all data requests on the desktop side. This means switching
+  between local JSON storage and the live API requires no changes to the
+  rest of the code.
+
+  The web and mobile React apps always talk directly to the API, so they
+  require a network connection to function.
+
+  The PostgreSQL setup allows:
+    - Multiple staff members to access the system simultaneously
+    - High level of data security and integrity required in healthcare
+
+  --------------------------------------------------------------------------
+  2.2 The Application Layer
+  --------------------------------------------------------------------------
+
+  DESKTOP (.NET MAUI - MVVM PATTERN)
+
+    The desktop app uses the MVVM design to stay modular and organized:
+
+    MODELS
+      The basic building blocks, representing things like residents,
+      medications, and care notes.
+
+    VIEWMODELS
+      The middleman -- takes raw data and prepares it to be displayed
+      on the screen.
+
+    VIEWS
+      The actual screens the user interacts with, designed to be clean
+      and simple.
+
+    Navigation is handled by MAUI Shell, which makes moving through the
+    app feel intuitive. Staff can quickly jump from a list of residents
+    to a specific profile, check a medication schedule, or generate a
+    report with just a few clicks.
+
+  WEB & MOBILE (REACT)
+
+    The web UI and mobile app are both built with React. They share a
+    lot of the same code since they both display the same data and call
+    the same API. The React side is organized into:
+
+    COMPONENTS
+      Reusable UI pieces like forms, tables, buttons, and cards.
+
+    PAGES / SCREENS
+      The main views such as Residents List, MAR Page, Login, etc.
+
+    SERVICES / API CALLS
+      Functions that call the ASP.NET Core backend to fetch and save
+      data.
+
+    The web version runs in the browser (Chrome, Edge, Firefox, Safari)
+    and the mobile version is packaged as a mobile app for Android and
+    iOS. On mobile, navigation uses a side menu or bottom navigation to
+    fit smaller screens.
+
+================================================================================
+  3. REPORTING AND CARE DOCUMENTATION
+================================================================================
+
+  One of the standout features of DATS CareHub is the Resident Report system.
+
+  In a typical care home, a shift change can be chaotic as staff try to catch
+  up on what happened earlier in the day. Our system generates a consolidated
+  care summary that pulls together:
+
+    - Demographic data
+    - Active medications
+    - Recent staff notes
+
+  ...into one easy-to-read page.
+
+  This report does more than just save time; it improves safety. Instead of
+  flipping through multiple folders or screens, a nurse can see the "big
+  picture" of a resident's health instantly.
+
+  Reports can be viewed on the desktop app, in the web browser, or on a
+  mobile device. They can also be printed or shared for handovers.
+
+  Use Cases:
+    - Shift handovers
+    - Internal reviews
+    - Sharing updates with visiting doctors
+
+================================================================================
+  4. AI INTEGRATION
+================================================================================
+
+  The "intelligence" in DATS CareHub comes from its integrated AI layer. It
+  is important to note that the AI is designed to be ASSISTIVE, NOT
+  AUTHORITATIVE. It doesn't replace the judgment of a trained professional
+  or make medical diagnoses. Instead, it acts like a highly efficient
+  assistant that helps staff make sense of the data already in the system.
+
+  Key AI Features:
+
+    PLAIN-LANGUAGE SUMMARIES
+      The AI can take a week's worth of technical notes and turn them into
+      a simple summary of how a resident is doing.
+
+    MEDICATION INSIGHTS
+      Provides easy-to-understand explanations of medications and their
+      side effects, which is incredibly helpful for trainees or
+      non-clinical staff.
+
+    QUALITY CONTROL
+      The AI acts as a second pair of eyes, flagging incomplete records
+      or missing dosage info before they become a problem.
+
+    TREND AWARENESS
+      If a resident has been reporting pain more frequently or missing
+      meals, the AI can highlight these patterns so staff can investigate
+      further.
+
+  --------------------------------------------------------------------------
+  Safety and Ethics
+  --------------------------------------------------------------------------
+
+  Because healthcare data is sensitive, we follow strict ethical guidelines:
+
+    - The AI NEVER changes data on its own
+    - The AI NEVER makes "emergency" decisions
+    - Every insight is clearly labeled as "informational only"
+    - The human staff member ALWAYS has the final say
+
+================================================================================
+  5. SCALABILITY & DEVELOPMENT
+================================================================================
+
+  DATS CareHub is more than just a prototype; it is a foundation for a much
+  larger system. As the project evolves, we plan to add:
+
+    MULTI-USER SUPPORT
+      Adding secure logins and role-based access so different staff members
+      (like managers vs. care aides) see the information relevant to them.
+
+    INVENTORY MANAGEMENT
+      Workflows to track medication stock and automate ordering.
+
+    EXPANDED AI
+      Moving toward deeper care planning assistance and better
+      accessibility for an aging workforce.
+
+    CROSS-PLATFORM ENHANCEMENTS
+      Continuing to improve the React web and mobile experiences, adding
+      features like push notifications on mobile and better responsive
+      layouts for various screen sizes.
+
+================================================================================
+  6. CONCLUSION
+================================================================================
+
+  DATS CareHub is a bridge between traditional, manual record-keeping and the
+  future of digital healthcare. By combining smart software design with
+  responsible AI, we've created a tool that makes care documentation more
+  efficient and meaningful.
+
+  With three ways to access the system -- a Windows desktop app, a web
+  browser, and a mobile app -- staff can work from wherever they are in the
+  facility. The desktop app provides full offline support, while the React
+  web and mobile apps offer lightweight, always-connected access through the
+  shared backend API.
+
+  This project demonstrates that technology, when used ethically, can
+  significantly improve the daily lives of both care providers and the
+  residents they serve.
+
+================================================================================
