@@ -32,5 +32,10 @@ public sealed class CareHubDbContext : DbContext
             .WithMany()
             .HasForeignKey(x => x.ResidentId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        // Backward-compatible mapping: database column is RecordedAtUtc.
+        modelBuilder.Entity<Observation>()
+            .Property(x => x.RecordedAt)
+            .HasColumnName("RecordedAtUtc");
     }
 }
