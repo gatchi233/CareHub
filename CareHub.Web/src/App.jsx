@@ -3,6 +3,7 @@ import { API_BASE, api } from "./api";
 
 const SECTIONS = ["Dashboard", "Residents", "Medications", "Observations", "Staff"];
 const EMPTY_GUID = "00000000-0000-0000-0000-000000000000";
+const DEFAULT_PAGE_SIZE = 8;
 
 function App() {
   const [activeSection, setActiveSection] = useState("Dashboard");
@@ -14,6 +15,8 @@ function App() {
   const [query, setQuery] = useState("");
   const [sortKey, setSortKey] = useState("name");
   const [sortDirection, setSortDirection] = useState("asc");
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     async function loadDashboard() {
@@ -48,6 +51,8 @@ function App() {
 
   useEffect(() => {
     setQuery("");
+    setCurrentPage(1);
+    setPageSize(DEFAULT_PAGE_SIZE);
     if (activeSection === "Observations") {
       setSortKey("date");
       setSortDirection("desc");
@@ -171,6 +176,38 @@ function App() {
     return filtered;
   }, [observations, query, sortKey, sortDirection]);
 
+  const pagedResidents = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return displayedResidents.slice(start, start + pageSize);
+  }, [displayedResidents, currentPage, pageSize]);
+
+  const pagedMedications = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return displayedMedications.slice(start, start + pageSize);
+  }, [displayedMedications, currentPage, pageSize]);
+
+  const pagedObservations = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return displayedObservations.slice(start, start + pageSize);
+  }, [displayedObservations, currentPage, pageSize]);
+
+  const activeTotalItems =
+    activeSection === "Residents"
+      ? displayedResidents.length
+      : activeSection === "Medications"
+        ? displayedMedications.length
+        : activeSection === "Observations"
+          ? displayedObservations.length
+          : 0;
+
+  const totalPages = Math.max(1, Math.ceil(activeTotalItems / pageSize));
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
+
   function renderSectionTools(sortOptions) {
     return (
       <div className="section-tools">
@@ -196,6 +233,53 @@ function App() {
         >
           {sortDirection === "asc" ? "Asc" : "Desc"}
         </button>
+        <select
+          value={pageSize}
+          onChange={(event) => {
+            setPageSize(Number(event.target.value));
+            setCurrentPage(1);
+          }}
+        >
+          <option value={8}>8 / page</option>
+          <option value={12}>12 / page</option>
+          <option value={20}>20 / page</option>
+        </select>
+      </div>
+    );
+  }
+
+  function renderSectionMeta(totalItems, itemLabel) {
+    const from = totalItems === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+    const to = Math.min(currentPage * pageSize, totalItems);
+
+    return (
+      <div className="section-meta">
+        <p>
+          Showing {from}-{to} of {totalItems} {itemLabel}
+        </p>
+        <div className="pager">
+          <button
+            type="button"
+            className="ghost-button"
+            onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+            disabled={currentPage === 1}
+          >
+            Prev
+          </button>
+          <small>
+            Page {currentPage} / {totalPages}
+          </small>
+          <button
+            type="button"
+            className="ghost-button"
+            onClick={() =>
+              setCurrentPage((page) => Math.min(totalPages, page + 1))
+            }
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </button>
+        </div>
       </div>
     );
   }
@@ -209,8 +293,11 @@ function App() {
             { value: "name", label: "Sort: Name" },
             { value: "room", label: "Sort: Room" }
           ])}
-          {displayedResidents.length === 0 && <p>No residents found.</p>}
-          {displayedResidents.map((resident) => {
+          {renderSectionMeta(displayedResidents.length, "residents")}
+          {displayedResidents.length === 0 && (
+            <p className="empty-state">No residents match this view.</p>
+          )}
+          {pagedResidents.map((resident) => {
             return (
               <div className="list-row" key={resident.id}>
                 <span>{resident._name}</span>
@@ -230,8 +317,11 @@ function App() {
             { value: "name", label: "Sort: Name" },
             { value: "stock", label: "Sort: Stock" }
           ])}
-          {displayedMedications.length === 0 && <p>No medications found.</p>}
-          {displayedMedications.map((med) => (
+          {renderSectionMeta(displayedMedications.length, "medications")}
+          {displayedMedications.length === 0 && (
+            <p className="empty-state">No medications match this view.</p>
+          )}
+          {pagedMedications.map((med) => (
             <div className="list-row" key={med.id}>
               <span>{med._name}</span>
               <small>
@@ -252,8 +342,11 @@ function App() {
             { value: "date", label: "Sort: Date" },
             { value: "summary", label: "Sort: Summary" }
           ])}
-          {displayedObservations.length === 0 && <p>No observations found.</p>}
-          {displayedObservations.map((obs) => (
+          {renderSectionMeta(displayedObservations.length, "observations")}
+          {displayedObservations.length === 0 && (
+            <p className="empty-state">No observations match this view.</p>
+          )}
+          {pagedObservations.map((obs) => (
             <div className="list-row" key={obs.id}>
               <span>{obs._summary}</span>
               <small>{obs._timestamp}</small>
