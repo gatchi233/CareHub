@@ -3,6 +3,7 @@ import PageTabs from "../components/PageTabs";
 
 const OBSERVATION_TABS = [
   { key: "timeline", label: "Timeline" },
+  { key: "list", label: "Observation List" },
   { key: "flags", label: "Flags" },
   { key: "reports", label: "Reports" }
 ];
@@ -76,6 +77,36 @@ function ObservationsPage({
               </div>
             ))}
           </article>
+        </section>
+      )}
+
+      {activeTab === "list" && (
+        <section className="card">
+          <h3>Observation List</h3>
+          {renderSectionTools([
+            { value: "date", label: "Sort: Date" },
+            { value: "summary", label: "Sort: Summary" }
+          ])}
+          {renderSectionMeta(displayedObservations.length, "observations")}
+          {displayedObservations.length === 0 && (
+            <p className="empty-state">No observations available.</p>
+          )}
+          {pagedObservations.map((obs, index) => (
+            <article className="observation-card" key={obs.id}>
+              <header>
+                <strong>
+                  {(currentPage - 1) * pageSize + index + 1}. {obs.type || "Observation"}
+                </strong>
+                <small>{obs._timestamp}</small>
+              </header>
+              <p>{obs._summary}</p>
+              <div className="observation-meta">
+                <span>Resident: {obs.residentName || obs.resident || "N/A"}</span>
+                <span>Value: {obs.value || "N/A"}</span>
+                <span>Recorded By: {obs.recordedBy || "N/A"}</span>
+              </div>
+            </article>
+          ))}
         </section>
       )}
 

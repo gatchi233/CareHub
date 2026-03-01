@@ -34,6 +34,7 @@ function App() {
   const [residents, setResidents] = useState([]);
   const [medications, setMedications] = useState([]);
   const [observations, setObservations] = useState([]);
+  const [staffMembers, setStaffMembers] = useState([]);
   const [query, setQuery] = useState("");
   const [sortKey, setSortKey] = useState("name");
   const [sortDirection, setSortDirection] = useState("asc");
@@ -130,6 +131,7 @@ function App() {
     setResidents([]);
     setMedications([]);
     setObservations([]);
+    setStaffMembers([]);
     setError("");
     setLoginError("");
   }
@@ -165,15 +167,18 @@ function App() {
         const canReadResidents = ["Admin", "Observer", "Resident"].includes(role);
         const canReadInventory = ["Admin", "Observer", "Resident"].includes(role);
         const canReadObservations = ["Admin", "Staff", "Observer", "Resident"].includes(role);
+        const canReadStaffList = ["Admin", "Observer"].includes(role);
 
-        const [resData, medData, obsData] = await Promise.all([
+        const [resData, medData, obsData, staffData] = await Promise.all([
           canReadResidents ? api.get("/residents") : Promise.resolve([]),
           canReadInventory ? api.get("/medications") : Promise.resolve([]),
-          canReadObservations ? api.get("/observations") : Promise.resolve([])
+          canReadObservations ? api.get("/observations") : Promise.resolve([]),
+          canReadStaffList ? api.get("/staff") : Promise.resolve([])
         ]);
         setResidents(Array.isArray(resData) ? resData : []);
         setMedications(Array.isArray(medData) ? medData : []);
         setObservations(Array.isArray(obsData) ? obsData : []);
+        setStaffMembers(Array.isArray(staffData) ? staffData : []);
       } catch (err) {
         if (err.status === 401 || err.status === 403) {
           handleLogout();
@@ -221,13 +226,19 @@ function App() {
   const displayedResidents = useMemo(() => {
     const filtered = residents
       .map((resident) => {
+        const firstName =
+          resident.firstName || resident.residentFName || resident.ResidentFName || "";
+        const lastName =
+          resident.lastName || resident.residentLName || resident.ResidentLName || "";
         const name =
           resident.fullName ||
-          `${resident.firstName || ""} ${resident.lastName || ""}`.trim() ||
+          `${firstName} ${lastName}`.trim() ||
           resident.name ||
-          `${resident.residentFName || ""} ${resident.residentLName || ""}`.trim() ||
+          `${resident.residentFName || resident.ResidentFName || ""} ${
+            resident.residentLName || resident.ResidentLName || ""
+          }`.trim() ||
           "Unnamed resident";
-        const room = resident.roomNumber || resident.room || "";
+        const room = resident.roomNumber || resident.RoomNumber || resident.room || "";
         return { ...resident, _name: name, _room: room };
       })
       .filter((resident) => {
@@ -490,6 +501,17 @@ function App() {
     }
   }
 
+  async function handleSaveResident(nextResident) {
+    const id = nextResident?.id || nextResident?.Id;
+    if (!id) {
+      throw new Error("Resident id is required.");
+    }
+
+    await api.put(`/residents/${id}`, nextResident);
+    const refreshed = await api.get("/residents");
+    setResidents(Array.isArray(refreshed) ? refreshed : []);
+  }
+
   function renderActivePage() {
     if (!visibleSectionKeys.includes(activeSection)) {
       return <article className="card error">Access denied for your role.</article>;
@@ -520,7 +542,10 @@ function App() {
         <ResidentsPage
           loading={loading}
           error={error}
+          authSession={authSession}
           authRole={authSession?.role}
+          canEditResidents={authSession?.role === "Admin"}
+          onSaveResident={handleSaveResident}
           currentResident={currentResident}
           displayedResidents={displayedResidents}
           pagedResidents={pagedResidents}
@@ -571,6 +596,7 @@ function App() {
         error={error}
         authRole={authSession?.role}
         currentResident={currentResident}
+        staffMembers={staffMembers}
       />
     );
   }
@@ -638,6 +664,9 @@ function App() {
               {section.key === "Residents" && <small>{residents.length}</small>}
               {section.key === "Inventory" && <small>{medications.length}</small>}
               {section.key === "Observations" && <small>{observations.length}</small>}
+              {section.key === "Staff" && authSession.role !== "Resident" && (
+                <small>{staffMembers.length}</small>
+              )}
               {section.key === "Dashboard" && lowStock.length > 0 && (
                 <small className="alert-pill">{lowStock.length}</small>
               )}

@@ -383,10 +383,72 @@ body {
   gap: 0.5rem;
 }
 
+.list-row-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.resident-edit-form {
+  margin-top: 1rem;
+  border-top: 1px solid #e5eff3;
+  padding-top: 1rem;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.resident-edit-form h4 {
+  margin: 0;
+}
+
+.resident-edit-form label {
+  display: grid;
+  gap: 0.3rem;
+  color: #204954;
+  font-weight: 600;
+}
+
+.resident-edit-form input {
+  border: 1px solid #cedfe6;
+  border-radius: 10px;
+  padding: 0.5rem 0.65rem;
+  background: #ffffff;
+  color: #15343f;
+}
+
 .staff-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 0.8rem;
+}
+
+.observation-card {
+  border: 1px solid #e2edf1;
+  border-radius: 12px;
+  padding: 0.8rem;
+  display: grid;
+  gap: 0.55rem;
+  margin-bottom: 0.65rem;
+}
+
+.observation-card header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem;
+}
+
+.observation-card p {
+  margin: 0;
+  color: #244954;
+}
+
+.observation-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  color: #4b6b75;
+  font-size: 0.9rem;
 }
 
 @media (max-width: 920px) {

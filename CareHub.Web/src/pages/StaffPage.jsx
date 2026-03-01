@@ -7,7 +7,7 @@ const STAFF_TABS = [
   { key: "assignments", label: "Assignments" }
 ];
 
-function StaffPage({ loading, error, authRole, currentResident }) {
+function StaffPage({ loading, error, authRole, currentResident, staffMembers = [] }) {
   const [activeTab, setActiveTab] = useState("directory");
 
   if (loading) {
@@ -49,16 +49,14 @@ function StaffPage({ loading, error, authRole, currentResident }) {
       {activeTab === "directory" && (
         <section className="staff-grid">
           <article className="card">
-            <h3>Registered Nurses</h3>
-            <p>Planned: contact cards, credentials, and active coverage windows.</p>
-          </article>
-          <article className="card">
-            <h3>Care Aides</h3>
-            <p>Planned: shift assignments, certifications, and handoff ownership.</p>
-          </article>
-          <article className="card">
-            <h3>On-Call Contacts</h3>
-            <p>Planned: emergency escalation chain and replacement pool.</p>
+            <h3>Staff Directory</h3>
+            {staffMembers.length === 0 && <p>No staff accounts available.</p>}
+            {staffMembers.map((member) => (
+              <div className="list-row" key={member.username}>
+                <span>{member.displayName || member.username}</span>
+                <small>{member.role}</small>
+              </div>
+            ))}
           </article>
         </section>
       )}
