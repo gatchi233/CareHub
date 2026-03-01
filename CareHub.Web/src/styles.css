@@ -229,12 +229,16 @@ body {
 
 .metric-caption {
   margin: 0.4rem 0 0;
-  color: #7a4f00;
+  color: #4f6f79;
   font-size: 0.9rem;
 }
 
 .warning strong {
   color: #a86800;
+}
+
+.warning .metric-caption {
+  color: #7a4f00;
 }
 
 .error {
@@ -253,6 +257,22 @@ body {
 
 .list-row:last-child {
   border-bottom: 0;
+}
+
+.recent-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.8rem;
+  padding: 0.45rem 0;
+  border-bottom: 1px solid #eef4f6;
+}
+
+.recent-row:last-child {
+  border-bottom: 0;
+}
+
+.recent-row small {
+  color: #4f6f79;
 }
 
 .list-primary {

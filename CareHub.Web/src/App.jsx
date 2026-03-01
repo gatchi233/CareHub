@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { API_BASE, api } from "./api";
+import ListToolbar from "./components/ListToolbar";
+import SectionMetaPager from "./components/SectionMetaPager";
+import StatCard from "./components/StatCard";
 
 const SECTIONS = ["Dashboard", "Residents", "Medications", "Observations", "Staff"];
 const EMPTY_GUID = "00000000-0000-0000-0000-000000000000";
@@ -93,6 +96,15 @@ function App() {
       return unassigned && Number(m.stockQuantity) <= Number(m.reorderLevel);
     });
   }, [medications]);
+  const occupiedRooms = useMemo(() => {
+    const roomSet = new Set(
+      residents
+        .map((resident) => resident.roomNumber || resident.room)
+        .filter((room) => room !== undefined && room !== null && String(room).trim() !== "")
+        .map((room) => String(room).trim())
+    );
+    return roomSet.size;
+  }, [residents]);
 
   useEffect(() => {
     resetSectionView();
@@ -277,6 +289,9 @@ function App() {
         event.preventDefault();
         searchInputRef.current?.focus();
       }
+      if (event.key === "Escape") {
+        setQuery("");
+      }
     }
 
     window.addEventListener("keydown", handleFocusShortcut);
@@ -316,45 +331,24 @@ function App() {
 
   function renderSectionTools(sortOptions) {
     return (
-      <div className="section-tools">
-        <input
-          ref={searchInputRef}
-          type="search"
-          value={query}
-          placeholder="Filter list... (Ctrl/Cmd+K)"
-          onChange={(event) => setQuery(event.target.value)}
-        />
-        <select value={sortKey} onChange={(event) => setSortKey(event.target.value)}>
-          {sortOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-        <button
-          type="button"
-          className="ghost-button"
-          onClick={() =>
-            setSortDirection((current) => (current === "asc" ? "desc" : "asc"))
-          }
-        >
-          {sortDirection === "asc" ? "Asc" : "Desc"}
-        </button>
-        <select
-          value={pageSize}
-          onChange={(event) => {
-            setPageSize(Number(event.target.value));
-            setCurrentPage(1);
-          }}
-        >
-          <option value={8}>8 / page</option>
-          <option value={12}>12 / page</option>
-          <option value={20}>20 / page</option>
-        </select>
-        <button type="button" className="ghost-button" onClick={resetSectionView}>
-          Reset
-        </button>
-      </div>
+      <ListToolbar
+        searchInputRef={searchInputRef}
+        query={query}
+        onQueryChange={setQuery}
+        sortKey={sortKey}
+        onSortKeyChange={setSortKey}
+        sortOptions={sortOptions}
+        sortDirection={sortDirection}
+        onToggleSortDirection={() =>
+          setSortDirection((current) => (current === "asc" ? "desc" : "asc"))
+        }
+        pageSize={pageSize}
+        onPageSizeChange={(size) => {
+          setPageSize(size);
+          setCurrentPage(1);
+        }}
+        onReset={resetSectionView}
+      />
     );
   }
 
@@ -363,46 +357,17 @@ function App() {
     const to = Math.min(currentPage * pageSize, totalItems);
 
     return (
-      <div className="section-meta">
-        <p>
-          Showing {from}-{to} of {totalItems} {itemLabel}
-        </p>
-        <div className="pager">
-          <button
-            type="button"
-            className="ghost-button"
-            onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
-            disabled={currentPage === 1}
-          >
-            Prev
-          </button>
-          <small>
-            Page {currentPage} / {totalPages}
-          </small>
-          {totalPages > 1 && (
-            <select
-              value={currentPage}
-              onChange={(event) => setCurrentPage(Number(event.target.value))}
-            >
-              {Array.from({ length: totalPages }, (_, idx) => idx + 1).map((page) => (
-                <option key={page} value={page}>
-                  Go to {page}
-                </option>
-              ))}
-            </select>
-          )}
-          <button
-            type="button"
-            className="ghost-button"
-            onClick={() =>
-              setCurrentPage((page) => Math.min(totalPages, page + 1))
-            }
-            disabled={currentPage === totalPages}
-          >
-            Next
-          </button>
-        </div>
-      </div>
+      <SectionMetaPager
+        from={from}
+        to={to}
+        totalItems={totalItems}
+        itemLabel={itemLabel}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPrev={() => setCurrentPage((page) => Math.max(1, page - 1))}
+        onNext={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+        onJump={setCurrentPage}
+      />
     );
   }
 
@@ -496,6 +461,14 @@ function App() {
     );
   }
 
+  async function handleCopySummary() {
+    try {
+      await navigator.clipboard.writeText(`${activeSection}: ${sectionSummary}`);
+    } catch {
+      // Ignore clipboard errors in restricted environments.
+    }
+  }
+
   return (
     <div className="app-shell">
       <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
@@ -537,6 +510,9 @@ function App() {
             <h2>{activeSection}</h2>
           </div>
           <p className="topbar-meta">{sectionSummary}</p>
+          <button type="button" className="secondary-button" onClick={handleCopySummary}>
+            Copy Summary
+          </button>
           {canExport && (
             <button type="button" className="secondary-button" onClick={handleExport}>
               Export CSV
@@ -564,23 +540,16 @@ function App() {
 
             {!loading && !error && (
               <>
-                <article className="card metric">
-                  <h3>Total Residents</h3>
-                  <strong>{residents.length}</strong>
-                </article>
-                <article className="card metric">
-                  <h3>Total Medications</h3>
-                  <strong>{medications.length}</strong>
-                </article>
-                <article className="card metric">
-                  <h3>Observations Logged</h3>
-                  <strong>{observations.length}</strong>
-                </article>
-                <article className="card metric warning">
-                  <h3>Low Stock Alerts</h3>
-                  <strong>{lowStock.length}</strong>
-                  <p className="metric-caption">{lowStockRate}% of medication records</p>
-                </article>
+                <StatCard title="Total Residents" value={residents.length} />
+                <StatCard title="Total Medications" value={medications.length} />
+                <StatCard title="Observations Logged" value={observations.length} />
+                <StatCard
+                  title="Low Stock Alerts"
+                  value={lowStock.length}
+                  tone="warning"
+                  caption={`${lowStockRate}% of medication records`}
+                />
+                <StatCard title="Occupied Rooms" value={occupiedRooms} />
                 <article className="card">
                   <h3>Quick Actions</h3>
                   <div className="action-row">
@@ -624,6 +593,16 @@ function App() {
                       {showAllReorders ? "Show less" : `Show all (${lowStock.length})`}
                     </button>
                   )}
+                </article>
+                <article className="card">
+                  <h3>Recent Observations</h3>
+                  {displayedObservations.slice(0, 5).map((obs) => (
+                    <div key={obs.id} className="recent-row">
+                      <span>{obs._summary}</span>
+                      <small>{obs._timestamp}</small>
+                    </div>
+                  ))}
+                  {displayedObservations.length === 0 && <p>No observations available.</p>}
                 </article>
               </>
             )}
