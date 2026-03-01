@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { API_BASE, api } from "./api";
+import { API_BASE, api, getAuthToken, setAuthToken } from "./api";
 import ListToolbar from "./components/ListToolbar";
 import SectionMetaPager from "./components/SectionMetaPager";
 import DashboardPage from "./pages/DashboardPage";
@@ -15,6 +15,14 @@ const SECTIONS = [
   { key: "Observations", label: "Observations" },
   { key: "Staff", label: "Staff" }
 ];
+
+const ROLE_SECTIONS = {
+  Admin: ["Dashboard", "Residents", "Inventory", "Observations", "Staff"],
+  Staff: ["Dashboard", "Residents", "Inventory", "Observations", "Staff"],
+  Observer: ["Dashboard", "Residents", "Inventory", "Observations"],
+  Resident: ["Dashboard", "Observations"]
+};
+
 const EMPTY_GUID = "00000000-0000-0000-0000-000000000000";
 const DEFAULT_PAGE_SIZE = 8;
 
@@ -32,7 +40,47 @@ function App() {
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [currentPage, setCurrentPage] = useState(1);
   const [showAllReorders, setShowAllReorders] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [authSession, setAuthSession] = useState(null);
+  const [loginError, setLoginError] = useState("");
+  const [loginForm, setLoginForm] = useState({ username: "", password: "" });
   const searchInputRef = useRef(null);
+
+  const visibleSectionKeys = useMemo(() => {
+    const role = authSession?.role || "";
+    return ROLE_SECTIONS[role] || [];
+  }, [authSession]);
+
+  useEffect(() => {
+    async function bootstrapAuth() {
+      const existing = getAuthToken();
+      if (!existing) {
+        setAuthLoading(false);
+        return;
+      }
+
+      try {
+        const me = await api.get("/auth/me");
+        setAuthSession(me);
+      } catch {
+        setAuthToken("");
+        setAuthSession(null);
+      } finally {
+        setAuthLoading(false);
+      }
+    }
+
+    bootstrapAuth();
+  }, []);
+
+  useEffect(() => {
+    if (visibleSectionKeys.length === 0) {
+      return;
+    }
+    if (!visibleSectionKeys.includes(activeSection)) {
+      setActiveSection(visibleSectionKeys[0]);
+    }
+  }, [activeSection, visibleSectionKeys]);
 
   function resetSectionView() {
     setQuery("");
@@ -76,8 +124,40 @@ function App() {
     URL.revokeObjectURL(url);
   }
 
+  function handleLogout() {
+    setAuthToken("");
+    setAuthSession(null);
+    setResidents([]);
+    setMedications([]);
+    setObservations([]);
+    setError("");
+    setLoginError("");
+  }
+
+  async function handleLoginSubmit(event) {
+    event.preventDefault();
+    setLoginError("");
+
+    try {
+      const login = await api.post("/auth/login", loginForm);
+      setAuthToken(login.accessToken);
+      const me = await api.get("/auth/me");
+      setAuthSession(me);
+      setLoginForm({ username: "", password: "" });
+    } catch (err) {
+      setLoginError(`Login failed. ${err.message}`);
+      setAuthToken("");
+      setAuthSession(null);
+    }
+  }
+
   useEffect(() => {
     async function loadDashboard() {
+      if (!authSession) {
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
         setError("");
@@ -90,6 +170,10 @@ function App() {
         setMedications(Array.isArray(medData) ? medData : []);
         setObservations(Array.isArray(obsData) ? obsData : []);
       } catch (err) {
+        if (err.status === 401 || err.status === 403) {
+          handleLogout();
+          return;
+        }
         setError(`Failed to load API data from ${API_BASE}. ${err.message}`);
       } finally {
         setLoading(false);
@@ -97,7 +181,8 @@ function App() {
     }
 
     loadDashboard();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authSession]);
 
   const lowStock = useMemo(() => {
     return medications.filter((m) => {
@@ -128,6 +213,7 @@ function App() {
           resident.fullName ||
           `${resident.firstName || ""} ${resident.lastName || ""}`.trim() ||
           resident.name ||
+          `${resident.residentFName || ""} ${resident.residentLName || ""}`.trim() ||
           "Unnamed resident";
         const room = resident.roomNumber || resident.room || "";
         return { ...resident, _name: name, _room: room };
@@ -202,8 +288,8 @@ function App() {
   const displayedObservations = useMemo(() => {
     const filtered = observations
       .map((obs) => {
-        const summary = obs.summary || obs.note || "Observation entry";
-        const timestamp = obs.observedAt || obs.createdAt || "";
+        const summary = obs.summary || obs.note || obs.value || "Observation entry";
+        const timestamp = obs.observedAt || obs.createdAt || obs.recordedAt || "";
         const dateValue = Date.parse(timestamp);
         return {
           ...obs,
@@ -272,6 +358,7 @@ function App() {
             ? `${lowStock.length} low stock alerts right now`
             : "Staff directory and planning workspace";
   const canExport =
+    authSession &&
     activeSection !== "Dashboard" &&
     activeSection !== "Staff" &&
     !loading &&
@@ -390,6 +477,10 @@ function App() {
   }
 
   function renderActivePage() {
+    if (!visibleSectionKeys.includes(activeSection)) {
+      return <article className="card error">Access denied for your role.</article>;
+    }
+
     if (activeSection === "Dashboard") {
       return (
         <DashboardPage
@@ -405,6 +496,7 @@ function App() {
           onToggleReorders={() => setShowAllReorders((isOpen) => !isOpen)}
           recentObservations={displayedObservations}
           onNavigate={setActiveSection}
+          availableSections={visibleSectionKeys}
         />
       );
     }
@@ -458,13 +550,57 @@ function App() {
     return <StaffPage loading={loading} error={error} />;
   }
 
+  if (authLoading) {
+    return (
+      <main className="auth-shell">
+        <article className="card auth-card">Checking session...</article>
+      </main>
+    );
+  }
+
+  if (!authSession) {
+    return (
+      <main className="auth-shell">
+        <form className="card auth-card" onSubmit={handleLoginSubmit}>
+          <h2>CareHub Login</h2>
+          <p>Use your role account to continue.</p>
+          <label>
+            Username
+            <input
+              value={loginForm.username}
+              onChange={(event) =>
+                setLoginForm((current) => ({ ...current, username: event.target.value }))
+              }
+              autoComplete="username"
+              required
+            />
+          </label>
+          <label>
+            Password
+            <input
+              type="password"
+              value={loginForm.password}
+              onChange={(event) =>
+                setLoginForm((current) => ({ ...current, password: event.target.value }))
+              }
+              autoComplete="current-password"
+              required
+            />
+          </label>
+          {loginError ? <p className="auth-error">{loginError}</p> : null}
+          <button type="submit">Sign In</button>
+        </form>
+      </main>
+    );
+  }
+
   return (
     <div className="app-shell">
       <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
         <h1>CareHub</h1>
-        <p>Retirement medication operations</p>
+        <p>{authSession.displayName || authSession.username}</p>
         <nav>
-          {SECTIONS.map((section) => (
+          {SECTIONS.filter((section) => visibleSectionKeys.includes(section.key)).map((section) => (
             <button
               key={section.key}
               className={activeSection === section.key ? "active" : ""}
@@ -498,7 +634,9 @@ function App() {
             </button>
             <h2>{activeSection}</h2>
           </div>
-          <p className="topbar-meta">{sectionSummary}</p>
+          <p className="topbar-meta">
+            {sectionSummary} | {authSession.role}
+          </p>
           <button type="button" className="secondary-button" onClick={handleCopySummary}>
             Copy Summary
           </button>
@@ -507,7 +645,7 @@ function App() {
               Export CSV
             </button>
           )}
-          <button onClick={() => window.location.reload()}>Refresh</button>
+          <button onClick={handleLogout}>Logout</button>
         </header>
         {renderActivePage()}
       </main>

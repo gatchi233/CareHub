@@ -20,7 +20,8 @@ function DashboardPage({
   showAllReorders,
   onToggleReorders,
   recentObservations,
-  onNavigate
+  onNavigate,
+  availableSections = []
 }) {
   const [activeTab, setActiveTab] = useState("overview");
 
@@ -55,18 +56,26 @@ function DashboardPage({
           <article className="card">
             <h3>Quick Actions</h3>
             <div className="action-row">
-              <button type="button" className="ghost-button" onClick={() => onNavigate("Residents")}>
-                View Residents
-              </button>
-              <button type="button" className="ghost-button" onClick={() => onNavigate("Inventory")}>
-                View Inventory
-              </button>
-              <button type="button" className="ghost-button" onClick={() => onNavigate("Observations")}>
-                View Observations
-              </button>
-              <button type="button" className="ghost-button" onClick={() => onNavigate("Staff")}>
-                View Staff
-              </button>
+              {availableSections.includes("Residents") && (
+                <button type="button" className="ghost-button" onClick={() => onNavigate("Residents")}>
+                  View Residents
+                </button>
+              )}
+              {availableSections.includes("Inventory") && (
+                <button type="button" className="ghost-button" onClick={() => onNavigate("Inventory")}>
+                  View Inventory
+                </button>
+              )}
+              {availableSections.includes("Observations") && (
+                <button type="button" className="ghost-button" onClick={() => onNavigate("Observations")}>
+                  View Observations
+                </button>
+              )}
+              {availableSections.includes("Staff") && (
+                <button type="button" className="ghost-button" onClick={() => onNavigate("Staff")}>
+                  View Staff
+                </button>
+              )}
             </div>
           </article>
 

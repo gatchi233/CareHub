@@ -1,12 +1,15 @@
-﻿using CareHub.Api.Data;
+using CareHub.Api.Data;
 using CareHub.Api.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace CareHub.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public sealed class ResidentsController : ControllerBase
 {
     private readonly CareHubDbContext _db;
@@ -15,22 +18,33 @@ public sealed class ResidentsController : ControllerBase
 
     // GET api/residents
     [HttpGet]
+    [Authorize(Roles = $"{Roles.Admin},{Roles.Staff},{Roles.Observer},{Roles.Resident}")]
     public async Task<ActionResult<List<Resident>>> GetAll(CancellationToken ct)
     {
-        var items = await _db.Residents
+        var query = _db.Residents
             .AsNoTracking()
             .OrderBy(r => r.ResidentLName)
             .ThenBy(r => r.ResidentFName)
-            .ToListAsync(ct);
+            .AsQueryable();
+
+        if (User.IsInRole(Roles.Resident))
+        {
+            var residentIdText = User.FindFirstValue("resident_id");
+            if (!Guid.TryParse(residentIdText, out var residentId))
+                return Forbid();
+            query = query.Where(r => r.Id == residentId);
+        }
+
+        var items = await query.ToListAsync(ct);
 
         return Ok(items);
     }
 
     // POST api/residents
     [HttpPost]
+    [Authorize(Roles = $"{Roles.Admin},{Roles.Staff}")]
     public async Task<ActionResult<Resident>> Create([FromBody] Resident resident, CancellationToken ct)
     {
-        // If client sends empty Guid, generate one
         if (resident.Id == Guid.Empty)
             resident.Id = Guid.NewGuid();
 
@@ -42,6 +56,7 @@ public sealed class ResidentsController : ControllerBase
 
     // PUT api/residents/{id}
     [HttpPut("{id:guid}")]
+    [Authorize(Roles = $"{Roles.Admin},{Roles.Staff}")]
     public async Task<IActionResult> Update(Guid id, [FromBody] Resident resident, CancellationToken ct)
     {
         if (id != resident.Id)
@@ -49,13 +64,9 @@ public sealed class ResidentsController : ControllerBase
 
         var exists = await _db.Residents.AnyAsync(r => r.Id == id, ct);
         if (exists)
-        {
             _db.Entry(resident).State = EntityState.Modified;
-        }
         else
-        {
             _db.Residents.Add(resident);
-        }
 
         await _db.SaveChangesAsync(ct);
         return NoContent();
@@ -63,6 +74,7 @@ public sealed class ResidentsController : ControllerBase
 
     // DELETE api/residents/{id}
     [HttpDelete("{id:guid}")]
+    [Authorize(Roles = Roles.Admin)]
     public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
     {
         var entity = await _db.Residents.FirstOrDefaultAsync(r => r.Id == id, ct);

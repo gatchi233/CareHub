@@ -12,6 +12,49 @@ body {
   margin: 0;
 }
 
+.auth-shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.auth-card {
+  width: min(440px, 100%);
+  display: grid;
+  gap: 0.8rem;
+}
+
+.auth-card h2 {
+  margin: 0;
+}
+
+.auth-card p {
+  margin: 0;
+  color: #3d606b;
+}
+
+.auth-card label {
+  display: grid;
+  gap: 0.35rem;
+  color: #1f4652;
+  font-weight: 600;
+}
+
+.auth-card input {
+  border: 1px solid #cedfe6;
+  border-radius: 10px;
+  padding: 0.55rem 0.7rem;
+  background: #ffffff;
+  color: #15343f;
+}
+
+.auth-error {
+  margin: 0;
+  color: #8c2c2c !important;
+  font-weight: 600;
+}
+
 .app-shell {
   min-height: 100vh;
   display: grid;

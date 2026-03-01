@@ -1,12 +1,15 @@
-﻿using CareHub.Api.Data;
+using CareHub.Api.Data;
 using CareHub.Api.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace CareHub.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public sealed class ObservationsController : ControllerBase
 {
     private readonly CareHubDbContext _db;
@@ -15,26 +18,57 @@ public sealed class ObservationsController : ControllerBase
 
     // GET api/observations
     [HttpGet]
+    [Authorize(Roles = $"{Roles.Admin},{Roles.Staff},{Roles.Observer},{Roles.Resident}")]
     public async Task<ActionResult<List<Observation>>> GetAll()
-        => await _db.Observations.AsNoTracking().ToListAsync();
+    {
+        var query = _db.Observations.AsNoTracking().AsQueryable();
+        if (User.IsInRole(Roles.Resident))
+        {
+            var residentIdText = User.FindFirstValue("resident_id");
+            if (!Guid.TryParse(residentIdText, out var residentId))
+                return Forbid();
+            query = query.Where(o => o.ResidentId == residentId);
+        }
+        return await query.ToListAsync();
+    }
 
     // GET api/observations/{id}
     [HttpGet("{id:guid}")]
+    [Authorize(Roles = $"{Roles.Admin},{Roles.Staff},{Roles.Observer},{Roles.Resident}")]
     public async Task<ActionResult<Observation>> GetById(Guid id)
     {
         var obs = await _db.Observations.AsNoTracking()
             .FirstOrDefaultAsync(x => x.Id == id);
+
+        if (obs is not null && User.IsInRole(Roles.Resident))
+        {
+            var residentIdText = User.FindFirstValue("resident_id");
+            if (!Guid.TryParse(residentIdText, out var residentClaimId))
+                return Forbid();
+            if (obs.ResidentId != residentClaimId)
+                return Forbid();
+        }
 
         return obs is null ? NotFound() : Ok(obs);
     }
 
     // GET api/observations/by-resident/{residentId}
     [HttpGet("by-resident/{residentId:guid}")]
+    [Authorize(Roles = $"{Roles.Admin},{Roles.Staff},{Roles.Observer},{Roles.Resident}")]
     public async Task<ActionResult<List<Observation>>> GetByResidentId(Guid residentId)
     {
+        if (User.IsInRole(Roles.Resident))
+        {
+            var residentIdText = User.FindFirstValue("resident_id");
+            if (!Guid.TryParse(residentIdText, out var residentClaimId))
+                return Forbid();
+            if (residentId != residentClaimId)
+                return Forbid();
+        }
+
         var list = await _db.Observations.AsNoTracking()
             .Where(x => x.ResidentId == residentId)
-            .OrderByDescending(x => x.RecordedAt) // or ObservedAtUtc
+            .OrderByDescending(x => x.RecordedAt)
             .ToListAsync();
 
         return Ok(list);
@@ -42,8 +76,18 @@ public sealed class ObservationsController : ControllerBase
 
     // GET api/observations/byResident/{residentId}
     [HttpGet("byResident/{residentId:guid}")]
+    [Authorize(Roles = $"{Roles.Admin},{Roles.Staff},{Roles.Observer},{Roles.Resident}")]
     public async Task<ActionResult<List<Observation>>> GetByResident(Guid residentId, CancellationToken ct)
     {
+        if (User.IsInRole(Roles.Resident))
+        {
+            var residentIdText = User.FindFirstValue("resident_id");
+            if (!Guid.TryParse(residentIdText, out var residentClaimId))
+                return Forbid();
+            if (residentId != residentClaimId)
+                return Forbid();
+        }
+
         var list = await _db.Observations
             .AsNoTracking()
             .Where(o => o.ResidentId == residentId)
@@ -55,12 +99,13 @@ public sealed class ObservationsController : ControllerBase
 
     // POST api/observations
     [HttpPost]
+    [Authorize(Roles = $"{Roles.Admin},{Roles.Staff}")]
     public async Task<ActionResult<Observation>> Create([FromBody] Observation item, CancellationToken ct)
     {
         if (item.Id == Guid.Empty)
             item.Id = Guid.NewGuid();
 
-       if (item.RecordedAt == default)
+        if (item.RecordedAt == default)
             item.RecordedAt = DateTime.UtcNow;
 
         _db.Observations.Add(item);
@@ -71,6 +116,7 @@ public sealed class ObservationsController : ControllerBase
 
     // PUT api/observations/{id}
     [HttpPut("{id:guid}")]
+    [Authorize(Roles = $"{Roles.Admin},{Roles.Staff}")]
     public async Task<IActionResult> Update(Guid id, Observation updated)
     {
         if (id != updated.Id)
@@ -88,6 +134,7 @@ public sealed class ObservationsController : ControllerBase
             existing.Value = updated.Value;
             existing.RecordedBy = updated.RecordedBy;
             existing.ResidentName = updated.ResidentName;
+            existing.RecordedAt = updated.RecordedAt;
         }
 
         await _db.SaveChangesAsync();
@@ -96,6 +143,7 @@ public sealed class ObservationsController : ControllerBase
 
     // DELETE api/observations/{id}
     [HttpDelete("{id:guid}")]
+    [Authorize(Roles = $"{Roles.Admin},{Roles.Staff}")]
     public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
     {
         var entity = await _db.Observations.FirstOrDefaultAsync(o => o.Id == id, ct);

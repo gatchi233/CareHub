@@ -18,8 +18,19 @@ public static class MauiProgram
         // DI
         builder.Services.AddSingleton<MobileAppShell>();
 
-        builder.Services.AddSingleton<ResidentReadOnlyJsonService>();
-        builder.Services.AddSingleton<MedicationReadOnlyJsonService>();
+        var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? "http://localhost:5001/";
+        var apiBase = new Uri(apiBaseUrl);
+
+        builder.Services.AddHttpClient<ResidentReadOnlyJsonService>(client =>
+        {
+            client.BaseAddress = apiBase;
+            client.Timeout = TimeSpan.FromSeconds(5);
+        });
+        builder.Services.AddHttpClient<MedicationReadOnlyJsonService>(client =>
+        {
+            client.BaseAddress = apiBase;
+            client.Timeout = TimeSpan.FromSeconds(5);
+        });
 
         builder.Services.AddTransient<ResidentsViewModel>();
         builder.Services.AddTransient<ResidentDetailViewModel>();

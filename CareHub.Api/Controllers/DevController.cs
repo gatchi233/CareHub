@@ -1,5 +1,6 @@
-﻿using CareHub.Api.Data;
+using CareHub.Api.Data;
 using CareHub.Api.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,6 +8,7 @@ namespace CareHub.Api.Controllers;
 
 [ApiController]
 [Route("api/dev")]
+[Authorize(Roles = Roles.Admin)]
 public sealed class DevController : ControllerBase
 {
     private readonly CareHubDbContext _db;
