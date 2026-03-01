@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import PageTabs from "../components/PageTabs";
 
-const RESIDENT_TABS = [
+const BASE_RESIDENT_TABS = [
   { key: "directory", label: "Directory" },
   { key: "rooms", label: "Room Map" },
   { key: "care", label: "Care Plans" }
@@ -13,6 +13,7 @@ function ResidentsPage({
   authSession,
   authRole,
   canEditResidents,
+  onCreateResident,
   onSaveResident,
   currentResident,
   displayedResidents,
@@ -22,10 +23,31 @@ function ResidentsPage({
   renderSectionTools,
   renderSectionMeta
 }) {
+  const residentTabs = useMemo(() => {
+    if (!canEditResidents) {
+      return BASE_RESIDENT_TABS;
+    }
+    return [...BASE_RESIDENT_TABS, { key: "add", label: "Add Resident" }];
+  }, [canEditResidents]);
+
   const [activeTab, setActiveTab] = useState("directory");
+  const [selectedResidentId, setSelectedResidentId] = useState("");
   const [editingResidentId, setEditingResidentId] = useState("");
   const [saveError, setSaveError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState("");
+  const [createForm, setCreateForm] = useState({
+    residentFName: "",
+    residentLName: "",
+    roomNumber: "",
+    dateOfBirth: "",
+    doctorName: "",
+    doctorContact: "",
+    emergencyContactName1: "",
+    emergencyContactPhone1: "",
+    emergencyRelationship1: ""
+  });
   const [editForm, setEditForm] = useState({
     residentFName: "",
     residentLName: "",
@@ -116,6 +138,49 @@ function ResidentsPage({
   const editingResident = displayedResidents.find(
     (resident) => (resident.id || resident.Id) === editingResidentId
   );
+  const selectedResident = displayedResidents.find(
+    (resident) => (resident.id || resident.Id) === selectedResidentId
+  );
+
+  function renderResidentDetails(resident) {
+    if (!resident) {
+      return null;
+    }
+
+    return (
+      <article className="card resident-detail-card">
+        <h4>Resident Details</h4>
+        <div className="list-row">
+          <span>Name</span>
+          <small>{resident._name}</small>
+        </div>
+        <div className="list-row">
+          <span>Room</span>
+          <small>{resident._room || "N/A"}</small>
+        </div>
+        <div className="list-row">
+          <span>Date of Birth</span>
+          <small>{resident.dateOfBirth || resident.DateOfBirth || "N/A"}</small>
+        </div>
+        <div className="list-row">
+          <span>Doctor / NP</span>
+          <small>{resident.doctorName || resident.DoctorName || "N/A"}</small>
+        </div>
+        <div className="list-row">
+          <span>Doctor Contact</span>
+          <small>{resident.doctorContact || resident.DoctorContact || "N/A"}</small>
+        </div>
+        <div className="list-row">
+          <span>Primary Contact</span>
+          <small>{resident.emergencyContactName1 || resident.EmergencyContactName1 || "N/A"}</small>
+        </div>
+        <div className="list-row">
+          <span>Contact Phone</span>
+          <small>{resident.emergencyContactPhone1 || resident.EmergencyContactPhone1 || "N/A"}</small>
+        </div>
+      </article>
+    );
+  }
 
   function startEditing(resident) {
     setSaveError("");
@@ -169,9 +234,52 @@ function ResidentsPage({
     }
   }
 
+  async function handleCreate(event) {
+    event.preventDefault();
+    if (!onCreateResident) {
+      return;
+    }
+
+    setCreating(true);
+    setCreateError("");
+
+    try {
+      const payload = {
+        residentFName: createForm.residentFName.trim(),
+        residentLName: createForm.residentLName.trim(),
+        roomNumber: createForm.roomNumber.trim(),
+        dateOfBirth: createForm.dateOfBirth.trim(),
+        doctorName: createForm.doctorName.trim(),
+        doctorContact: createForm.doctorContact.trim(),
+        emergencyContactName1: createForm.emergencyContactName1.trim(),
+        emergencyContactPhone1: createForm.emergencyContactPhone1.trim(),
+        emergencyRelationship1: createForm.emergencyRelationship1.trim(),
+        roomType: "Double",
+        bedLabel: "B"
+      };
+
+      await onCreateResident(payload);
+      setCreateForm({
+        residentFName: "",
+        residentLName: "",
+        roomNumber: "",
+        dateOfBirth: "",
+        doctorName: "",
+        doctorContact: "",
+        emergencyContactName1: "",
+        emergencyContactPhone1: "",
+        emergencyRelationship1: ""
+      });
+    } catch (err) {
+      setCreateError(err?.message || "Failed to create resident.");
+    } finally {
+      setCreating(false);
+    }
+  }
+
   return (
     <section className="page-shell">
-      <PageTabs tabs={RESIDENT_TABS} activeTab={activeTab} onChange={setActiveTab} />
+      <PageTabs tabs={residentTabs} activeTab={activeTab} onChange={setActiveTab} />
 
       {activeTab === "directory" && (
         <section className="card">
@@ -183,7 +291,13 @@ function ResidentsPage({
           {renderSectionMeta(displayedResidents.length, "residents")}
           {displayedResidents.length === 0 && <p className="empty-state">No residents match this view.</p>}
           {pagedResidents.map((resident, index) => (
-            <div className="list-row" key={resident.id || resident.Id}>
+            <div
+              className={`list-row resident-clickable ${
+                (resident.id || resident.Id) === selectedResidentId ? "selected" : ""
+              }`}
+              key={resident.id || resident.Id}
+              onClick={() => setSelectedResidentId(resident.id || resident.Id)}
+            >
               <span className="list-primary">
                 <b className="row-index">{(currentPage - 1) * pageSize + index + 1}</b>
                 {resident._name}
@@ -191,13 +305,21 @@ function ResidentsPage({
               <span className="list-row-actions">
                 <small>Room {resident._room || "N/A"}</small>
                 {canEditResidents && (
-                  <button type="button" className="ghost-button" onClick={() => startEditing(resident)}>
+                  <button
+                    type="button"
+                    className="ghost-button"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      startEditing(resident);
+                    }}
+                  >
                     Edit
                   </button>
                 )}
               </span>
             </div>
           ))}
+          {selectedResident ? renderResidentDetails(selectedResident) : null}
           {canEditResidents && editingResident && (
             <form className="resident-edit-form" onSubmit={handleSave}>
               <h4>Edit Resident</h4>
@@ -312,6 +434,132 @@ function ResidentsPage({
         </section>
       )}
 
+      {activeTab === "add" && canEditResidents && (
+        <section className="card">
+          <h3>Add Resident</h3>
+          <form className="resident-edit-form resident-create-form" onSubmit={handleCreate}>
+            <label>
+              First Name
+              <input
+                value={createForm.residentFName}
+                onChange={(event) =>
+                  setCreateForm((current) => ({
+                    ...current,
+                    residentFName: event.target.value
+                  }))
+                }
+                required
+              />
+            </label>
+            <label>
+              Last Name
+              <input
+                value={createForm.residentLName}
+                onChange={(event) =>
+                  setCreateForm((current) => ({
+                    ...current,
+                    residentLName: event.target.value
+                  }))
+                }
+                required
+              />
+            </label>
+            <label>
+              Room Number
+              <input
+                value={createForm.roomNumber}
+                onChange={(event) =>
+                  setCreateForm((current) => ({
+                    ...current,
+                    roomNumber: event.target.value
+                  }))
+                }
+                required
+              />
+            </label>
+            <label>
+              Date of Birth
+              <input
+                value={createForm.dateOfBirth}
+                onChange={(event) =>
+                  setCreateForm((current) => ({
+                    ...current,
+                    dateOfBirth: event.target.value
+                  }))
+                }
+                placeholder="YYYY-MM-DD"
+              />
+            </label>
+            <label>
+              Doctor / NP
+              <input
+                value={createForm.doctorName}
+                onChange={(event) =>
+                  setCreateForm((current) => ({
+                    ...current,
+                    doctorName: event.target.value
+                  }))
+                }
+              />
+            </label>
+            <label>
+              Doctor Contact
+              <input
+                value={createForm.doctorContact}
+                onChange={(event) =>
+                  setCreateForm((current) => ({
+                    ...current,
+                    doctorContact: event.target.value
+                  }))
+                }
+              />
+            </label>
+            <label>
+              Primary Contact
+              <input
+                value={createForm.emergencyContactName1}
+                onChange={(event) =>
+                  setCreateForm((current) => ({
+                    ...current,
+                    emergencyContactName1: event.target.value
+                  }))
+                }
+              />
+            </label>
+            <label>
+              Contact Phone
+              <input
+                value={createForm.emergencyContactPhone1}
+                onChange={(event) =>
+                  setCreateForm((current) => ({
+                    ...current,
+                    emergencyContactPhone1: event.target.value
+                  }))
+                }
+              />
+            </label>
+            <label>
+              Relationship
+              <input
+                value={createForm.emergencyRelationship1}
+                onChange={(event) =>
+                  setCreateForm((current) => ({
+                    ...current,
+                    emergencyRelationship1: event.target.value
+                  }))
+                }
+              />
+            </label>
+            {createError ? <p className="auth-error">{createError}</p> : null}
+            <div className="action-row">
+              <button type="submit" className="ghost-button" disabled={creating}>
+                {creating ? "Adding..." : "Add Resident"}
+              </button>
+            </div>
+          </form>
+        </section>
+      )}
+
       {activeTab === "rooms" && (
         <section className="card">
           <h3>Room Map</h3>
@@ -325,14 +573,22 @@ function ResidentsPage({
                 </header>
                 <div className="room-occupants">
                   {residents.map((resident) => (
-                    <span key={resident.id || resident.Id} className="room-occupant-pill">
+                    <button
+                      type="button"
+                      key={resident.id || resident.Id}
+                      className={`room-occupant-pill ${
+                        (resident.id || resident.Id) === selectedResidentId ? "selected" : ""
+                      }`}
+                      onClick={() => setSelectedResidentId(resident.id || resident.Id)}
+                    >
                       {resident._name}
-                    </span>
+                    </button>
                   ))}
                 </div>
               </article>
             ))}
           </section>
+          {selectedResident ? renderResidentDetails(selectedResident) : null}
         </section>
       )}
 

@@ -379,6 +379,18 @@ body,
   border-bottom: 0;
 }
 
+.resident-clickable {
+  cursor: pointer;
+}
+
+.resident-clickable:hover {
+  background: #f7fbfd;
+}
+
+.resident-clickable.selected {
+  background: #eef7fb;
+}
+
 .recent-row {
   display: flex;
   justify-content: space-between;
@@ -498,11 +510,22 @@ body,
 }
 
 .room-occupant-pill {
+  border: 0;
   border-radius: 999px;
   padding: 0.25rem 0.55rem;
   background: #e8f3f6;
   color: #1a4753;
   font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.room-occupant-pill.selected {
+  background: #0f6278;
+  color: #ffffff;
+}
+
+.resident-detail-card {
+  margin-top: 0.8rem;
 }
 
 .staff-grid {

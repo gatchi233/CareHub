@@ -512,6 +512,12 @@ function App() {
     setResidents(Array.isArray(refreshed) ? refreshed : []);
   }
 
+  async function handleCreateResident(nextResident) {
+    await api.post("/residents", nextResident);
+    const refreshed = await api.get("/residents");
+    setResidents(Array.isArray(refreshed) ? refreshed : []);
+  }
+
   async function handleSaveMedication(nextMedication) {
     const id = nextMedication?.id || nextMedication?.Id;
     if (!id) {
@@ -566,6 +572,7 @@ function App() {
           authSession={authSession}
           authRole={authSession?.role}
           canEditResidents={authSession?.role === "Admin"}
+          onCreateResident={handleCreateResident}
           onSaveResident={handleSaveResident}
           currentResident={currentResident}
           displayedResidents={displayedResidents}
