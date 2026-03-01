@@ -2,9 +2,19 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { API_BASE, api } from "./api";
 import ListToolbar from "./components/ListToolbar";
 import SectionMetaPager from "./components/SectionMetaPager";
-import StatCard from "./components/StatCard";
+import DashboardPage from "./pages/DashboardPage";
+import InventoryPage from "./pages/InventoryPage";
+import ObservationsPage from "./pages/ObservationsPage";
+import ResidentsPage from "./pages/ResidentsPage";
+import StaffPage from "./pages/StaffPage";
 
-const SECTIONS = ["Dashboard", "Residents", "Medications", "Observations", "Staff"];
+const SECTIONS = [
+  { key: "Dashboard", label: "Dashboard" },
+  { key: "Residents", label: "Residents" },
+  { key: "Inventory", label: "Inventory" },
+  { key: "Observations", label: "Observations" },
+  { key: "Staff", label: "Staff" }
+];
 const EMPTY_GUID = "00000000-0000-0000-0000-000000000000";
 const DEFAULT_PAGE_SIZE = 8;
 
@@ -91,11 +101,11 @@ function App() {
 
   const lowStock = useMemo(() => {
     return medications.filter((m) => {
-      const unassigned =
-        !m.residentId || m.residentId === EMPTY_GUID;
+      const unassigned = !m.residentId || m.residentId === EMPTY_GUID;
       return unassigned && Number(m.stockQuantity) <= Number(m.reorderLevel);
     });
   }, [medications]);
+
   const occupiedRooms = useMemo(() => {
     const roomSet = new Set(
       residents
@@ -150,7 +160,7 @@ function App() {
     return filtered;
   }, [residents, query, sortKey, sortDirection]);
 
-  const displayedMedications = useMemo(() => {
+  const displayedInventory = useMemo(() => {
     const filtered = medications
       .map((med) => {
         const name = med.medName || med.name || "Unnamed medication";
@@ -229,10 +239,10 @@ function App() {
     return displayedResidents.slice(start, start + pageSize);
   }, [displayedResidents, currentPage, pageSize]);
 
-  const pagedMedications = useMemo(() => {
+  const pagedInventory = useMemo(() => {
     const start = (currentPage - 1) * pageSize;
-    return displayedMedications.slice(start, start + pageSize);
-  }, [displayedMedications, currentPage, pageSize]);
+    return displayedInventory.slice(start, start + pageSize);
+  }, [displayedInventory, currentPage, pageSize]);
 
   const pagedObservations = useMemo(() => {
     const start = (currentPage - 1) * pageSize;
@@ -242,8 +252,8 @@ function App() {
   const activeTotalItems =
     activeSection === "Residents"
       ? displayedResidents.length
-      : activeSection === "Medications"
-        ? displayedMedications.length
+      : activeSection === "Inventory"
+        ? displayedInventory.length
         : activeSection === "Observations"
           ? displayedObservations.length
           : 0;
@@ -254,13 +264,13 @@ function App() {
   const sectionSummary =
     activeSection === "Residents"
       ? `${displayedResidents.length} residents in current view`
-      : activeSection === "Medications"
-        ? `${displayedMedications.length} medications in current view`
+      : activeSection === "Inventory"
+        ? `${displayedInventory.length} inventory items in current view`
         : activeSection === "Observations"
           ? `${displayedObservations.length} observations in current view`
           : activeSection === "Dashboard"
             ? `${lowStock.length} low stock alerts right now`
-            : "Staff directory coming next";
+            : "Staff directory and planning workspace";
   const canExport =
     activeSection !== "Dashboard" &&
     activeSection !== "Staff" &&
@@ -307,11 +317,11 @@ function App() {
       );
       return;
     }
-    if (activeSection === "Medications") {
+    if (activeSection === "Inventory") {
       downloadCsv(
-        "medications.csv",
+        "inventory.csv",
         ["Medication", "Stock", "Reorder Level", "Low Stock"],
-        displayedMedications.map((med) => [
+        displayedInventory.map((med) => [
           med._name,
           med._stock,
           med._reorder,
@@ -371,102 +381,80 @@ function App() {
     );
   }
 
-  function renderSectionCard() {
-    if (activeSection === "Residents") {
-      return (
-        <section className="card">
-          <h3>Residents</h3>
-          {renderSectionTools([
-            { value: "name", label: "Sort: Name" },
-            { value: "room", label: "Sort: Room" }
-          ])}
-          {renderSectionMeta(displayedResidents.length, "residents")}
-          {displayedResidents.length === 0 && (
-            <p className="empty-state">No residents match this view.</p>
-          )}
-          {pagedResidents.map((resident, index) => {
-            return (
-              <div className="list-row" key={resident.id}>
-                <span className="list-primary">
-                  <b className="row-index">{(currentPage - 1) * pageSize + index + 1}</b>
-                  {resident._name}
-                </span>
-                <small>Room {resident._room || "N/A"}</small>
-              </div>
-            );
-          })}
-        </section>
-      );
-    }
-
-    if (activeSection === "Medications") {
-      return (
-        <section className="card">
-          <h3>Medications</h3>
-          {renderSectionTools([
-            { value: "name", label: "Sort: Name" },
-            { value: "stock", label: "Sort: Stock" }
-          ])}
-          {renderSectionMeta(displayedMedications.length, "medications")}
-          {displayedMedications.length === 0 && (
-            <p className="empty-state">No medications match this view.</p>
-          )}
-          {pagedMedications.map((med, index) => (
-            <div className={`list-row ${med._isLow ? "row-alert" : ""}`} key={med.id}>
-              <span className="list-primary">
-                <b className="row-index">{(currentPage - 1) * pageSize + index + 1}</b>
-                {med._name}
-              </span>
-              <small>
-                {med._stock} in stock
-                {med.reorderLevel != null ? ` | Reorder at ${med._reorder}` : ""}
-                {med._isLow ? " | LOW" : ""}
-              </small>
-            </div>
-          ))}
-        </section>
-      );
-    }
-
-    if (activeSection === "Observations") {
-      return (
-        <section className="card">
-          <h3>Observations</h3>
-          {renderSectionTools([
-            { value: "date", label: "Sort: Date" },
-            { value: "summary", label: "Sort: Summary" }
-          ])}
-          {renderSectionMeta(displayedObservations.length, "observations")}
-          {displayedObservations.length === 0 && (
-            <p className="empty-state">No observations match this view.</p>
-          )}
-          {pagedObservations.map((obs, index) => (
-            <div className="list-row" key={obs.id}>
-              <span className="list-primary">
-                <b className="row-index">{(currentPage - 1) * pageSize + index + 1}</b>
-                {obs._summary}
-              </span>
-              <small>{obs._timestamp}</small>
-            </div>
-          ))}
-        </section>
-      );
-    }
-
-    return (
-      <section className="card">
-        <h3>Staff</h3>
-        <p>This section is planned next. Dashboard data is already live.</p>
-      </section>
-    );
-  }
-
   async function handleCopySummary() {
     try {
       await navigator.clipboard.writeText(`${activeSection}: ${sectionSummary}`);
     } catch {
       // Ignore clipboard errors in restricted environments.
     }
+  }
+
+  function renderActivePage() {
+    if (activeSection === "Dashboard") {
+      return (
+        <DashboardPage
+          loading={loading}
+          error={error}
+          residentsCount={residents.length}
+          medicationsCount={medications.length}
+          observationsCount={observations.length}
+          lowStock={lowStock}
+          lowStockRate={lowStockRate}
+          occupiedRooms={occupiedRooms}
+          showAllReorders={showAllReorders}
+          onToggleReorders={() => setShowAllReorders((isOpen) => !isOpen)}
+          recentObservations={displayedObservations}
+          onNavigate={setActiveSection}
+        />
+      );
+    }
+
+    if (activeSection === "Residents") {
+      return (
+        <ResidentsPage
+          loading={loading}
+          error={error}
+          displayedResidents={displayedResidents}
+          pagedResidents={pagedResidents}
+          currentPage={currentPage}
+          pageSize={pageSize}
+          renderSectionTools={renderSectionTools}
+          renderSectionMeta={renderSectionMeta}
+        />
+      );
+    }
+
+    if (activeSection === "Inventory") {
+      return (
+        <InventoryPage
+          loading={loading}
+          error={error}
+          displayedInventory={displayedInventory}
+          pagedInventory={pagedInventory}
+          currentPage={currentPage}
+          pageSize={pageSize}
+          renderSectionTools={renderSectionTools}
+          renderSectionMeta={renderSectionMeta}
+        />
+      );
+    }
+
+    if (activeSection === "Observations") {
+      return (
+        <ObservationsPage
+          loading={loading}
+          error={error}
+          displayedObservations={displayedObservations}
+          pagedObservations={pagedObservations}
+          currentPage={currentPage}
+          pageSize={pageSize}
+          renderSectionTools={renderSectionTools}
+          renderSectionMeta={renderSectionMeta}
+        />
+      );
+    }
+
+    return <StaffPage loading={loading} error={error} />;
   }
 
   return (
@@ -477,18 +465,18 @@ function App() {
         <nav>
           {SECTIONS.map((section) => (
             <button
-              key={section}
-              className={activeSection === section ? "active" : ""}
+              key={section.key}
+              className={activeSection === section.key ? "active" : ""}
               onClick={() => {
-                setActiveSection(section);
+                setActiveSection(section.key);
                 setSidebarOpen(false);
               }}
             >
-              <span>{section}</span>
-              {section === "Residents" && <small>{residents.length}</small>}
-              {section === "Medications" && <small>{medications.length}</small>}
-              {section === "Observations" && <small>{observations.length}</small>}
-              {section === "Dashboard" && lowStock.length > 0 && (
+              <span>{section.label}</span>
+              {section.key === "Residents" && <small>{residents.length}</small>}
+              {section.key === "Inventory" && <small>{medications.length}</small>}
+              {section.key === "Observations" && <small>{observations.length}</small>}
+              {section.key === "Dashboard" && lowStock.length > 0 && (
                 <small className="alert-pill">{lowStock.length}</small>
               )}
             </button>
@@ -520,94 +508,7 @@ function App() {
           )}
           <button onClick={() => window.location.reload()}>Refresh</button>
         </header>
-
-        {activeSection !== "Dashboard" && !loading && !error && renderSectionCard()}
-        {activeSection !== "Dashboard" && loading && (
-          <section className="card">
-            <p>Loading {activeSection.toLowerCase()}...</p>
-          </section>
-        )}
-        {activeSection !== "Dashboard" && error && (
-          <section className="card error">
-            <p>{error}</p>
-          </section>
-        )}
-
-        {activeSection === "Dashboard" && (
-          <section className="dashboard-grid">
-            {loading && <article className="card">Loading dashboard...</article>}
-            {error && <article className="card error">{error}</article>}
-
-            {!loading && !error && (
-              <>
-                <StatCard title="Total Residents" value={residents.length} />
-                <StatCard title="Total Medications" value={medications.length} />
-                <StatCard title="Observations Logged" value={observations.length} />
-                <StatCard
-                  title="Low Stock Alerts"
-                  value={lowStock.length}
-                  tone="warning"
-                  caption={`${lowStockRate}% of medication records`}
-                />
-                <StatCard title="Occupied Rooms" value={occupiedRooms} />
-                <article className="card">
-                  <h3>Quick Actions</h3>
-                  <div className="action-row">
-                    <button type="button" className="ghost-button" onClick={() => setActiveSection("Residents")}>
-                      View Residents
-                    </button>
-                    <button type="button" className="ghost-button" onClick={() => setActiveSection("Medications")}>
-                      View Medications
-                    </button>
-                    <button
-                      type="button"
-                      className="ghost-button"
-                      onClick={() => setActiveSection("Observations")}
-                    >
-                      View Observations
-                    </button>
-                  </div>
-                </article>
-                <article className="card">
-                  <h3>Inventory Reorder List</h3>
-                  {lowStock.length === 0 && <p>No low-stock items.</p>}
-                  {lowStock
-                    .slice(0, showAllReorders ? lowStock.length : 6)
-                    .map((m, index) => (
-                    <div className="list-row" key={m.id}>
-                      <span className="list-primary">
-                        <b className="row-index">{index + 1}</b>
-                        {m.medName}
-                      </span>
-                      <small>
-                        {m.stockQuantity} / {m.reorderLevel}
-                      </small>
-                    </div>
-                    ))}
-                  {lowStock.length > 6 && (
-                    <button
-                      type="button"
-                      className="ghost-button"
-                      onClick={() => setShowAllReorders((isOpen) => !isOpen)}
-                    >
-                      {showAllReorders ? "Show less" : `Show all (${lowStock.length})`}
-                    </button>
-                  )}
-                </article>
-                <article className="card">
-                  <h3>Recent Observations</h3>
-                  {displayedObservations.slice(0, 5).map((obs) => (
-                    <div key={obs.id} className="recent-row">
-                      <span>{obs._summary}</span>
-                      <small>{obs._timestamp}</small>
-                    </div>
-                  ))}
-                  {displayedObservations.length === 0 && <p>No observations available.</p>}
-                </article>
-              </>
-            )}
-          </section>
-        )}
+        {renderActivePage()}
       </main>
     </div>
   );
