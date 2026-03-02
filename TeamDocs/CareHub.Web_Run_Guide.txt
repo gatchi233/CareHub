@@ -1,0 +1,90 @@
+﻿CareHub.Web Run Guide
+
+Prerequisites
+- .NET 8 SDK installed
+- Node.js + npm installed
+- PostgreSQL running and reachable by CareHub.Api connection string
+
+1) Go to project directory
+- Open terminal in your project root folder (the folder that contains CareHub.Api and CareHub.Web).
+
+2) Start API
+From project root:
+
+dotnet run --project .\CareHub.Api\CareHub.Api.csproj --launch-profile http
+
+Expected
+- API runs on http://localhost:5001
+- Health check:
+  curl.exe -i http://localhost:5001/health
+  Expect: HTTP 200 and {"ok":true}
+
+3) Start Web
+Open another terminal in the web folder:
+
+cd .\CareHub.Web
+npm.cmd install
+npm.cmd run dev
+
+Expected
+- Vite dev server URL (usually http://localhost:5173)
+- Web calls API base from src/api.js default: http://localhost:5001/api
+
+4) Login Accounts (seeded)
+- Admin: admin / admin123
+- Staff: staff1 / staff123
+- Observer: observer1 / observer123
+- Resident: resident1 / resident123
+- Extra residents: resident2 ... resident16 / resident123
+
+5) First-Run / Seed Behavior
+- On API startup, DataSeedService loads residents/medications/observations and auth users.
+- Added resident2..resident16 and resident IDs ...0016 to ...0030 are inserted if missing.
+- If records already exist, seed skips duplicates by ID/username.
+
+6) Quick Verification Commands
+Create admin token:
+$u="http://localhost:5001"
+$h=@{"Content-Type"="application/json"}
+$adminBody=@{username="admin";password="admin123"} | ConvertTo-Json -Compress
+$adminToken=(Invoke-RestMethod -Method Post -Uri "$u/api/auth/login" -Headers $h -Body $adminBody).accessToken
+
+Verify residents endpoint:
+Invoke-RestMethod -Uri "$u/api/residents" -Headers @{Authorization="Bearer $adminToken"}
+
+Verify staff endpoint:
+Invoke-RestMethod -Uri "$u/api/staff" -Headers @{Authorization="Bearer $adminToken"}
+
+7) Common Issues and Fixes
+A) 401 Unauthorized / invalid_token
+- Cause: missing/expired token or literal placeholder token text.
+- Fix: login again and use the fresh token variable.
+
+B) 500 on /api/staff with StringComparison translation error
+- Ensure latest code is running (query should avoid string.Equals(..., StringComparison)).
+- Rebuild and restart API.
+
+C) relation "AppUsers" does not exist
+- DB schema is behind current model/migrations.
+- Run migrations from API project and restart.
+
+D) dotnet ef not found
+- Use tool path if needed:
+  & "$env:USERPROFILE\.dotnet\tools\dotnet-ef.exe" database update --project ".\CareHub.Api\CareHub.Api.csproj" --startup-project ".\CareHub.Api\CareHub.Api.csproj"
+
+E) PowerShell blocks npm script execution
+- Use npm.cmd instead of npm:
+  npm.cmd run dev
+  npm.cmd run build
+
+8) Stop Services
+- In each terminal, press Ctrl+C.
+
+9) Recommended Run Order
+1. Start PostgreSQL
+2. Start API
+3. Confirm /health
+4. Start Web
+5. Login as admin and test Residents/Inventory/Staff updates
+
+

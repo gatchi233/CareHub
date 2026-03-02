@@ -1,0 +1,189 @@
+﻿CareHub Full Implementation Summary (Web + API Integration)
+
+
+Project Scope Covered
+- Frontend app: CareHub.Web (React + Vite)
+- Backend integration target: CareHub.Api (/api)
+- Auth model: JWT login + /auth/me session bootstrap
+
+1) Web App Architecture
+- Single-page app with role-aware navigation and section rendering.
+- Main sections: Dashboard, Residents, Inventory, Observations, Staff.
+- Shared list UX components:
+  - ListToolbar: search, sort key, asc/desc toggle, page size, reset.
+  - SectionMetaPager: range text, prev/next, page jump.
+- API client wrapper with centralized JSON request logic and token header support.
+
+2) Authentication and Session Behavior
+- Login screen posts credentials to /api/auth/login.
+- Access token is stored in localStorage (carehub_token).
+- App bootstraps prior token and validates with /api/auth/me.
+- Invalid/expired token clears session and returns to login.
+- Logout clears token and in-memory datasets.
+
+3) Role-Based Authorization in Web UI
+Role -> visible sections
+- Admin: Dashboard, Residents, Inventory, Observations, Staff
+- Staff: Dashboard, Observations
+- Observer: Dashboard, Residents, Inventory, Observations
+- Resident: Dashboard, Residents, Observations, Staff
+
+Role-based API reads (parallelized per session)
+- Residents API read: Admin, Observer, Resident
+- Medications API read: Admin, Observer, Resident
+- Observations API read: Admin, Staff, Observer, Resident
+- Staff API read: Admin, Observer
+
+4) Dashboard Page
+Tabs
+- Overview
+- Operations
+- Activity
+
+Features
+- KPIs: total residents, medications, observations, low stock alerts, occupied rooms.
+- Low-stock metric calculated from unassigned inventory where stock <= reorder level.
+- Quick action buttons navigate to permitted sections.
+- Reorder list with show more/show less behavior.
+- Recent observations list.
+
+5) Residents Page
+Tabs
+- Directory
+- Room Map
+- Care Plans
+- Add Resident (Admin only)
+
+Resident role view
+- My Resident Profile card with name, room, DOB, primary contact, contact phone.
+
+Directory (non-resident roles)
+- Search/sort/pagination enabled.
+- Clickable resident rows.
+- Selected resident shows Resident Details card:
+  - Name, Room, DOB, Doctor/NP, Doctor Contact, Primary Contact, Contact Phone.
+- Admin can edit resident inline form and save via PUT /api/residents/{id}.
+
+Add Resident (Admin only)
+- Dedicated sub-tab form (not always visible).
+- Creates resident via POST /api/residents.
+- Refreshes residents list after create.
+
+Room Map
+- Groups residents by room.
+- Shows room cards with resident count.
+- Resident pills are clickable and drive same details panel.
+- Supports multiple residents in same room.
+
+Care Plans tab
+- Placeholder cards for planned features (status, escalations, family notes).
+
+6) Inventory Page
+Tabs
+- Catalog
+- Reorder Queue
+- Audit
+
+Catalog
+- Search/sort/pagination enabled.
+- Low-stock row highlighting.
+- Displays stock and reorder threshold.
+- Admin Edit form for medication fields (name, dosage, usage, stock, reorder level).
+- Save via PUT /api/medications/{id}, then list refresh.
+
+Reorder Queue
+- Displays low-stock subset.
+
+Audit
+- Placeholder cards (stock movement, expiry tracking, compliance checks).
+
+7) Observations Page
+Tabs
+- Timeline
+- Observation List
+- Flags
+- Reports
+
+Timeline
+- Search/sort/pagination enabled.
+- Shows summary + timestamp.
+- Resident role additionally sees “My Care Team” doctor and contact.
+
+Observation List
+- Card-style entries with type, timestamp, summary, resident/value/recorded-by fields.
+
+Flags
+- Top recent items view.
+
+Reports
+- Placeholder cards for future reporting/trends/export center.
+
+8) Staff Page
+Tabs
+- Directory
+- Shifts
+- Assignments
+
+Resident role view
+- “My Assigned Care Team” card from current resident doctor/contact fields.
+
+Directory (non-resident roles)
+- Staff account list with role.
+- Admin can edit staff account (display name, role, optional password).
+- Save via PUT /api/staff/{username}, then list refresh.
+
+Shifts / Assignments
+- Placeholder cards for planned staffing features.
+
+9) Global UX / Utilities
+- Top bar summary text per section.
+- Copy Summary button (clipboard).
+- CSV export for Residents / Inventory / Observations filtered views.
+- Keyboard shortcuts:
+  - Ctrl/Cmd+K focuses search (list sections).
+  - Escape clears search query.
+- Sidebar badges show section counts and alert pill on Dashboard.
+- Mobile sidebar overlay with menu toggle.
+- Content pane scroll behavior separated from side nav.
+
+10) Data Shape Handling
+- Residents name/room normalization supports multiple property variants:
+  - residentFName / ResidentFName / firstName etc.
+  - roomNumber / RoomNumber / room
+- Observation timestamp formatting handles parse failures safely.
+- API request helper handles 204 responses as null.
+
+11) API Endpoints Used by Web
+Auth
+- POST /api/auth/login
+- GET /api/auth/me
+
+Residents
+- GET /api/residents
+- POST /api/residents (admin create)
+- PUT /api/residents/{id} (admin update)
+
+Inventory
+- GET /api/medications
+- PUT /api/medications/{id} (admin update)
+
+Observations
+- GET /api/observations
+
+Staff
+- GET /api/staff
+- PUT /api/staff/{username} (admin update)
+
+12) Seed/Data Additions Implemented
+- Added 15 resident records in CareHub.Desktop/Resources/Raw/Residents.json:
+  IDs 00000000-0000-0000-0000-000000000016 through ...000000000030
+- Added 15 resident auth users in CareHub.Api/appsettings.json:
+  resident2 through resident16
+  password: resident123
+  each mapped to matching ResidentId
+- These were assigned into existing room numbers to support multi-occupancy rooms.
+
+13) Current Constraints / Notes
+- Some tabs are intentionally placeholders for future scope (care plans, audits, staffing planning, reports).
+- Build in restricted sandbox may fail with esbuild spawn EPERM; local machine run remains authoritative.
+- Seed insertion behavior depends on API startup DataSeedService and existing DB state.
