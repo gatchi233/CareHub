@@ -26,6 +26,7 @@
 
 ### Members:
 
+- Samuel - Web UI
 - Devi – Web UI
 - Tanvi – Web UI
 
