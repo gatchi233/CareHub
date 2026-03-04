@@ -96,11 +96,17 @@ namespace CareHub
                 client.BaseAddress = apiBase;
                 client.Timeout = TimeSpan.FromSeconds(2);
             });
+            builder.Services.AddHttpClient<MarApiService>(client =>
+            {
+                client.BaseAddress = apiBase;
+                client.Timeout = TimeSpan.FromSeconds(2);
+            });
 
             // Local JSON services
             builder.Services.AddSingleton<ResidentJsonService>();
             builder.Services.AddSingleton<MedicationJsonService>();
             builder.Services.AddSingleton<ObservationJsonService>();
+            builder.Services.AddSingleton<MarJsonService>();
 
             // Medications: API + Local + Wrapper
             builder.Services.AddSingleton((Func<IServiceProvider, CareHub.Services.Abstractions.IMedicationService>)(sp =>
@@ -118,6 +124,15 @@ namespace CareHub
                 var local = sp.GetRequiredService<ObservationJsonService>();
                 var queue = sp.GetRequiredService<ISyncQueue>();
                 return new ObservationService(api, local, queue);
+            });
+
+            // MAR: API + Local + Wrapper
+            builder.Services.AddSingleton<IMarService>(sp =>
+            {
+                var api = sp.GetRequiredService<MarApiService>();
+                var local = sp.GetRequiredService<MarJsonService>();
+                var queue = sp.GetRequiredService<ISyncQueue>();
+                return new MarService(api, local, queue);
             });
 
             // Residents: API + Local + Wrapper (registered after Meds/Obs so it can remap their IDs)
@@ -146,6 +161,7 @@ namespace CareHub
             builder.Services.AddTransient<ResidentsPageViewModel>();
             builder.Services.AddTransient<StaffManagementViewModel>();
             builder.Services.AddTransient<ResidentObservationsViewModel>();
+            builder.Services.AddTransient<MarPageViewModel>();
 
             // Pages
             builder.Services.AddTransient<EditMedicationPage>();
@@ -160,6 +176,7 @@ namespace CareHub
             builder.Services.AddTransient<ViewResidentPage>();
             builder.Services.AddTransient<StaffManagementPage>();
             builder.Services.AddTransient<ResidentObservationsPage>();
+            builder.Services.AddTransient<MarPage>();
             builder.Services.AddTransient<LoginPage>();
 
 #if DEBUG

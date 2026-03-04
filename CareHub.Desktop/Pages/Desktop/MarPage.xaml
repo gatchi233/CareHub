@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="CareHub.Pages.Desktop.MarPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="MAR"
+    BackgroundColor="{StaticResource Mar_Main_Background}">
+
+    <Grid Padding="16" RowDefinitions="Auto,Auto,Auto,*" RowSpacing="12">
+
+        <!-- Page header -->
+        <Grid ColumnDefinitions="*,Auto">
+            <VerticalStackLayout Spacing="2">
+                <Label Text="MEDICATION ADMINISTRATION RECORD"
+                       FontSize="11" FontAttributes="Bold" CharacterSpacing="1.5"
+                       TextColor="{StaticResource Mar_Font_Secondary}"/>
+                <Label Text="{Binding ResidentName}"
+                       FontSize="20" FontAttributes="Bold"
+                       TextColor="{StaticResource Mar_Font_Primary}"
+                       IsVisible="{Binding ResidentName, Converter={StaticResource StringNotEmptyConverter}}"/>
+            </VerticalStackLayout>
+
+            <Border Grid.Column="1"
+                    Padding="8,4" StrokeThickness="0"
+                    BackgroundColor="{StaticResource Alert_Warning}"
+                    VerticalOptions="Center"
+                    IsVisible="{Binding IsOffline}">
+                <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                <Label Text="OFFLINE" FontSize="10" FontAttributes="Bold"
+                       TextColor="{StaticResource Button_Font_Primary}"/>
+            </Border>
+        </Grid>
+
+        <!-- Top action bar: REFRESH + CLOSE only (read-only page) -->
+        <HorizontalStackLayout Grid.Row="1" Spacing="8">
+
+            <!-- REFRESH -->
+            <Border StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
+                <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
+                    <Image Grid.Column="0" Source="icons8_updates_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Logout}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
+                        <Label Text="REFRESH" TextColor="{StaticResource Button_Font_Primary}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
+                    </Border>
+                </Grid>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding RefreshCommand}"/>
+                </Border.GestureRecognizers>
+            </Border>
+
+            <!-- CLOSE -->
+            <Border StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
+                <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
+                    <Image Grid.Column="0" Source="icons8_close_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Close}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
+                        <Label Text="CLOSE" TextColor="{StaticResource Button_Font_Primary}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
+                    </Border>
+                </Grid>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnCloseClicked"/>
+                </Border.GestureRecognizers>
+            </Border>
+
+        </HorizontalStackLayout>
+
+        <!-- Status + Date range filter -->
+        <Grid Grid.Row="2" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+
+            <Label Text="{Binding StatusMessage}"
+                   VerticalOptions="Center" FontSize="12"
+                   TextColor="{StaticResource Mar_Font_Secondary}"/>
+
+            <!-- TODAY / 3 DAYS / 7 DAYS toggle -->
+            <Grid Grid.Column="1" ColumnDefinitions="*,*,*" WidthRequest="210">
+
+                <Border Grid.Column="0" HeightRequest="28" Padding="0" StrokeThickness="0"
+                        BackgroundColor="{StaticResource Button_Cancel}">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="4,0,4,0"/></Border.StrokeShape>
+                    <Border.Triggers>
+                        <DataTrigger TargetType="Border" Binding="{Binding IsRangeToday}" Value="True">
+                            <Setter Property="BackgroundColor" Value="{StaticResource Alert_Info}"/>
+                        </DataTrigger>
+                    </Border.Triggers>
+                    <Label Text="TODAY" FontSize="10" FontAttributes="Bold"
+                           TextColor="{StaticResource Button_Font_Primary}"
+                           VerticalOptions="Center" HorizontalOptions="Center"/>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding TodayCommand}"/>
+                    </Border.GestureRecognizers>
+                </Border>
+
+                <Border Grid.Column="1" HeightRequest="28" Padding="0" StrokeThickness="0"
+                        BackgroundColor="{StaticResource Button_Cancel}">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="0"/></Border.StrokeShape>
+                    <Border.Triggers>
+                        <DataTrigger TargetType="Border" Binding="{Binding IsRange3Days}" Value="True">
+                            <Setter Property="BackgroundColor" Value="{StaticResource Alert_Info}"/>
+                        </DataTrigger>
+                    </Border.Triggers>
+                    <Label Text="3 DAYS" FontSize="10" FontAttributes="Bold"
+                           TextColor="{StaticResource Button_Font_Primary}"
+                           VerticalOptions="Center" HorizontalOptions="Center"/>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding Last3Command}"/>
+                    </Border.GestureRecognizers>
+                </Border>
+
+                <Border Grid.Column="2" HeightRequest="28" Padding="0" StrokeThickness="0"
+                        BackgroundColor="{StaticResource Button_Cancel}">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="0,4,0,4"/></Border.StrokeShape>
+                    <Border.Triggers>
+                        <DataTrigger TargetType="Border" Binding="{Binding IsRange7Days}" Value="True">
+                            <Setter Property="BackgroundColor" Value="{StaticResource Alert_Info}"/>
+                        </DataTrigger>
+                    </Border.Triggers>
+                    <Label Text="7 DAYS" FontSize="10" FontAttributes="Bold"
+                           TextColor="{StaticResource Button_Font_Primary}"
+                           VerticalOptions="Center" HorizontalOptions="Center"/>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding Last7Command}"/>
+                    </Border.GestureRecognizers>
+                </Border>
+
+            </Grid>
+        </Grid>
+
+        <!-- Main content card -->
+        <Border Grid.Row="3"
+                Padding="12,10"
+                BackgroundColor="{StaticResource Mar_Card_Background}"
+                Stroke="{StaticResource Mar_Card_Border}"
+                StrokeThickness="1">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="12"/>
+            </Border.StrokeShape>
+
+            <Grid RowDefinitions="Auto,Auto,*">
+
+                <Label Text="SCHEDULE OVERVIEW"
+                       FontSize="11" FontAttributes="Bold" CharacterSpacing="1.5"
+                       TextColor="{StaticResource Mar_Font_Secondary}"/>
+
+                <BoxView Grid.Row="1" HeightRequest="1" Color="{StaticResource Mar_Card_Border}" Margin="0,6,0,10"/>
+
+                <!-- Loading indicator -->
+                <ActivityIndicator Grid.Row="2"
+                                   IsRunning="{Binding IsBusy}"
+                                   IsVisible="{Binding IsBusy}"
+                                   Color="{StaticResource Alert_Info}"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Start"
+                                   Margin="0,20,0,0"/>
+
+                <RefreshView Grid.Row="2"
+                             IsRefreshing="{Binding IsRefreshing}"
+                             Command="{Binding RefreshCommand}">
+
+                    <!-- Grouped by resident -->
+                    <CollectionView ItemsSource="{Binding ResidentGroups}"
+                                    SelectionMode="None">
+
+                        <CollectionView.EmptyView>
+                            <VerticalStackLayout Padding="20" Spacing="6"
+                                                 VerticalOptions="Center" HorizontalOptions="Center">
+                                <Label Text="No scheduled medications in this range."
+                                       FontAttributes="Bold" FontSize="14"
+                                       TextColor="{StaticResource Mar_Font_Primary}"
+                                       HorizontalOptions="Center"/>
+                                <Label Text="Medications with active schedules will appear here."
+                                       FontSize="12" TextColor="{StaticResource Mar_Font_Secondary}"
+                                       HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                        </CollectionView.EmptyView>
+
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout Orientation="Vertical" ItemSpacing="16"/>
+                        </CollectionView.ItemsLayout>
+
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <VerticalStackLayout Spacing="6">
+
+                                    <!-- Resident header -->
+                                    <Border Padding="10,6" StrokeThickness="0"
+                                            BackgroundColor="{StaticResource Mar_Main_Background}">
+                                        <Border.StrokeShape><RoundRectangle CornerRadius="6"/></Border.StrokeShape>
+                                        <Label Text="{Binding Header}"
+                                               FontSize="14" FontAttributes="Bold"
+                                               TextColor="{StaticResource Mar_Font_Primary}"/>
+                                    </Border>
+
+                                    <!-- Scheduled slots -->
+                                    <CollectionView ItemsSource="{Binding ScheduledSlots}"
+                                                    SelectionMode="None">
+                                        <CollectionView.ItemsLayout>
+                                            <LinearItemsLayout Orientation="Vertical" ItemSpacing="4"/>
+                                        </CollectionView.ItemsLayout>
+                                        <CollectionView.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Padding="10,8"
+                                                        BackgroundColor="{StaticResource Mar_Main_Background}"
+                                                        Stroke="{StaticResource Mar_Card_Border}"
+                                                        StrokeThickness="1">
+                                                    <Border.StrokeShape><RoundRectangle CornerRadius="6"/></Border.StrokeShape>
+
+                                                    <Grid ColumnDefinitions="60,*,Auto,Auto" ColumnSpacing="10">
+
+                                                        <!-- Scheduled time -->
+                                                        <Label Text="{Binding ScheduledLocalTime}"
+                                                               FontSize="13" FontAttributes="Bold"
+                                                               TextColor="{StaticResource Mar_Font_Primary}"
+                                                               VerticalOptions="Center"/>
+
+                                                        <!-- Medication name + dose -->
+                                                        <VerticalStackLayout Grid.Column="1" Spacing="1" VerticalOptions="Center">
+                                                            <Label Text="{Binding MedicationName}"
+                                                                   FontSize="12" FontAttributes="Bold"
+                                                                   TextColor="{StaticResource Mar_Font_Primary}"
+                                                                   LineBreakMode="TailTruncation"/>
+                                                            <HorizontalStackLayout Spacing="8">
+                                                                <Border Padding="6,2" StrokeThickness="0"
+                                                                        BackgroundColor="{StaticResource Badge_BP}"
+                                                                        VerticalOptions="Center">
+                                                                    <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                                                                    <Label Text="{Binding DoseDisplay}"
+                                                                           FontSize="10" FontAttributes="Bold"
+                                                                           TextColor="{StaticResource Button_Font_Primary}"/>
+                                                                </Border>
+                                                                <!-- Recorded by + admin time -->
+                                                                <Label FontSize="10"
+                                                                       TextColor="{StaticResource Mar_Font_Secondary}"
+                                                                       VerticalOptions="Center"
+                                                                       IsVisible="{Binding RecordedBy, Converter={StaticResource StringNotEmptyConverter}}">
+                                                                    <Label.Text>
+                                                                        <MultiBinding StringFormat="{}at {0} by {1}">
+                                                                            <Binding Path="LastAdministeredLocal"/>
+                                                                            <Binding Path="RecordedBy"/>
+                                                                        </MultiBinding>
+                                                                    </Label.Text>
+                                                                </Label>
+                                                            </HorizontalStackLayout>
+                                                        </VerticalStackLayout>
+
+                                                        <!-- Notes preview -->
+                                                        <Label Grid.Column="2"
+                                                               Text="{Binding NotesPreview}"
+                                                               FontSize="10"
+                                                               TextColor="{StaticResource Mar_Font_Secondary}"
+                                                               VerticalOptions="Center"
+                                                               LineBreakMode="TailTruncation"
+                                                               MaximumWidthRequest="200"
+                                                               IsVisible="{Binding NotesPreview, Converter={StaticResource StringNotEmptyConverter}}"/>
+
+                                                        <!-- Status pill -->
+                                                        <Border Grid.Column="3" Padding="10,4" StrokeThickness="0"
+                                                                BackgroundColor="{Binding Status, Converter={StaticResource MarStatusToColorConverter}}"
+                                                                VerticalOptions="Center">
+                                                            <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
+                                                            <Label Text="{Binding Status}"
+                                                                   FontSize="10" FontAttributes="Bold"
+                                                                   TextColor="{StaticResource Button_Font_Primary}"/>
+                                                        </Border>
+
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </CollectionView.ItemTemplate>
+                                    </CollectionView>
+
+                                    <!-- Unscheduled section -->
+                                    <VerticalStackLayout IsVisible="{Binding HasUnscheduled}" Spacing="4">
+
+                                        <Label Text="UNSCHEDULED" FontSize="10" FontAttributes="Bold"
+                                               CharacterSpacing="1" Margin="10,6,0,0"
+                                               TextColor="{StaticResource Mar_Font_Secondary}"/>
+
+                                        <CollectionView ItemsSource="{Binding UnscheduledEntries}"
+                                                        SelectionMode="None">
+                                            <CollectionView.ItemsLayout>
+                                                <LinearItemsLayout Orientation="Vertical" ItemSpacing="4"/>
+                                            </CollectionView.ItemsLayout>
+                                            <CollectionView.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border Padding="10,8"
+                                                            BackgroundColor="#F0EDE8"
+                                                            Stroke="{StaticResource Mar_Card_Border}"
+                                                            StrokeThickness="1"
+                                                            StrokeDashArray="4,2">
+                                                        <Border.StrokeShape><RoundRectangle CornerRadius="6"/></Border.StrokeShape>
+
+                                                        <Grid ColumnDefinitions="60,*,Auto,Auto" ColumnSpacing="10">
+
+                                                            <Label Text="{Binding LastAdministeredLocal}"
+                                                                   FontSize="13" FontAttributes="Bold"
+                                                                   TextColor="{StaticResource Mar_Font_Primary}"
+                                                                   VerticalOptions="Center"/>
+
+                                                            <VerticalStackLayout Grid.Column="1" Spacing="1" VerticalOptions="Center">
+                                                                <Label Text="{Binding MedicationName}"
+                                                                       FontSize="12" FontAttributes="Bold"
+                                                                       TextColor="{StaticResource Mar_Font_Primary}"
+                                                                       LineBreakMode="TailTruncation"/>
+                                                                <HorizontalStackLayout Spacing="8">
+                                                                    <Border Padding="6,2" StrokeThickness="0"
+                                                                            BackgroundColor="{StaticResource Badge_BP}"
+                                                                            VerticalOptions="Center">
+                                                                        <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                                                                        <Label Text="{Binding DoseDisplay}"
+                                                                               FontSize="10" FontAttributes="Bold"
+                                                                               TextColor="{StaticResource Button_Font_Primary}"/>
+                                                                    </Border>
+                                                                    <Label FontSize="10"
+                                                                           TextColor="{StaticResource Mar_Font_Secondary}"
+                                                                           VerticalOptions="Center"
+                                                                           IsVisible="{Binding RecordedBy, Converter={StaticResource StringNotEmptyConverter}}">
+                                                                        <Label.Text>
+                                                                            <MultiBinding StringFormat="{}by {0}">
+                                                                                <Binding Path="RecordedBy"/>
+                                                                            </MultiBinding>
+                                                                        </Label.Text>
+                                                                    </Label>
+                                                                </HorizontalStackLayout>
+                                                            </VerticalStackLayout>
+
+                                                            <Label Grid.Column="2"
+                                                                   Text="{Binding NotesPreview}"
+                                                                   FontSize="10"
+                                                                   TextColor="{StaticResource Mar_Font_Secondary}"
+                                                                   VerticalOptions="Center"
+                                                                   LineBreakMode="TailTruncation"
+                                                                   MaximumWidthRequest="200"
+                                                                   IsVisible="{Binding NotesPreview, Converter={StaticResource StringNotEmptyConverter}}"/>
+
+                                                            <Border Grid.Column="3" Padding="10,4" StrokeThickness="0"
+                                                                    BackgroundColor="{Binding Status, Converter={StaticResource MarStatusToColorConverter}}"
+                                                                    VerticalOptions="Center">
+                                                                <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
+                                                                <Label Text="{Binding Status}"
+                                                                       FontSize="10" FontAttributes="Bold"
+                                                                       TextColor="{StaticResource Button_Font_Primary}"/>
+                                                            </Border>
+
+                                                        </Grid>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </CollectionView.ItemTemplate>
+                                        </CollectionView>
+
+                                    </VerticalStackLayout>
+
+                                </VerticalStackLayout>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+
+                    </CollectionView>
+                </RefreshView>
+
+            </Grid>
+        </Border>
+
+    </Grid>
+</ContentPage>

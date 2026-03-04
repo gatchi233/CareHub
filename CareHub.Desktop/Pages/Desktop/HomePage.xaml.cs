@@ -5,6 +5,7 @@ using CareHub.Models;
 using CareHub.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Maui.Controls;
+using CareHub.Services;
 using CareHub.Services.Abstractions;
 
 namespace CareHub.Pages.Desktop
@@ -15,6 +16,7 @@ namespace CareHub.Pages.Desktop
         private readonly IMedicationService _medicationService;
         private readonly IResidentService _residentService;
         private readonly IObservationService _observationService;
+        private readonly IMarService _marService;
 
         private List<Medication> _allMedications = new();
         private List<Resident> _allResidents = new();
@@ -32,6 +34,7 @@ namespace CareHub.Pages.Desktop
             _medicationService = services.GetRequiredService<IMedicationService>();
             _residentService = services.GetRequiredService<IResidentService>();
             _observationService = services.GetRequiredService<IObservationService>();
+            _marService = services.GetRequiredService<IMarService>();
 
             BindingContext = _vm;
 
@@ -74,6 +77,19 @@ namespace CareHub.Pages.Desktop
                     .ToList();
 
                 RunSearch();
+                _vm.ComputeAlerts();
+
+                // Load MAR dashboard
+                try
+                {
+                    var (fromUtc, toUtc, _, _) = MarScheduleHelper.GetTodayRange();
+                    var marEntries = await _marService.LoadAsync(null, fromUtc, toUtc);
+                    _vm.ComputeMarDashboard(_allMedications, marEntries);
+                }
+                catch
+                {
+                    // MAR dashboard is non-critical — skip on failure
+                }
             }
             catch
             {
@@ -150,6 +166,16 @@ namespace CareHub.Pages.Desktop
             }
         }
 
+
+        private async void OnViewInventoryClicked(object sender, EventArgs e)
+        {
+            await Shell.Current.GoToAsync("//MedicationInventoryPage");
+        }
+
+        private async void OnViewMarClicked(object sender, EventArgs e)
+        {
+            await Shell.Current.GoToAsync("//MarPage");
+        }
 
         private void RunSearch()
         {

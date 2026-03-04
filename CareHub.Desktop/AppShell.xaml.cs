@@ -29,6 +29,7 @@ namespace CareHub
         Routing.RegisterRoute(nameof(ResidentObservationsPage), typeof(ResidentObservationsPage));
         Routing.RegisterRoute(nameof(ResidentReportPage), typeof(ResidentReportPage));
         Routing.RegisterRoute(nameof(ViewResidentPage), typeof(ViewResidentPage));
+        Routing.RegisterRoute(nameof(MarPage), typeof(MarPage));
         }
 
         private bool _handlingUnsaved;
@@ -193,6 +194,10 @@ namespace CareHub
                 var obsSvc = MauiProgram.Services.GetService<IObservationService>() as ObservationService;
                 if (obsSvc != null)
                     total += await obsSvc.SyncAsync();
+
+                var marSvc = MauiProgram.Services.GetService<IMarService>() as MarService;
+                if (marSvc != null)
+                    total += await marSvc.SyncAsync();
 
                 var message = total > 0
                     ? $"Synced {total} record(s)"

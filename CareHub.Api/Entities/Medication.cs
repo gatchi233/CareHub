@@ -19,7 +19,7 @@ namespace CareHub.Api.Entities
         public int StockQuantity { get; set; } = 0;
         public int ReorderLevel { get; set; } = 10;
 
-        public DateTimeOffset ExpiryDate { get; set; } = DateTimeOffset.Now.AddMonths(6);
+        public DateTimeOffset ExpiryDate { get; set; } = DateTimeOffset.UtcNow.AddMonths(6);
 
         // Link to resident
         public Guid? ResidentId { get; set; }

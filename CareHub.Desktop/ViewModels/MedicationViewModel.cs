@@ -1,4 +1,5 @@
-﻿using CareHub.Models;
+﻿using CareHub.Desktop.Models;
+using CareHub.Models;
 using CareHub.Pages.Desktop;
 using CareHub.Services.Abstractions;
 using CareHub.Services.Local;
@@ -28,6 +29,39 @@ namespace CareHub.ViewModels
         private List<Medication> _allMedications = new();
 
         public ObservableCollection<Medication> Medications { get; } = new();
+
+        // Inventory alert properties (read-only dashboard)
+        public ObservableCollection<InventoryAlertItem> LowStockTop3 { get; } = new();
+        public ObservableCollection<InventoryAlertItem> ExpiringSoonTop3 { get; } = new();
+
+        private int _lowStockCount;
+        public int LowStockCount
+        {
+            get => _lowStockCount;
+            private set { if (_lowStockCount == value) return; _lowStockCount = value; OnPropertyChanged(); OnPropertyChanged(nameof(HasLowStock)); }
+        }
+
+        private int _expiringSoonCount;
+        public int ExpiringSoonCount
+        {
+            get => _expiringSoonCount;
+            private set { if (_expiringSoonCount == value) return; _expiringSoonCount = value; OnPropertyChanged(); OnPropertyChanged(nameof(HasExpiringSoon)); }
+        }
+
+        public bool HasLowStock => LowStockCount > 0;
+        public bool HasExpiringSoon => ExpiringSoonCount > 0;
+
+        // MAR dashboard properties
+        public ObservableCollection<MarDashboardItem> PendingMarTop { get; } = new();
+
+        private int _pendingMarCount;
+        public int PendingMarCount
+        {
+            get => _pendingMarCount;
+            private set { if (_pendingMarCount == value) return; _pendingMarCount = value; OnPropertyChanged(); OnPropertyChanged(nameof(HasPendingMar)); }
+        }
+
+        public bool HasPendingMar => PendingMarCount > 0;
 
         public bool IsBusy
         {
@@ -295,6 +329,99 @@ namespace CareHub.ViewModels
         #endif
         }
 
+        public void ComputeAlerts()
+        {
+            var now = DateTimeOffset.Now;
+
+            // Low stock: stockQuantity <= reorderLevel
+            var lowStock = _allMedications
+                .Where(m => m.StockQuantity <= m.ReorderLevel)
+                .OrderBy(m => m.StockQuantity)
+                .ToList();
+
+            LowStockCount = lowStock.Count;
+            LowStockTop3.Clear();
+            foreach (var m in lowStock.Take(3))
+            {
+                LowStockTop3.Add(new InventoryAlertItem
+                {
+                    MedName = m.MedName,
+                    Detail = $"{m.StockQuantity} {m.QuantityUnit} (reorder at {m.ReorderLevel})",
+                    ResidentName = m.ResidentName
+                });
+            }
+
+            // Expiring soon: expiryDate within 30 days (local time)
+            var thirtyDaysFromNow = now.AddDays(30);
+            var expiringSoon = _allMedications
+                .Where(m =>
+                {
+                    var expiryLocal = m.ExpiryDate.ToLocalTime();
+                    return expiryLocal.Date >= now.Date && expiryLocal.Date <= thirtyDaysFromNow.Date;
+                })
+                .OrderBy(m => m.ExpiryDate)
+                .ToList();
+
+            ExpiringSoonCount = expiringSoon.Count;
+            ExpiringSoonTop3.Clear();
+            foreach (var m in expiringSoon.Take(3))
+            {
+                var expiryLocal = m.ExpiryDate.ToLocalTime().Date;
+                var daysLeft = (int)(expiryLocal - now.Date).TotalDays;
+                ExpiringSoonTop3.Add(new InventoryAlertItem
+                {
+                    MedName = m.MedName,
+                    Detail = $"{expiryLocal:yyyy-MM-dd} ({daysLeft} day{(daysLeft == 1 ? "" : "s")} left)",
+                    ResidentName = m.ResidentName
+                });
+            }
+        }
+
+        public void ComputeMarDashboard(List<Medication> meds, List<MarEntry> marEntries)
+        {
+            var (_, _, fromLocal, toLocal) = MarScheduleHelper.GetTodayRange();
+
+            // Only resident-assigned meds
+            var residentMeds = meds.Where(m => m.ResidentId.HasValue).ToList();
+
+            var slots = MarScheduleHelper.GenerateSlots(residentMeds, fromLocal, toLocal);
+            var matchedIds = new HashSet<Guid>();
+            MarScheduleHelper.OverlayMarEntries(slots, marEntries, matchedIds);
+
+            // Group by resident, count pending + missed
+            var groups = slots
+                .GroupBy(s => s.ResidentId)
+                .Select(g => new MarDashboardItem
+                {
+                    ResidentId = g.Key,
+                    ResidentName = g.First().MedicationName, // placeholder, overwritten below
+                    PendingCount = g.Count(s => s.Status == "Pending"),
+                    MissedCount = g.Count(s => s.Status == "Missed")
+                })
+                .Where(d => d.PendingCount > 0 || d.MissedCount > 0)
+                .OrderByDescending(d => d.MissedCount)
+                .ThenByDescending(d => d.PendingCount)
+                .ToList();
+
+            // Resolve resident names from meds
+            foreach (var item in groups)
+            {
+                var med = meds.FirstOrDefault(m => m.ResidentId == item.ResidentId);
+                item.ResidentName = med?.ResidentName ?? "Unknown";
+            }
+
+            var totalPending = groups.Sum(g => g.PendingCount);
+            var totalMissed = groups.Sum(g => g.MissedCount);
+
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                PendingMarCount = totalPending + totalMissed;
+                PendingMarTop.Clear();
+                foreach (var item in groups.Take(5))
+                    PendingMarTop.Add(item);
+            });
+        }
+
         private static Page? TryGetPage()
             => Application.Current?.Windows.FirstOrDefault()?.Page;
 
@@ -303,6 +430,32 @@ namespace CareHub.ViewModels
             var page = TryGetPage();
             if (page is not null)
                 await page.DisplayAlert(title, message, "OK");
+        }
+    }
+
+    public class InventoryAlertItem
+    {
+        public string MedName { get; set; } = "";
+        public string Detail { get; set; } = "";
+        public string? ResidentName { get; set; }
+    }
+
+    public class MarDashboardItem
+    {
+        public Guid ResidentId { get; set; }
+        public string ResidentName { get; set; } = "";
+        public int PendingCount { get; set; }
+        public int MissedCount { get; set; }
+
+        public string Summary
+        {
+            get
+            {
+                var parts = new List<string>();
+                if (PendingCount > 0) parts.Add($"{PendingCount} pending");
+                if (MissedCount > 0) parts.Add($"{MissedCount} missed");
+                return string.Join(", ", parts);
+            }
         }
     }
 }

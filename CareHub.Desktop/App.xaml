@@ -32,6 +32,8 @@
             <conv:BoolToEnableDisableTextConverter x:Key="BoolToEnableDisableTextConverter" />
             <conv:UtcToLocalDateTimeConverter x:Key="UtcToLocalDateTimeConverter" />
             <conv:InvertedBoolConverter x:Key="InverseBoolConverter" />
+            <conv:MarStatusToColorConverter x:Key="MarStatusToColorConverter" />
+            <conv:IntPositiveConverter x:Key="IntPositiveConverter" />
 
         </ResourceDictionary>
 

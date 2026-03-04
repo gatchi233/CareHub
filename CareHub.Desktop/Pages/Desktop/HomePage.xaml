@@ -9,7 +9,7 @@
     BackgroundColor="{StaticResource Homepage_Main_Background}">
 
     <Grid Padding="16"
-          RowDefinitions="Auto,*"
+          RowDefinitions="Auto,Auto,Auto,*"
           RowSpacing="16">
 
         <!-- ========== Row 0: Search Section (2 columns) ========== -->
@@ -213,8 +213,240 @@
             </Border>
         </Grid>
 
-        <!-- ========== Row 1: Medications list ========== -->
-        <Grid Grid.Row="1" RowDefinitions="Auto,*" RowSpacing="8">
+        <!-- ========== Row 1: Pending MAR Dashboard ========== -->
+        <Border Grid.Row="1"
+                Stroke="{StaticResource Homepage_Card_Border}"
+                StrokeThickness="1"
+                BackgroundColor="{StaticResource Homepage_Card_Background}"
+                Padding="12"
+                IsVisible="{Binding HasPendingMar}">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="12"/>
+            </Border.StrokeShape>
+
+            <VerticalStackLayout Spacing="8">
+
+                <Grid ColumnDefinitions="*,Auto">
+                    <HorizontalStackLayout Spacing="6">
+                        <Border Padding="6,3" StrokeThickness="0"
+                                BackgroundColor="{StaticResource Alert_Error}">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                            <Label Text="{Binding PendingMarCount, StringFormat='Pending today: {0}'}"
+                                   FontSize="11" FontAttributes="Bold"
+                                   TextColor="{StaticResource Button_Font_Primary}"/>
+                        </Border>
+                    </HorizontalStackLayout>
+
+                    <Border Grid.Column="1" StrokeThickness="0" HeightRequest="24"
+                            BackgroundColor="{StaticResource Button_Icon_Background}">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                        <Label Text="VIEW MAR" FontSize="9" FontAttributes="Bold"
+                               TextColor="{StaticResource Button_Font_Primary}"
+                               Padding="8,0"
+                               VerticalOptions="Center" HorizontalOptions="Center"/>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnViewMarClicked"/>
+                        </Border.GestureRecognizers>
+                    </Border>
+                </Grid>
+
+                <!-- Top residents with pending/missed -->
+                <CollectionView ItemsSource="{Binding PendingMarTop}"
+                                SelectionMode="None"
+                                HeightRequest="120">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Vertical" ItemSpacing="2"/>
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid ColumnDefinitions="*,Auto,Auto" Padding="4,2">
+                                <Label Text="{Binding ResidentName}"
+                                       FontSize="12" FontAttributes="Bold"
+                                       TextColor="{StaticResource Homepage_Font_Primary}"
+                                       LineBreakMode="TailTruncation"
+                                       VerticalOptions="Center"/>
+                                <Border Grid.Column="1" Padding="6,2" StrokeThickness="0"
+                                        BackgroundColor="{StaticResource Alert_Warning}"
+                                        Margin="4,0"
+                                        IsVisible="{Binding PendingCount, Converter={StaticResource IntPositiveConverter}}">
+                                    <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                                    <Label Text="{Binding PendingCount, StringFormat='{0} pending'}"
+                                           FontSize="10" FontAttributes="Bold"
+                                           TextColor="{StaticResource Button_Font_Secondary}"/>
+                                </Border>
+                                <Border Grid.Column="2" Padding="6,2" StrokeThickness="0"
+                                        BackgroundColor="{StaticResource Alert_Error}"
+                                        IsVisible="{Binding MissedCount, Converter={StaticResource IntPositiveConverter}}">
+                                    <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                                    <Label Text="{Binding MissedCount, StringFormat='{0} missed'}"
+                                           FontSize="10" FontAttributes="Bold"
+                                           TextColor="{StaticResource Button_Font_Primary}"/>
+                                </Border>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+            </VerticalStackLayout>
+        </Border>
+
+        <!-- ========== Row 2: Inventory Alerts ========== -->
+        <Grid Grid.Row="2"
+              ColumnDefinitions="*,*"
+              ColumnSpacing="16">
+
+            <!-- LOW STOCK card -->
+            <Border Grid.Column="0"
+                    Stroke="{StaticResource Homepage_Card_Border}"
+                    StrokeThickness="1"
+                    BackgroundColor="{StaticResource Homepage_Card_Background}"
+                    Padding="12">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12"/>
+                </Border.StrokeShape>
+
+                <VerticalStackLayout Spacing="8">
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <HorizontalStackLayout Spacing="6">
+                            <Border Padding="6,3" StrokeThickness="0"
+                                    BackgroundColor="{StaticResource Alert_Error}">
+                                <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                                <Label Text="{Binding LowStockCount, StringFormat='Low stock: {0}'}"
+                                       FontSize="11" FontAttributes="Bold"
+                                       TextColor="{StaticResource Button_Font_Primary}"/>
+                            </Border>
+                        </HorizontalStackLayout>
+
+                        <Border Grid.Column="1" StrokeThickness="0" HeightRequest="24"
+                                BackgroundColor="{StaticResource Button_Icon_Background}">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                            <Label Text="VIEW ALL" FontSize="9" FontAttributes="Bold"
+                                   TextColor="{StaticResource Button_Font_Primary}"
+                                   Padding="8,0"
+                                   VerticalOptions="Center" HorizontalOptions="Center"/>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnViewInventoryClicked"/>
+                            </Border.GestureRecognizers>
+                        </Border>
+                    </Grid>
+
+                    <!-- Top 3 low stock items -->
+                    <CollectionView ItemsSource="{Binding LowStockTop3}"
+                                    SelectionMode="None"
+                                    HeightRequest="90">
+                        <CollectionView.EmptyView>
+                            <Label Text="No low stock items."
+                                   FontSize="11" TextColor="{StaticResource Homepage_Font_Secondary}"
+                                   Margin="4,0"/>
+                        </CollectionView.EmptyView>
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout Orientation="Vertical" ItemSpacing="2"/>
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid ColumnDefinitions="*,Auto" Padding="4,2">
+                                    <VerticalStackLayout Spacing="0">
+                                        <Label Text="{Binding MedName}"
+                                               FontSize="12" FontAttributes="Bold"
+                                               TextColor="{StaticResource Homepage_Font_Primary}"
+                                               LineBreakMode="TailTruncation"/>
+                                        <Label Text="{Binding Detail}"
+                                               FontSize="10"
+                                               TextColor="{StaticResource Alert_Error}"/>
+                                    </VerticalStackLayout>
+                                    <Label Grid.Column="1"
+                                           Text="{Binding ResidentName}"
+                                           FontSize="10"
+                                           TextColor="{StaticResource Homepage_Font_Secondary}"
+                                           VerticalOptions="Center"
+                                           IsVisible="{Binding ResidentName, Converter={StaticResource StringNotEmptyConverter}}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- EXPIRING SOON card -->
+            <Border Grid.Column="1"
+                    Stroke="{StaticResource Homepage_Card_Border}"
+                    StrokeThickness="1"
+                    BackgroundColor="{StaticResource Homepage_Card_Background}"
+                    Padding="12">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12"/>
+                </Border.StrokeShape>
+
+                <VerticalStackLayout Spacing="8">
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <HorizontalStackLayout Spacing="6">
+                            <Border Padding="6,3" StrokeThickness="0"
+                                    BackgroundColor="{StaticResource Alert_Warning}">
+                                <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                                <Label Text="{Binding ExpiringSoonCount, StringFormat='Expiring in 30 days: {0}'}"
+                                       FontSize="11" FontAttributes="Bold"
+                                       TextColor="{StaticResource Button_Font_Secondary}"/>
+                            </Border>
+                        </HorizontalStackLayout>
+
+                        <Border Grid.Column="1" StrokeThickness="0" HeightRequest="24"
+                                BackgroundColor="{StaticResource Button_Icon_Background}">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                            <Label Text="VIEW ALL" FontSize="9" FontAttributes="Bold"
+                                   TextColor="{StaticResource Button_Font_Primary}"
+                                   Padding="8,0"
+                                   VerticalOptions="Center" HorizontalOptions="Center"/>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnViewInventoryClicked"/>
+                            </Border.GestureRecognizers>
+                        </Border>
+                    </Grid>
+
+                    <!-- Top 3 expiring items -->
+                    <CollectionView ItemsSource="{Binding ExpiringSoonTop3}"
+                                    SelectionMode="None"
+                                    HeightRequest="90">
+                        <CollectionView.EmptyView>
+                            <Label Text="No medications expiring soon."
+                                   FontSize="11" TextColor="{StaticResource Homepage_Font_Secondary}"
+                                   Margin="4,0"/>
+                        </CollectionView.EmptyView>
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout Orientation="Vertical" ItemSpacing="2"/>
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid ColumnDefinitions="*,Auto" Padding="4,2">
+                                    <VerticalStackLayout Spacing="0">
+                                        <Label Text="{Binding MedName}"
+                                               FontSize="12" FontAttributes="Bold"
+                                               TextColor="{StaticResource Homepage_Font_Primary}"
+                                               LineBreakMode="TailTruncation"/>
+                                        <Label Text="{Binding Detail}"
+                                               FontSize="10"
+                                               TextColor="{StaticResource Alert_Warning}"/>
+                                    </VerticalStackLayout>
+                                    <Label Grid.Column="1"
+                                           Text="{Binding ResidentName}"
+                                           FontSize="10"
+                                           TextColor="{StaticResource Homepage_Font_Secondary}"
+                                           VerticalOptions="Center"
+                                           IsVisible="{Binding ResidentName, Converter={StaticResource StringNotEmptyConverter}}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                </VerticalStackLayout>
+            </Border>
+
+        </Grid>
+
+        <!-- ========== Row 3: Medications list ========== -->
+        <Grid Grid.Row="3" RowDefinitions="Auto,*" RowSpacing="8">
 
             <Label Text="3. Medications"
                    FontAttributes="Bold"

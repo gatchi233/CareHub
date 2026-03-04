@@ -3,6 +3,7 @@ using System;
 using CareHub.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CareHub.Api.Migrations
 {
     [DbContext(typeof(CareHubDbContext))]
-    partial class CareHubDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260301110342_MarRenameFieldsAndAddRecordedBy")]
+    partial class MarRenameFieldsAndAddRecordedBy
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,39 +24,6 @@ namespace CareHub.Api.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("CareHub.Api.Entities.AppUser", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("DisplayName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("PasswordHash")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid?>("ResidentId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Username")
-                        .IsUnique();
-
-                    b.ToTable("AppUsers", (string)null);
-                });
 
             modelBuilder.Entity("CareHub.Api.Entities.MarEntry", b =>
                 {
@@ -73,8 +43,8 @@ namespace CareHub.Api.Migrations
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("DoseQuantity")
-                        .HasColumnType("integer");
+                    b.Property<decimal>("DoseQuantity")
+                        .HasColumnType("decimal(10,2)");
 
                     b.Property<string>("DoseUnit")
                         .IsRequired()
@@ -128,7 +98,7 @@ namespace CareHub.Api.Migrations
 
                     b.HasIndex("ResidentId");
 
-                    b.ToTable("MarEntries", (string)null);
+                    b.ToTable("MarEntries");
                 });
 
             modelBuilder.Entity("CareHub.Api.Entities.Medication", b =>
@@ -264,7 +234,7 @@ namespace CareHub.Api.Migrations
 
                     b.HasIndex("ResidentId");
 
-                    b.ToTable("Medications", (string)null);
+                    b.ToTable("Medications");
                 });
 
             modelBuilder.Entity("CareHub.Api.Entities.MedicationInventoryLedger", b =>
@@ -273,8 +243,8 @@ namespace CareHub.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<int>("ChangeQty")
-                        .HasColumnType("integer");
+                    b.Property<decimal>("ChangeQty")
+                        .HasColumnType("decimal(10,2)");
 
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("timestamp with time zone");
@@ -302,7 +272,7 @@ namespace CareHub.Api.Migrations
 
                     b.HasIndex("MedicationId");
 
-                    b.ToTable("MedicationInventoryLedgers", (string)null);
+                    b.ToTable("MedicationInventoryLedgers");
                 });
 
             modelBuilder.Entity("CareHub.Api.Entities.Observation", b =>
@@ -337,7 +307,7 @@ namespace CareHub.Api.Migrations
 
                     b.HasIndex("ResidentId");
 
-                    b.ToTable("Observations", (string)null);
+                    b.ToTable("Observations");
                 });
 
             modelBuilder.Entity("CareHub.Api.Entities.Resident", b =>
@@ -464,7 +434,7 @@ namespace CareHub.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Residents", (string)null);
+                    b.ToTable("Residents");
                 });
 
             modelBuilder.Entity("CareHub.Api.Entities.MarEntry", b =>

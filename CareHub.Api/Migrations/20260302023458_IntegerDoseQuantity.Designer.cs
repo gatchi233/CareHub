@@ -3,6 +3,7 @@ using System;
 using CareHub.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CareHub.Api.Migrations
 {
     [DbContext(typeof(CareHubDbContext))]
-    partial class CareHubDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260302023458_IntegerDoseQuantity")]
+    partial class IntegerDoseQuantity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -52,7 +55,7 @@ namespace CareHub.Api.Migrations
                     b.HasIndex("Username")
                         .IsUnique();
 
-                    b.ToTable("AppUsers", (string)null);
+                    b.ToTable("AppUsers");
                 });
 
             modelBuilder.Entity("CareHub.Api.Entities.MarEntry", b =>
@@ -128,7 +131,7 @@ namespace CareHub.Api.Migrations
 
                     b.HasIndex("ResidentId");
 
-                    b.ToTable("MarEntries", (string)null);
+                    b.ToTable("MarEntries");
                 });
 
             modelBuilder.Entity("CareHub.Api.Entities.Medication", b =>
@@ -264,7 +267,7 @@ namespace CareHub.Api.Migrations
 
                     b.HasIndex("ResidentId");
 
-                    b.ToTable("Medications", (string)null);
+                    b.ToTable("Medications");
                 });
 
             modelBuilder.Entity("CareHub.Api.Entities.MedicationInventoryLedger", b =>
@@ -302,7 +305,7 @@ namespace CareHub.Api.Migrations
 
                     b.HasIndex("MedicationId");
 
-                    b.ToTable("MedicationInventoryLedgers", (string)null);
+                    b.ToTable("MedicationInventoryLedgers");
                 });
 
             modelBuilder.Entity("CareHub.Api.Entities.Observation", b =>
@@ -337,7 +340,7 @@ namespace CareHub.Api.Migrations
 
                     b.HasIndex("ResidentId");
 
-                    b.ToTable("Observations", (string)null);
+                    b.ToTable("Observations");
                 });
 
             modelBuilder.Entity("CareHub.Api.Entities.Resident", b =>
@@ -464,7 +467,7 @@ namespace CareHub.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Residents", (string)null);
+                    b.ToTable("Residents");
                 });
 
             modelBuilder.Entity("CareHub.Api.Entities.MarEntry", b =>

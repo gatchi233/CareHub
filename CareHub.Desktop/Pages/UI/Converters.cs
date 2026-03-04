@@ -53,6 +53,15 @@ namespace CareHub.Pages.UI.Converters
             => throw new NotImplementedException();
     }
 
+    public class IntPositiveConverter : IValueConverter
+    {
+        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+            => value is int i && i > 0;
+
+        public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+            => throw new NotImplementedException();
+    }
+
     public class BoolToEnableDisableTextConverter : IValueConverter
     {
         public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
@@ -85,6 +94,26 @@ namespace CareHub.Pages.UI.Converters
 
             return true;
         }
+    }
+
+    public class MarStatusToColorConverter : IValueConverter
+    {
+        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        {
+            var status = value as string ?? "";
+            return status switch
+            {
+                "Given" => Application.Current?.Resources.TryGetValue("Badge_Given", out var g) == true ? g : Colors.Green,
+                "Refused" => Application.Current?.Resources.TryGetValue("Badge_Refused", out var r) == true ? r : Colors.Red,
+                "Held" => Application.Current?.Resources.TryGetValue("Badge_Held", out var h) == true ? h : Colors.Orange,
+                "Missed" => Application.Current?.Resources.TryGetValue("Badge_Missed", out var m) == true ? m : Colors.Gray,
+                "Pending" => Application.Current?.Resources.TryGetValue("Badge_Pending", out var p) == true ? p : Colors.LightGray,
+                _ => Application.Current?.Resources.TryGetValue("Badge_NotAvailable", out var n) == true ? n : Colors.Gray,
+            };
+        }
+
+        public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+            => throw new NotSupportedException();
     }
 
     public class UtcToLocalDateTimeConverter : IValueConverter

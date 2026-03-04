@@ -119,4 +119,19 @@
     <Color x:Key="Badge_SPO2">#26A69A</Color>
     <Color x:Key="Badge_Note">#E0B875</Color>
 
+    <!-- MAR (Medication Administration Record) -->
+    <Color x:Key="Mar_Main_Background">#F5F7F3</Color>
+    <Color x:Key="Mar_Card_Border">#A5A58D</Color>
+    <Color x:Key="Mar_Card_Background">#FFFFFF</Color>
+    <Color x:Key="Mar_Font_Primary">#3D3D35</Color>
+    <Color x:Key="Mar_Font_Secondary">#6B6B5D</Color>
+
+    <!-- MAR Status Badges -->
+    <Color x:Key="Badge_Given">#2E7D32</Color>
+    <Color x:Key="Badge_Refused">#B85C5C</Color>
+    <Color x:Key="Badge_Held">#E0B875</Color>
+    <Color x:Key="Badge_Missed">#8D7A6B</Color>
+    <Color x:Key="Badge_NotAvailable">#6B6B5D</Color>
+    <Color x:Key="Badge_Pending">#B8A99C</Color>
+
 </ResourceDictionary>
