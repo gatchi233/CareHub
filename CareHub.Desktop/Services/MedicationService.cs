@@ -65,6 +65,34 @@ public class MedicationService : IMedicationService
                         }
                     }
 
+                    // Merge local fields into API items where API is missing them (non-blocking)
+                    var localById = localItems.ToDictionary(m => m.Id);
+                    var toSync = new List<Medication>();
+                    foreach (var apiItem in apiItems)
+                    {
+                        if (!localById.TryGetValue(apiItem.Id, out var localItem))
+                            continue;
+
+                        if (!apiItem.PurchaseDate.HasValue && localItem.PurchaseDate.HasValue)
+                        {
+                            apiItem.PurchaseDate = localItem.PurchaseDate;
+                            toSync.Add(apiItem);
+                        }
+                    }
+
+                    if (toSync.Count > 0)
+                    {
+                        // Push in background so LoadAsync returns immediately
+                        _ = Task.Run(async () =>
+                        {
+                            foreach (var med in toSync)
+                            {
+                                try { await _apiMed.UpsertAsync(med); }
+                                catch { break; }
+                            }
+                        });
+                    }
+
                     await _localMed.ReplaceAllAsync(apiItems);
                     return apiItems;
                 }
@@ -174,6 +202,74 @@ public class MedicationService : IMedicationService
         }
 
         return await _localMed.GetLowStockAsync();
+    }
+
+    public async Task AdjustStockFifoAsync(string medName, int delta)
+    {
+        // Compute per-batch FIFO splits so we can enqueue standard StockAdjustment
+        // items that SyncAsync already knows how to process.
+        var localList = await _localMed.LoadAsync();
+        var batches = localList
+            .Where(m => (m.ResidentId == null || m.ResidentId == Guid.Empty)
+                && string.Equals(m.MedName, medName, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(m => m.ExpiryDate)
+            .ToList();
+
+        // Compute per-batch deltas before the local write
+        var perBatchDeltas = new List<(Guid Id, int Delta)>();
+        if (batches.Count > 0)
+        {
+            if (delta < 0)
+            {
+                int remaining = -delta;
+                foreach (var b in batches)
+                {
+                    if (remaining <= 0) break;
+                    int deduct = Math.Min(b.StockQuantity, remaining);
+                    if (deduct > 0)
+                        perBatchDeltas.Add((b.Id, -deduct));
+                    remaining -= deduct;
+                }
+            }
+            else if (delta > 0)
+            {
+                perBatchDeltas.Add((batches[0].Id, delta));
+            }
+        }
+
+        // Apply FIFO locally
+        await _localMed.AdjustStockFifoAsync(medName, delta);
+
+        // If online, push per-batch adjustments to API immediately
+        if (ConnectivityHelper.IsOnline())
+        {
+            try
+            {
+                foreach (var (id, d) in perBatchDeltas)
+                    await _apiMed.AdjustStockAsync(id, d);
+                ConnectivityHelper.MarkOnline();
+                return;
+            }
+            catch
+            {
+                ConnectivityHelper.MarkOffline();
+            }
+        }
+
+        // Offline — enqueue standard StockAdjustment items per batch
+        foreach (var (id, d) in perBatchDeltas)
+        {
+            var payload = new { MedicationId = id, Delta = d };
+            var payloadJson = JsonSerializer.Serialize(payload, _jsonOptions);
+
+            await _queue.EnqueueAsync(new SyncQueueItem
+            {
+                EntityType = "StockAdjustment",
+                Operation = SyncOperation.Update,
+                PayloadJson = payloadJson,
+                CreatedAtUtc = DateTime.UtcNow
+            });
+        }
     }
 
     public async Task AdjustStockAsync(Guid medicationId, int delta)

@@ -3,7 +3,9 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using CareHub.Models;
+using CareHub.Services;
 using CareHub.Services.Abstractions;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CareHub.ViewModels
 {
@@ -78,7 +80,11 @@ namespace CareHub.ViewModels
                     var qty = tuple.Item2;
                     var notes = tuple.Item3;
 
-                    await _orderService.CreateAsync(med.Id, qty, "Staff", notes);
+                    var auth = MauiProgram.Services.GetService<AuthService>();
+                    var user = auth?.CurrentUser != null
+                        ? $"{auth.CurrentUser.StaffName} ({auth.CurrentUser.Role})"
+                        : "Unknown";
+                    await _orderService.CreateAsync(med.Id, qty, user, notes);
                     await LoadAsync();
                 }
                 catch
@@ -97,10 +103,11 @@ namespace CareHub.ViewModels
 
                 var list = await _medService.LoadAsync();
 
-                // Global inventory for the whole retirement home
+                // Global inventory for the whole retirement home, grouped by MedName
                 var inventory = list
                     .Where(m => m.ResidentId == null || m.ResidentId == Guid.Empty)
-                    .Select(m => new MedicationInventoryRow(m))
+                    .GroupBy(m => m.MedName)
+                    .Select(g => new MedicationInventoryRow(g.Key, g.ToList()))
                     .ToList();
 
                 IEnumerable<MedicationInventoryRow> sorted = SortMode switch
@@ -152,17 +159,38 @@ namespace CareHub.ViewModels
         public MedicationInventoryRow(Medication med)
         {
             Med = med;
+            Batches = new List<Medication> { med };
+        }
+
+        public MedicationInventoryRow(string medName, List<Medication> batches)
+        {
+            Med = batches[0];
+            Batches = batches;
+            _medName = medName;
+            _stockQuantity = batches.Sum(b => b.StockQuantity);
+            _reorderLevel = batches.Max(b => b.ReorderLevel);
         }
 
         public Medication Med { get; }
+        public List<Medication> Batches { get; }
+
+        private readonly string? _medName;
+        private readonly int? _stockQuantity;
+        private readonly int? _reorderLevel;
 
         public Guid Id => Med.Id;
-        public string MedName => Med.MedName;
-        public int StockQuantity => Med.StockQuantity;
-        public int ReorderLevel => Med.ReorderLevel;
+        public string MedName => _medName ?? Med.MedName;
+        public int StockQuantity => _stockQuantity ?? Med.StockQuantity;
+        public int ReorderLevel => _reorderLevel ?? Med.ReorderLevel;
         public string? Usage => Med.Usage;
         public string? QuantityUnit => Med.QuantityUnit;
 
-        public bool IsLowStock => StockQuantity <= ReorderLevel;
+        public int UsableStock => Batches
+            .Where(b => !b.IsExpired && b.DaysUntilExpiry > 30)
+            .Sum(b => b.StockQuantity);
+
+        public bool IsLowStock => UsableStock <= ReorderLevel;
+        public bool HasExpiryAlert => Batches.Any(b => b.IsExpired || b.DaysUntilExpiry <= 30);
+        public int BatchCount => Batches.Count;
     }
 }

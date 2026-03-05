@@ -9,7 +9,7 @@
     BackgroundColor="{StaticResource Medication_Main_Background}">
 
 
-    <Grid Padding="16" RowDefinitions="Auto,*" RowSpacing="12">
+    <Grid Padding="16" RowDefinitions="Auto,Auto,*" RowSpacing="12">
 
         <!-- Top bar: Search + action Button (match ResidentsPage layout) -->
         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
@@ -41,6 +41,30 @@
 
                     <Border.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnOrdersClicked" />
+                    </Border.GestureRecognizers>
+                </Border>
+
+                <!-- Pending Orders -->
+                <Border StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="4"/>
+                    </Border.StrokeShape>
+
+                    <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
+                        <Image Grid.Column="0" Source="icons8_basketpaid_100.png"
+                               HeightRequest="16" WidthRequest="16"
+                               HorizontalOptions="Center" VerticalOptions="Center"/>
+
+                        <Border Grid.Column="1" BackgroundColor="{StaticResource Button_View}"
+                                Padding="10,0" StrokeThickness="0">
+                            <Label Text="PENDING"
+                                   TextColor="{StaticResource Button_Font_Primary}" FontSize="11"
+                                   VerticalOptions="Center" FontAttributes="Bold"/>
+                        </Border>
+                    </Grid>
+
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnPendingOrdersClicked" />
                     </Border.GestureRecognizers>
                 </Border>
 
@@ -78,8 +102,31 @@
             </HorizontalStackLayout>
         </Grid>
 
+        <!-- Filter banner -->
+        <Border Grid.Row="1" Padding="10,6" StrokeThickness="0"
+                BackgroundColor="{StaticResource Alert_Warning}"
+                IsVisible="{Binding IsFilterActive, Source={x:Reference Root}}">
+            <Border.StrokeShape><RoundRectangle CornerRadius="6"/></Border.StrokeShape>
+            <Grid ColumnDefinitions="*,Auto">
+                <Label Text="{Binding FilterBannerText, Source={x:Reference Root}}"
+                       FontSize="12" FontAttributes="Bold"
+                       TextColor="{StaticResource Button_Font_Secondary}"
+                       VerticalOptions="Center"/>
+                <Border Grid.Column="1" StrokeThickness="0" HeightRequest="24"
+                        BackgroundColor="{StaticResource Button_Icon_Background}" Padding="8,0">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                    <Label Text="CLEAR" FontSize="10" FontAttributes="Bold"
+                           TextColor="{StaticResource Button_Font_Primary}"
+                           VerticalOptions="Center" HorizontalOptions="Center"/>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnClearFilterClicked"/>
+                    </Border.GestureRecognizers>
+                </Border>
+            </Grid>
+        </Border>
+
         <!-- Inventory list -->
-        <CollectionView x:Name="InventoryCollection" Grid.Row="1" ItemsSource="{Binding Items}">
+        <CollectionView x:Name="InventoryCollection" Grid.Row="2" ItemsSource="{Binding Items}">
 
             <CollectionView.EmptyView>
                 <Label Text="No inventory items found." 
@@ -100,6 +147,10 @@
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="8"/>
                         </Border.StrokeShape>
+
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnCardTapped" CommandParameter="{Binding .}"/>
+                        </Border.GestureRecognizers>
 
                         <Grid ColumnDefinitions="*,Auto"
                               ColumnSpacing="10"
@@ -133,12 +184,10 @@
 
                                 <!-- Low stock badge -->
 
-                                <Border Padding="8,4" BackgroundColor="{StaticResource Alert_Warning}" IsVisible="{Binding IsLowStock}" StrokeThickness="0">
-                                    <Border.StrokeShape>
-                                        <RoundRectangle CornerRadius="6"/>
-                                    </Border.StrokeShape>
-                                    <Label Text="LOW" TextColor="{StaticResource Button_Font_Primary}"  FontAttributes="Bold" FontSize="12" />
-                                </Border>
+                                <Image Source="icons8_redwarning_100.png"
+                                       HeightRequest="22" WidthRequest="22"
+                                       IsVisible="{Binding IsLowStock}"
+                                       VerticalOptions="Center" />
 
                                 <Border StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
                                     <Border.StrokeShape>

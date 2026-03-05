@@ -154,6 +154,7 @@ namespace CareHub
             builder.Services.AddTransient<FloorPlanViewModel>();
             builder.Services.AddTransient<HomePageViewModel>();
             builder.Services.AddTransient<LoginViewModel>();
+            builder.Services.AddTransient<MedicationBatchesViewModel>();
             builder.Services.AddTransient<MedicationInventoryViewModel>();
             builder.Services.AddTransient<MedicationOrdersViewModel>();
             builder.Services.AddTransient<MedicationViewModel>();
@@ -168,6 +169,7 @@ namespace CareHub
             builder.Services.AddTransient<EditResidentPage>();
             builder.Services.AddTransient<FloorPlanPage>();
             builder.Services.AddTransient<HomePage>();
+            builder.Services.AddTransient<MedicationBatchesPage>();
             builder.Services.AddTransient<MedicationInventoryPage>();
             builder.Services.AddTransient<MedicationOrdersPage>();
             builder.Services.AddTransient<ResidentMedicationsPage>();

@@ -20,7 +20,10 @@
         public DateTimeOffset? CancelledAt { get; set; }
         public string? CancelledBy { get; set; }
 
+        public string? MedicationName { get; set; }
         public string? Notes { get; set; }
+
+        public DateTimeOffset? ReceivedExpiryDate { get; set; }
     }
 
     public enum MedicationOrderStatus

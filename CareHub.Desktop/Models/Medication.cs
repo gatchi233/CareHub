@@ -24,6 +24,17 @@ namespace CareHub.Models
         public int StockQuantity { get; set; } = 0;
         public int ReorderLevel { get; set; } = 10;
 
+        public DateTimeOffset? PurchaseDate { get; set; }
+
+        [JsonIgnore]
+        public DateTime? PurchaseDateLocal
+        {
+            get => PurchaseDate?.UtcDateTime.Date;
+            set => PurchaseDate = value.HasValue
+                ? new DateTimeOffset(value.Value.Date, TimeSpan.Zero)
+                : null;
+        }
+
         public DateTimeOffset ExpiryDate { get; set; } =
             new DateTimeOffset(DateTime.UtcNow.Date.AddMonths(6), TimeSpan.Zero);
 
@@ -190,6 +201,45 @@ namespace CareHub.Models
 
         [JsonIgnore]
         public int DisplayIndex { get; set; }
+
+        // MAR status per slot (populated from MAR entries, display-only on HomePage)
+        [JsonIgnore]
+        public string Slot1Status { get; set; } = "Pending";
+        [JsonIgnore]
+        public string Slot2Status { get; set; } = "Pending";
+        [JsonIgnore]
+        public string Slot3Status { get; set; } = "Pending";
+
+        [JsonIgnore]
+        public string? Slot1AdminTime { get; set; }
+        [JsonIgnore]
+        public string? Slot2AdminTime { get; set; }
+        [JsonIgnore]
+        public string? Slot3AdminTime { get; set; }
+
+        [JsonIgnore]
+        public bool Slot1HasTime => Slot1Status == "Given" || Slot1Status == "Refused";
+        [JsonIgnore]
+        public bool Slot2HasTime => Slot2Status == "Given" || Slot2Status == "Refused";
+        [JsonIgnore]
+        public bool Slot3HasTime => Slot3Status == "Given" || Slot3Status == "Refused";
+
+        [JsonIgnore]
+        public Microsoft.Maui.Graphics.Color Slot1StatusColor => GetStatusColor(Slot1Status);
+        [JsonIgnore]
+        public Microsoft.Maui.Graphics.Color Slot2StatusColor => GetStatusColor(Slot2Status);
+        [JsonIgnore]
+        public Microsoft.Maui.Graphics.Color Slot3StatusColor => GetStatusColor(Slot3Status);
+
+        private static Microsoft.Maui.Graphics.Color GetStatusColor(string status) => status switch
+        {
+            "Given" => Microsoft.Maui.Graphics.Color.FromArgb("#2E7D32"),
+            "Refused" => Microsoft.Maui.Graphics.Color.FromArgb("#E65100"),
+            "Held" => Microsoft.Maui.Graphics.Color.FromArgb("#F57F17"),
+            "Missed" => Microsoft.Maui.Graphics.Color.FromArgb("#C62828"),
+            "NotAvailable" => Microsoft.Maui.Graphics.Color.FromArgb("#616161"),
+            _ => Microsoft.Maui.Graphics.Color.FromArgb("#757575") // Pending
+        };
 
         public bool IsExpired => DateTimeOffset.UtcNow.Date > ExpiryDate.Date;
 

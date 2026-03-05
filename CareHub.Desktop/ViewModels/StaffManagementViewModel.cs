@@ -59,7 +59,7 @@ namespace CareHub.ViewModels
         public bool HasSelection => Selected != null;
         public bool CanEdit     => HasSelection && !IsEditing;
         public bool CannotEdit  => !CanEdit;
-        public string PanelTitle => IsEditing ? "EDIT STAFF RECORD" : "VIEW STAFF RECORD";
+        public string PanelTitle => IsEditing ? "EDIT STAFF RECORD" : "DETAIL RECORD";
 
         // ── Editor fields ────────────────────────────────────────────────────
 

@@ -99,7 +99,7 @@ namespace CareHub.ViewModels
                 foreach (var o in orders.OrderByDescending(x => x.RequestedAt))
                 {
                     medNameMap.TryGetValue(o.MedicationId, out var medName);
-                    medName ??= $"Medication #{o.MedicationId}";
+                    medName ??= o.MedicationName ?? $"Medication #{o.MedicationId}";
                     Orders.Add(new MedicationOrderRow(o, medName));
                 }
             }

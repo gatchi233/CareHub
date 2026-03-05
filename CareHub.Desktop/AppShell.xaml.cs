@@ -24,6 +24,7 @@ namespace CareHub
         // Routes – only register sub-pages that are NOT declared as ShellContent in XAML
         Routing.RegisterRoute(nameof(EditMedicationPage), typeof(EditMedicationPage));
         Routing.RegisterRoute(nameof(EditResidentPage), typeof(EditResidentPage));
+        Routing.RegisterRoute(nameof(MedicationBatchesPage), typeof(MedicationBatchesPage));
         Routing.RegisterRoute(nameof(MedicationOrdersPage), typeof(MedicationOrdersPage));
         Routing.RegisterRoute(nameof(ResidentMedicationsPage), typeof(ResidentMedicationsPage));
         Routing.RegisterRoute(nameof(ResidentObservationsPage), typeof(ResidentObservationsPage));

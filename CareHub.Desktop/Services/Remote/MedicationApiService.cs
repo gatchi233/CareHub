@@ -110,6 +110,11 @@ public class MedicationApiService : IMedicationService
         }
     }
 
+    public Task AdjustStockFifoAsync(string medName, int delta)
+    {
+        throw new OfflineException("FIFO stock adjustment is local-only.");
+    }
+
     public async Task AdjustStockAsync(Guid medicationId, int delta)
     {
         try

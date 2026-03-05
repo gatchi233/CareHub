@@ -6,6 +6,7 @@
     "StockQuantity": 500,
     "ReorderLevel": 180,
     "QuantityUnit": "tablet",
+    "PurchaseDate": "2025-09-15T00:00:00+00:00",
     "ExpiryDate": "2026-06-06T00:00:00-07:00"
   },
   {
@@ -15,16 +16,38 @@
     "StockQuantity": 300,
     "ReorderLevel": 100,
     "QuantityUnit": "tablet",
+    "PurchaseDate": "2025-08-20T00:00:00+00:00",
     "ExpiryDate": "2026-05-20T00:00:00-07:00"
   },
   {
     "Id": "00000000-0000-0000-0000-000000001003",
-    "MedName": "Samsca",
+    "MedName": "Samsca 15mg",
     "Usage": "Hyponatremia",
-    "StockQuantity": 90,
+    "StockQuantity": 40,
     "ReorderLevel": 30,
     "QuantityUnit": "tablet",
+    "PurchaseDate": "2025-10-01T00:00:00+00:00",
     "ExpiryDate": "2026-04-15T00:00:00-07:00"
+  },
+  {
+    "Id": "00000000-0000-0000-0000-000000001061",
+    "MedName": "Samsca 15mg",
+    "Usage": "Hyponatremia",
+    "StockQuantity": 30,
+    "ReorderLevel": 30,
+    "QuantityUnit": "tablet",
+    "PurchaseDate": "2025-12-15T00:00:00+00:00",
+    "ExpiryDate": "2026-06-20T00:00:00-07:00"
+  },
+  {
+    "Id": "00000000-0000-0000-0000-000000001062",
+    "MedName": "Samsca 15mg",
+    "Usage": "Hyponatremia",
+    "StockQuantity": 20,
+    "ReorderLevel": 30,
+    "QuantityUnit": "tablet",
+    "PurchaseDate": "2025-08-10T00:00:00+00:00",
+    "ExpiryDate": "2026-02-10T00:00:00-07:00"
   },
   {
     "Id": "00000000-0000-0000-0000-000000001004",
@@ -33,16 +56,28 @@
     "StockQuantity": 200,
     "ReorderLevel": 60,
     "QuantityUnit": "tablet",
+    "PurchaseDate": "2025-11-01T00:00:00+00:00",
     "ExpiryDate": "2026-08-01T00:00:00-07:00"
   },
   {
     "Id": "00000000-0000-0000-0000-000000001005",
     "MedName": "Metformin 500mg",
     "Usage": "Type 2 Diabetes",
-    "StockQuantity": 600,
+    "StockQuantity": 350,
     "ReorderLevel": 200,
     "QuantityUnit": "tablet",
+    "PurchaseDate": "2025-11-20T00:00:00+00:00",
     "ExpiryDate": "2026-07-12T00:00:00-07:00"
+  },
+  {
+    "Id": "00000000-0000-0000-0000-000000001063",
+    "MedName": "Metformin 500mg",
+    "Usage": "Type 2 Diabetes",
+    "StockQuantity": 250,
+    "ReorderLevel": 200,
+    "QuantityUnit": "tablet",
+    "PurchaseDate": "2025-09-05T00:00:00+00:00",
+    "ExpiryDate": "2026-03-01T00:00:00-07:00"
   },
   {
     "Id": "00000000-0000-0000-0000-000000001006",
@@ -51,6 +86,7 @@
     "StockQuantity": 500,
     "ReorderLevel": 180,
     "QuantityUnit": "tablet",
+    "PurchaseDate": "2025-12-01T00:00:00+00:00",
     "ExpiryDate": "2026-09-01T00:00:00-07:00"
   },
   {
@@ -60,6 +96,7 @@
     "StockQuantity": 450,
     "ReorderLevel": 150,
     "QuantityUnit": "tablet",
+    "PurchaseDate": "2025-06-28T00:00:00+00:00",
     "ExpiryDate": "2026-03-28T00:00:00-07:00"
   },
   {
@@ -69,6 +106,7 @@
     "StockQuantity": 400,
     "ReorderLevel": 150,
     "QuantityUnit": "tablet",
+    "PurchaseDate": "2026-02-04T00:00:00+00:00",
     "ExpiryDate": "2026-11-04T23:00:00-08:00"
   },
   {
@@ -78,6 +116,7 @@
     "StockQuantity": 300,
     "ReorderLevel": 100,
     "QuantityUnit": "tablet",
+    "PurchaseDate": "2026-01-10T00:00:00+00:00",
     "ExpiryDate": "2026-10-10T00:00:00-07:00"
   },
   {
@@ -87,6 +126,7 @@
     "StockQuantity": 400,
     "ReorderLevel": 150,
     "QuantityUnit": "tablet",
+    "PurchaseDate": "2025-05-17T00:00:00+00:00",
     "ExpiryDate": "2026-02-17T23:00:00-08:00"
   },
   {
@@ -96,6 +136,7 @@
     "StockQuantity": 450,
     "ReorderLevel": 150,
     "QuantityUnit": "capsule",
+    "PurchaseDate": "2026-02-28T00:00:00+00:00",
     "ExpiryDate": "2026-11-30T23:00:00-08:00"
   },
   {
@@ -105,6 +146,7 @@
     "StockQuantity": 350,
     "ReorderLevel": 120,
     "QuantityUnit": "capsule",
+    "PurchaseDate": "2025-09-30T00:00:00+00:00",
     "ExpiryDate": "2026-06-30T00:00:00-07:00"
   },
   {
@@ -114,6 +156,7 @@
     "StockQuantity": 500,
     "ReorderLevel": 180,
     "QuantityUnit": "tablet",
+    "PurchaseDate": "2025-11-15T00:00:00+00:00",
     "ExpiryDate": "2026-08-15T00:00:00-07:00"
   },
   {
@@ -123,6 +166,7 @@
     "StockQuantity": 450,
     "ReorderLevel": 150,
     "QuantityUnit": "tablet",
+    "PurchaseDate": "2025-10-20T00:00:00+00:00",
     "ExpiryDate": "2026-07-20T00:00:00-07:00"
   },
   {
@@ -132,6 +176,7 @@
     "StockQuantity": 450,
     "ReorderLevel": 150,
     "QuantityUnit": "tablet",
+    "PurchaseDate": "2025-12-10T00:00:00+00:00",
     "ExpiryDate": "2026-09-10T00:00:00-07:00"
   },
   {
@@ -141,6 +186,7 @@
     "StockQuantity": 800,
     "ReorderLevel": 250,
     "QuantityUnit": "tablet",
+    "PurchaseDate": "2025-12-14T00:00:00+00:00",
     "ExpiryDate": "2026-12-14T23:00:00-08:00"
   },
   {
@@ -150,6 +196,7 @@
     "StockQuantity": 400,
     "ReorderLevel": 120,
     "QuantityUnit": "tablet",
+    "PurchaseDate": "2026-01-20T00:00:00+00:00",
     "ExpiryDate": "2026-10-20T00:00:00-07:00"
   },
   {
@@ -159,6 +206,7 @@
     "StockQuantity": 250,
     "ReorderLevel": 90,
     "QuantityUnit": "tablet",
+    "PurchaseDate": "2026-02-28T00:00:00+00:00",
     "ExpiryDate": "2026-11-29T23:00:00-08:00"
   },
   {
@@ -168,6 +216,7 @@
     "StockQuantity": 400,
     "ReorderLevel": 150,
     "QuantityUnit": "tablet",
+    "PurchaseDate": "2025-11-25T00:00:00+00:00",
     "ExpiryDate": "2026-08-25T00:00:00-07:00"
   },
   {
@@ -177,6 +226,7 @@
     "StockQuantity": 600,
     "ReorderLevel": 200,
     "QuantityUnit": "tablet",
+    "PurchaseDate": "2025-10-14T00:00:00+00:00",
     "ExpiryDate": "2027-01-14T23:00:00-08:00"
   },
   {
@@ -186,6 +236,7 @@
     "StockQuantity": 200,
     "ReorderLevel": 60,
     "QuantityUnit": "tablet",
+    "PurchaseDate": "2025-12-30T00:00:00+00:00",
     "ExpiryDate": "2026-09-30T00:00:00-07:00"
   },
   {
@@ -195,6 +246,7 @@
     "StockQuantity": 150,
     "ReorderLevel": 50,
     "QuantityUnit": "tablet",
+    "PurchaseDate": "2025-10-15T00:00:00+00:00",
     "ExpiryDate": "2026-07-15T00:00:00-07:00"
   },
   {
@@ -204,6 +256,7 @@
     "StockQuantity": 300,
     "ReorderLevel": 100,
     "QuantityUnit": "tablet",
+    "PurchaseDate": "2026-01-05T00:00:00+00:00",
     "ExpiryDate": "2026-10-05T00:00:00-07:00"
   },
   {
@@ -213,6 +266,7 @@
     "StockQuantity": 150,
     "ReorderLevel": 50,
     "QuantityUnit": "capsule",
+    "PurchaseDate": "2025-09-20T00:00:00+00:00",
     "ExpiryDate": "2026-06-20T00:00:00-07:00"
   },
   {
@@ -222,6 +276,7 @@
     "StockQuantity": 200,
     "ReorderLevel": 60,
     "QuantityUnit": "tablet",
+    "PurchaseDate": "2025-11-10T00:00:00+00:00",
     "ExpiryDate": "2026-08-10T00:00:00-07:00"
   },
   {
@@ -231,6 +286,7 @@
     "StockQuantity": 100,
     "ReorderLevel": 35,
     "QuantityUnit": "capsule",
+    "PurchaseDate": "2025-08-30T00:00:00+00:00",
     "ExpiryDate": "2026-05-30T00:00:00-07:00"
   },
   {
@@ -240,6 +296,7 @@
     "StockQuantity": 50,
     "ReorderLevel": 20,
     "QuantityUnit": "bottle",
+    "PurchaseDate": "2025-11-28T00:00:00+00:00",
     "ExpiryDate": "2027-02-28T23:00:00-08:00"
   },
   {
@@ -249,6 +306,7 @@
     "StockQuantity": 40,
     "ReorderLevel": 15,
     "QuantityUnit": "tube",
+    "PurchaseDate": "2026-02-14T00:00:00+00:00",
     "ExpiryDate": "2026-11-14T23:00:00-08:00"
   },
   {
@@ -258,6 +316,7 @@
     "StockQuantity": 30,
     "ReorderLevel": 12,
     "QuantityUnit": "tube",
+    "PurchaseDate": "2025-12-20T00:00:00+00:00",
     "ExpiryDate": "2026-09-20T00:00:00-07:00"
   },
   {
@@ -267,6 +326,7 @@
     "StockQuantity": 30,
     "ReorderLevel": 12,
     "QuantityUnit": "tube",
+    "PurchaseDate": "2026-01-25T00:00:00+00:00",
     "ExpiryDate": "2026-10-25T00:00:00-07:00"
   },
   {
@@ -276,6 +336,7 @@
     "StockQuantity": 35,
     "ReorderLevel": 15,
     "QuantityUnit": "tube",
+    "PurchaseDate": "2025-12-09T00:00:00+00:00",
     "ExpiryDate": "2026-12-09T23:00:00-08:00"
   },
   {
@@ -285,6 +346,7 @@
     "StockQuantity": 30,
     "ReorderLevel": 12,
     "QuantityUnit": "tube",
+    "PurchaseDate": "2026-02-19T00:00:00+00:00",
     "ExpiryDate": "2026-11-19T23:00:00-08:00"
   },
   {
@@ -294,6 +356,7 @@
     "StockQuantity": 45,
     "ReorderLevel": 18,
     "QuantityUnit": "tube",
+    "PurchaseDate": "2025-11-30T00:00:00+00:00",
     "ExpiryDate": "2026-08-30T00:00:00-07:00"
   },
   {
@@ -303,6 +366,7 @@
     "StockQuantity": 45,
     "ReorderLevel": 18,
     "QuantityUnit": "tube",
+    "PurchaseDate": "2025-12-15T00:00:00+00:00",
     "ExpiryDate": "2026-09-15T00:00:00-07:00"
   },
   {
@@ -312,6 +376,7 @@
     "StockQuantity": 50,
     "ReorderLevel": 20,
     "QuantityUnit": "tube",
+    "PurchaseDate": "2025-11-14T00:00:00+00:00",
     "ExpiryDate": "2027-02-14T23:00:00-08:00"
   },
   {
@@ -321,6 +386,7 @@
     "StockQuantity": 50,
     "ReorderLevel": 20,
     "QuantityUnit": "tube",
+    "PurchaseDate": "2025-10-19T00:00:00+00:00",
     "ExpiryDate": "2027-01-19T23:00:00-08:00"
   },
   {
@@ -330,6 +396,7 @@
     "StockQuantity": 35,
     "ReorderLevel": 15,
     "QuantityUnit": "bottle",
+    "PurchaseDate": "2026-01-30T00:00:00+00:00",
     "ExpiryDate": "2026-10-30T00:00:00-07:00"
   },
   {
@@ -339,6 +406,7 @@
     "StockQuantity": 40,
     "ReorderLevel": 15,
     "QuantityUnit": "bottle",
+    "PurchaseDate": "2025-12-19T00:00:00+00:00",
     "ExpiryDate": "2026-12-19T23:00:00-08:00"
   },
   {
@@ -348,6 +416,7 @@
     "StockQuantity": 400,
     "ReorderLevel": 150,
     "QuantityUnit": "capsule",
+    "PurchaseDate": "2026-02-09T00:00:00+00:00",
     "ExpiryDate": "2026-11-09T23:00:00-08:00"
   },
   {
@@ -357,6 +426,7 @@
     "StockQuantity": 500,
     "ReorderLevel": 150,
     "QuantityUnit": "tablet",
+    "PurchaseDate": "2025-11-27T00:00:00+00:00",
     "ExpiryDate": "2027-02-27T23:00:00-08:00"
   },
   {
@@ -366,6 +436,7 @@
     "StockQuantity": 700,
     "ReorderLevel": 250,
     "QuantityUnit": "tablet",
+    "PurchaseDate": "2025-09-15T00:00:00+00:00",
     "ExpiryDate": "2027-06-15T00:00:00-07:00"
   },
   {
@@ -375,6 +446,7 @@
     "StockQuantity": 700,
     "ReorderLevel": 250,
     "QuantityUnit": "tablet",
+    "PurchaseDate": "2025-08-20T00:00:00+00:00",
     "ExpiryDate": "2027-05-20T00:00:00-07:00"
   },
   {
@@ -384,6 +456,7 @@
     "StockQuantity": 300,
     "ReorderLevel": 100,
     "QuantityUnit": "tablet",
+    "PurchaseDate": "2025-12-25T00:00:00+00:00",
     "ExpiryDate": "2026-09-25T00:00:00-07:00"
   },
   {
@@ -393,6 +466,7 @@
     "StockQuantity": 60,
     "ReorderLevel": 25,
     "QuantityUnit": "bottle",
+    "PurchaseDate": "2025-11-15T00:00:00+00:00",
     "ExpiryDate": "2026-08-15T00:00:00-07:00"
   },
   {
@@ -402,6 +476,7 @@
     "StockQuantity": 50,
     "ReorderLevel": 20,
     "QuantityUnit": "bottle",
+    "PurchaseDate": "2025-12-20T00:00:00+00:00",
     "ExpiryDate": "2026-09-20T00:00:00-07:00"
   },
   {
@@ -411,6 +486,7 @@
     "StockQuantity": 25,
     "ReorderLevel": 10,
     "QuantityUnit": "bottle",
+    "PurchaseDate": "2025-09-10T00:00:00+00:00",
     "ExpiryDate": "2026-06-10T00:00:00-07:00"
   },
   {
@@ -420,6 +496,7 @@
     "StockQuantity": 40,
     "ReorderLevel": 15,
     "QuantityUnit": "bottle",
+    "PurchaseDate": "2025-10-25T00:00:00+00:00",
     "ExpiryDate": "2026-07-25T00:00:00-07:00"
   },
   {
@@ -429,6 +506,7 @@
     "StockQuantity": 35,
     "ReorderLevel": 15,
     "QuantityUnit": "bottle",
+    "PurchaseDate": "2025-11-30T00:00:00+00:00",
     "ExpiryDate": "2026-08-30T00:00:00-07:00"
   },
   {
@@ -438,6 +516,7 @@
     "StockQuantity": 300,
     "ReorderLevel": 100,
     "QuantityUnit": "capsule",
+    "PurchaseDate": "2025-08-15T00:00:00+00:00",
     "ExpiryDate": "2026-05-15T00:00:00-07:00"
   },
   {
@@ -447,6 +526,7 @@
     "StockQuantity": 200,
     "ReorderLevel": 75,
     "QuantityUnit": "tablet",
+    "PurchaseDate": "2025-10-20T00:00:00+00:00",
     "ExpiryDate": "2026-07-20T00:00:00-07:00"
   },
   {
@@ -456,6 +536,7 @@
     "StockQuantity": 200,
     "ReorderLevel": 75,
     "QuantityUnit": "tablet",
+    "PurchaseDate": "2025-12-10T00:00:00+00:00",
     "ExpiryDate": "2026-09-10T00:00:00-07:00"
   },
   {
@@ -465,6 +546,7 @@
     "StockQuantity": 250,
     "ReorderLevel": 90,
     "QuantityUnit": "capsule",
+    "PurchaseDate": "2025-09-25T00:00:00+00:00",
     "ExpiryDate": "2026-06-25T00:00:00-07:00"
   },
   {
@@ -474,6 +556,7 @@
     "StockQuantity": 150,
     "ReorderLevel": 50,
     "QuantityUnit": "tablet",
+    "PurchaseDate": "2025-11-05T00:00:00+00:00",
     "ExpiryDate": "2026-08-05T00:00:00-07:00"
   },
   {
@@ -483,6 +566,7 @@
     "StockQuantity": 300,
     "ReorderLevel": 100,
     "QuantityUnit": "capsule",
+    "PurchaseDate": "2025-12-29T00:00:00+00:00",
     "ExpiryDate": "2026-12-29T23:00:00-08:00"
   },
   {
@@ -492,6 +576,7 @@
     "StockQuantity": 250,
     "ReorderLevel": 90,
     "QuantityUnit": "capsule",
+    "PurchaseDate": "2025-10-14T00:00:00+00:00",
     "ExpiryDate": "2027-01-14T23:00:00-08:00"
   },
   {
@@ -501,6 +586,7 @@
     "StockQuantity": 400,
     "ReorderLevel": 150,
     "QuantityUnit": "lozenge",
+    "PurchaseDate": "2025-09-20T00:00:00+00:00",
     "ExpiryDate": "2027-03-20T00:00:00-07:00"
   },
   {
@@ -510,6 +596,7 @@
     "StockQuantity": 350,
     "ReorderLevel": 120,
     "QuantityUnit": "lozenge",
+    "PurchaseDate": "2025-11-27T00:00:00+00:00",
     "ExpiryDate": "2027-02-27T23:00:00-08:00"
   },
   {
@@ -519,6 +606,7 @@
     "StockQuantity": 40,
     "ReorderLevel": 15,
     "QuantityUnit": "bottle",
+    "PurchaseDate": "2026-02-09T00:00:00+00:00",
     "ExpiryDate": "2026-11-09T23:00:00-08:00"
   },
   {
@@ -528,6 +616,7 @@
     "StockQuantity": 300,
     "ReorderLevel": 100,
     "QuantityUnit": "tablet",
+    "PurchaseDate": "2025-10-15T00:00:00+00:00",
     "ExpiryDate": "2027-04-15T00:00:00-07:00"
   },
   {
@@ -537,6 +626,7 @@
     "StockQuantity": 400,
     "ReorderLevel": 150,
     "QuantityUnit": "tablet",
+    "PurchaseDate": "2025-11-30T00:00:00+00:00",
     "ExpiryDate": "2027-05-30T00:00:00-07:00"
   }
 ]

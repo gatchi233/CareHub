@@ -10,7 +10,7 @@
 
     <Grid Padding="16"
           ColumnDefinitions="*,*,*"
-          RowDefinitions="Auto,Auto,*"
+          RowDefinitions="200,Auto,*"
           ColumnSpacing="16"
           RowSpacing="16">
 
@@ -124,7 +124,7 @@
                                Padding="8,0"
                                VerticalOptions="Center" HorizontalOptions="Center"/>
                         <Border.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="OnViewInventoryClicked"/>
+                            <TapGestureRecognizer Tapped="OnViewLowStockClicked"/>
                         </Border.GestureRecognizers>
                     </Border>
                 </Grid>
@@ -180,7 +180,7 @@
                         <Border Padding="6,3" StrokeThickness="0"
                                 BackgroundColor="{StaticResource Alert_Warning}">
                             <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
-                            <Label Text="{Binding ExpiringSoonCount, StringFormat='Expiring in 30 days: {0}'}"
+                            <Label Text="{Binding ExpiringSoonCount, StringFormat='Expiry alert: {0}'}"
                                    FontSize="11" FontAttributes="Bold"
                                    TextColor="{StaticResource Button_Font_Secondary}"/>
                         </Border>
@@ -194,7 +194,7 @@
                                Padding="8,0"
                                VerticalOptions="Center" HorizontalOptions="Center"/>
                         <Border.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="OnViewInventoryClicked"/>
+                            <TapGestureRecognizer Tapped="OnViewExpiryAlertClicked"/>
                         </Border.GestureRecognizers>
                     </Border>
                 </Grid>
@@ -202,7 +202,7 @@
                 <CollectionView ItemsSource="{Binding ExpiringSoonTop3}"
                                 SelectionMode="None">
                     <CollectionView.EmptyView>
-                        <Label Text="No medications expiring soon."
+                        <Label Text="No expiry alerts."
                                FontSize="11" TextColor="{StaticResource Homepage_Font_Secondary}"
                                Margin="4,0"/>
                     </CollectionView.EmptyView>
@@ -364,6 +364,12 @@
                             SelectionMode="Single"
                             SelectionChanged="OnSelectionChanged">
 
+                <CollectionView.EmptyView>
+                    <Label Text="No resident medications scheduled for today."
+                           FontSize="13" TextColor="{StaticResource Homepage_Font_Secondary}"
+                           Margin="4,8"/>
+                </CollectionView.EmptyView>
+
                 <CollectionView.ItemsLayout>
                     <LinearItemsLayout Orientation="Vertical" ItemSpacing="6" />
                 </CollectionView.ItemsLayout>
@@ -405,46 +411,79 @@
                                     </Label.FormattedText>
                                 </Label>
 
-                                <!-- Col 2: Timeslot chips -->
+                                <!-- Col 2: Timeslot status badges -->
                                 <HorizontalStackLayout Grid.Column="2" Spacing="12"
                                                        VerticalOptions="Center">
                                     <!-- Slot 1 -->
-                                    <HorizontalStackLayout Spacing="0">
-                                        <Label Text="{Binding TodayTime1, StringFormat='{}{0:hh\\:mm}'}"
-                                               FontSize="18" FontAttributes="Bold"
-                                               TextColor="{StaticResource Homepage_Font_Primary}"
-                                               VerticalOptions="Center" />
-                                        <CheckBox IsChecked="{Binding IsDone}"
-                                                  CheckedChanged="OnDoneCheckedChanged"
-                                                  VerticalOptions="Center"
-                                                  Margin="0,0,-10,0" />
-                                    </HorizontalStackLayout>
+                                    <VerticalStackLayout Spacing="1">
+                                        <HorizontalStackLayout Spacing="6">
+                                            <Label Text="{Binding TodayTime1, StringFormat='{}{0:hh\\:mm}'}"
+                                                   FontSize="16" FontAttributes="Bold"
+                                                   TextColor="{StaticResource Homepage_Font_Primary}"
+                                                   VerticalOptions="Center" />
+                                            <Border Padding="6,2" StrokeThickness="0"
+                                                    BackgroundColor="{Binding Slot1StatusColor}"
+                                                    VerticalOptions="Center">
+                                                <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                                                <Label Text="{Binding Slot1Status}"
+                                                       FontSize="10" FontAttributes="Bold"
+                                                       TextColor="White"
+                                                       TextTransform="Uppercase"/>
+                                            </Border>
+                                        </HorizontalStackLayout>
+                                        <Label Text="{Binding Slot1AdminTime}"
+                                               FontSize="10"
+                                               TextColor="{StaticResource Homepage_Font_Secondary}"
+                                               IsVisible="{Binding Slot1HasTime}"/>
+                                    </VerticalStackLayout>
 
                                     <!-- Slot 2 -->
-                                    <HorizontalStackLayout Spacing="0"
-                                                           IsVisible="{Binding HasSlot2}">
-                                        <Label Text="{Binding TodayTime2, StringFormat='{}{0:hh\\:mm}'}"
-                                               FontSize="18" FontAttributes="Bold"
-                                               TextColor="{StaticResource Homepage_Font_Primary}"
-                                               VerticalOptions="Center" />
-                                        <CheckBox IsChecked="{Binding IsDoneSlot2}"
-                                                  CheckedChanged="OnDoneCheckedChanged"
-                                                  VerticalOptions="Center"
-                                                  Margin="0,0,-10,0" />
-                                    </HorizontalStackLayout>
+                                    <VerticalStackLayout Spacing="1"
+                                                         IsVisible="{Binding HasSlot2}">
+                                        <HorizontalStackLayout Spacing="6">
+                                            <Label Text="{Binding TodayTime2, StringFormat='{}{0:hh\\:mm}'}"
+                                                   FontSize="16" FontAttributes="Bold"
+                                                   TextColor="{StaticResource Homepage_Font_Primary}"
+                                                   VerticalOptions="Center" />
+                                            <Border Padding="6,2" StrokeThickness="0"
+                                                    BackgroundColor="{Binding Slot2StatusColor}"
+                                                    VerticalOptions="Center">
+                                                <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                                                <Label Text="{Binding Slot2Status}"
+                                                       FontSize="10" FontAttributes="Bold"
+                                                       TextColor="White"
+                                                       TextTransform="Uppercase"/>
+                                            </Border>
+                                        </HorizontalStackLayout>
+                                        <Label Text="{Binding Slot2AdminTime}"
+                                               FontSize="10"
+                                               TextColor="{StaticResource Homepage_Font_Secondary}"
+                                               IsVisible="{Binding Slot2HasTime}"/>
+                                    </VerticalStackLayout>
 
                                     <!-- Slot 3 -->
-                                    <HorizontalStackLayout Spacing="0"
-                                                           IsVisible="{Binding HasSlot3}">
-                                        <Label Text="{Binding TodayTime3, StringFormat='{}{0:hh\\:mm}'}"
-                                               FontSize="18" FontAttributes="Bold"
-                                               TextColor="{StaticResource Homepage_Font_Primary}"
-                                               VerticalOptions="Center" />
-                                        <CheckBox IsChecked="{Binding IsDoneSlot3}"
-                                                  CheckedChanged="OnDoneCheckedChanged"
-                                                  VerticalOptions="Center"
-                                                  Margin="0,0,-10,0" />
-                                    </HorizontalStackLayout>
+                                    <VerticalStackLayout Spacing="1"
+                                                         IsVisible="{Binding HasSlot3}">
+                                        <HorizontalStackLayout Spacing="6">
+                                            <Label Text="{Binding TodayTime3, StringFormat='{}{0:hh\\:mm}'}"
+                                                   FontSize="16" FontAttributes="Bold"
+                                                   TextColor="{StaticResource Homepage_Font_Primary}"
+                                                   VerticalOptions="Center" />
+                                            <Border Padding="6,2" StrokeThickness="0"
+                                                    BackgroundColor="{Binding Slot3StatusColor}"
+                                                    VerticalOptions="Center">
+                                                <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                                                <Label Text="{Binding Slot3Status}"
+                                                       FontSize="10" FontAttributes="Bold"
+                                                       TextColor="White"
+                                                       TextTransform="Uppercase"/>
+                                            </Border>
+                                        </HorizontalStackLayout>
+                                        <Label Text="{Binding Slot3AdminTime}"
+                                               FontSize="10"
+                                               TextColor="{StaticResource Homepage_Font_Secondary}"
+                                               IsVisible="{Binding Slot3HasTime}"/>
+                                    </VerticalStackLayout>
                                 </HorizontalStackLayout>
 
                             </Grid>

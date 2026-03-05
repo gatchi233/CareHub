@@ -12,5 +12,6 @@ namespace CareHub.Services.Abstractions
         // Inventory helpers
         Task<List<Medication>> GetLowStockAsync();
         Task AdjustStockAsync(Guid medicationId, int delta);
+        Task AdjustStockFifoAsync(string medName, int delta);
     }
 }

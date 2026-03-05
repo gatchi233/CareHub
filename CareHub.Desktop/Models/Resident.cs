@@ -69,6 +69,9 @@ namespace CareHub.Models
         public string? EmergencyContactPhone2 { get; set; }
         public string? EmergencyRelationship2 { get; set; }
 
+        [JsonIgnore]
+        public bool HasEmergencyContact2 => !string.IsNullOrWhiteSpace(EmergencyContactName2);
+
         // Doctor information
         public string DoctorName { get; set; } = string.Empty;
         public string DoctorContact { get; set; } = string.Empty;

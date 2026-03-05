@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<pages:AuthPage
+    x:Name="Root"
+    x:Class="CareHub.Pages.Desktop.MedicationBatchesPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:pages="clr-namespace:CareHub.Pages"
+    xmlns:vm="clr-namespace:CareHub.ViewModels"
+    Title="Batch Inventory"
+    BackgroundColor="{StaticResource Medication_Main_Background}">
+
+    <Grid Padding="16" RowDefinitions="Auto,Auto,*" RowSpacing="12">
+
+        <!-- Row 0 — Header -->
+        <VerticalStackLayout Spacing="2">
+            <Label Text="BATCH INVENTORY"
+                   FontSize="11" FontAttributes="Bold" CharacterSpacing="1.5"
+                   TextColor="{StaticResource Medication_Font_Secondary}"/>
+            <Label Text="{Binding MedName}"
+                   FontSize="17" FontAttributes="Bold"
+                   TextColor="{StaticResource Medication_Font_Primary}"/>
+        </VerticalStackLayout>
+
+        <!-- Row 1 — Action bar -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto" ColumnSpacing="12">
+            <Label Text="{Binding Summary}"
+                   FontSize="15"
+                   TextColor="{StaticResource Medication_Font_Secondary}"
+                   VerticalOptions="Center"/>
+
+            <HorizontalStackLayout Grid.Column="1" Spacing="8" VerticalOptions="Center">
+                <!-- ORDER -->
+                <Border StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                    <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
+                        <Image Grid.Column="0" Source="icons8_basketadd_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
+                        <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Create}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
+                            <Label Text="ORDER" TextColor="{StaticResource Button_Font_Primary}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
+                        </Border>
+                    </Grid>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnOrderClicked"/>
+                    </Border.GestureRecognizers>
+                </Border>
+
+                <!-- CLOSE -->
+                <Border StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                    <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
+                        <Image Grid.Column="0" Source="icons8_close_100.png" HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
+                        <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Cancel}" Padding="10,0" StrokeThickness="0" InputTransparent="True">
+                            <Label Text="CLOSE" TextColor="{StaticResource Button_Font_Secondary}" FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
+                        </Border>
+                    </Grid>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnCloseClicked"/>
+                    </Border.GestureRecognizers>
+                </Border>
+
+                <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                   IsVisible="{Binding IsBusy}"
+                                   VerticalOptions="Center"/>
+            </HorizontalStackLayout>
+        </Grid>
+
+        <!-- Row 2 — Batch cards -->
+        <CollectionView Grid.Row="2"
+                        ItemsSource="{Binding Batches}"
+                        SelectionMode="None">
+
+            <CollectionView.EmptyView>
+                <VerticalStackLayout Padding="20" Spacing="6"
+                                     VerticalOptions="Center" HorizontalOptions="Center">
+                    <Label Text="No batches found."
+                           FontAttributes="Bold" FontSize="14"
+                           TextColor="{StaticResource Medication_Font_Primary}"
+                           HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
+
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Vertical" ItemSpacing="8"/>
+            </CollectionView.ItemsLayout>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:BatchRow">
+                    <Border Padding="12,10"
+                            BackgroundColor="{StaticResource Medication_Card_Background}"
+                            Stroke="{Binding BorderColor}"
+                            StrokeThickness="1">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="8"/>
+                        </Border.StrokeShape>
+
+                        <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="6">
+
+                            <!-- Row 0: Batch # + Badge + Stock -->
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                                    <Label Text="{Binding BatchLabel}"
+                                           FontAttributes="Bold" FontSize="15"
+                                           TextColor="{StaticResource Medication_Font_Primary}"
+                                           VerticalOptions="Center"/>
+                                    <Border Padding="6,2" StrokeThickness="0"
+                                            BackgroundColor="{Binding WarningColor}"
+                                            IsVisible="{Binding ShowWarning}">
+                                        <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                                        <Label Text="{Binding WarningText}"
+                                               FontSize="10" FontAttributes="Bold"
+                                               TextColor="White"/>
+                                    </Border>
+                                </HorizontalStackLayout>
+                                <Label Grid.Column="1"
+                                       Text="{Binding StockText}"
+                                       FontSize="14" FontAttributes="Bold"
+                                       TextColor="{StaticResource Medication_Font_Primary}"
+                                       VerticalOptions="Center"/>
+                            </Grid>
+
+                            <!-- Row 1: Dates -->
+                            <HorizontalStackLayout Grid.Row="1" Spacing="16">
+                                <HorizontalStackLayout Spacing="4" IsVisible="{Binding HasPurchaseDate}">
+                                    <Label Text="Purchased:" FontSize="12" TextColor="{StaticResource Medication_Font_Secondary}"/>
+                                    <Label Text="{Binding PurchaseDateText}" FontSize="12" TextColor="{StaticResource Medication_Font_Primary}"/>
+                                </HorizontalStackLayout>
+                                <HorizontalStackLayout Spacing="4">
+                                    <Label Text="Expires:" FontSize="12" TextColor="{StaticResource Medication_Font_Secondary}"/>
+                                    <Label Text="{Binding ExpiryDateText}" FontSize="12" TextColor="{StaticResource Medication_Font_Primary}"/>
+                                </HorizontalStackLayout>
+                            </HorizontalStackLayout>
+
+                            <!-- Row 2: Action buttons -->
+                            <HorizontalStackLayout Grid.Row="2" Spacing="8">
+
+                                <!-- ADJUST (not for expired) -->
+                                <Border StrokeThickness="0" HeightRequest="24"
+                                        BackgroundColor="{StaticResource Button_Icon_Background}"
+                                        IsVisible="{Binding IsNotExpired}">
+                                    <Border.StrokeShape><RoundRectangle CornerRadius="3"/></Border.StrokeShape>
+                                    <Grid ColumnDefinitions="22,Auto" Margin="0" InputTransparent="True">
+                                        <Image Grid.Column="0" Source="icons8_adjust_100.png" HeightRequest="12" WidthRequest="12" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                        <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Edit}" Padding="7,0" StrokeThickness="0" InputTransparent="True">
+                                            <Label Text="ADJUST" TextColor="{StaticResource Button_Font_Primary}" FontSize="10" VerticalOptions="Center" FontAttributes="Bold"/>
+                                        </Border>
+                                    </Grid>
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer
+                                            Command="{Binding Source={x:Reference Root}, Path=BindingContext.AdjustStockCommand}"
+                                            CommandParameter="{Binding Med}"/>
+                                    </Border.GestureRecognizers>
+                                </Border>
+
+                                <!-- TRASH (expired only) -->
+                                <Border StrokeThickness="0" HeightRequest="24"
+                                        BackgroundColor="{StaticResource Button_Icon_Background}"
+                                        IsVisible="{Binding IsExpired}">
+                                    <Border.StrokeShape><RoundRectangle CornerRadius="3"/></Border.StrokeShape>
+                                    <Grid ColumnDefinitions="22,Auto" Margin="0" InputTransparent="True">
+                                        <Image Grid.Column="0" Source="icons8_delete_100.png" HeightRequest="12" WidthRequest="12" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                        <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Delete}" Padding="7,0" StrokeThickness="0" InputTransparent="True">
+                                            <Label Text="TRASH" TextColor="{StaticResource Button_Font_Primary}" FontSize="10" VerticalOptions="Center" FontAttributes="Bold"/>
+                                        </Border>
+                                    </Grid>
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer
+                                            Command="{Binding Source={x:Reference Root}, Path=BindingContext.TrashBatchCommand}"
+                                            CommandParameter="{Binding Med}"/>
+                                    </Border.GestureRecognizers>
+                                </Border>
+
+                                <!-- RETURN -->
+                                <Border StrokeThickness="0" HeightRequest="24"
+                                        BackgroundColor="{StaticResource Button_Icon_Background}">
+                                    <Border.StrokeShape><RoundRectangle CornerRadius="3"/></Border.StrokeShape>
+                                    <Grid ColumnDefinitions="22,Auto" Margin="0" InputTransparent="True">
+                                        <Image Grid.Column="0" Source="icons8_basketremove_100.png" HeightRequest="12" WidthRequest="12" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                        <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Delete}" Padding="7,0" StrokeThickness="0" InputTransparent="True">
+                                            <Label Text="RETURN" TextColor="{StaticResource Button_Font_Primary}" FontSize="10" VerticalOptions="Center" FontAttributes="Bold"/>
+                                        </Border>
+                                    </Grid>
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer
+                                            Command="{Binding Source={x:Reference Root}, Path=BindingContext.ReturnBatchCommand}"
+                                            CommandParameter="{Binding Med}"/>
+                                    </Border.GestureRecognizers>
+                                </Border>
+
+                            </HorizontalStackLayout>
+
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+        </CollectionView>
+
+    </Grid>
+</pages:AuthPage>

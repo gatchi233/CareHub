@@ -5,7 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:pages="clr-namespace:CareHub.Pages"
     xmlns:model="clr-namespace:CareHub.Models"
-    Title="Medications"
+    Title="Resident Medications"
     BackgroundColor="{StaticResource Medication_Main_Background}">
 
     <Grid Padding="16" RowDefinitions="Auto,Auto,*" RowSpacing="12">
@@ -16,7 +16,7 @@
                    FontSize="11" FontAttributes="Bold" CharacterSpacing="1.5"
                    TextColor="{StaticResource Medication_Font_Secondary}"/>
             <Label x:Name="HeaderLabel"
-                   Text="Medications"
+                   Text="Resident Medications"
                    FontSize="20" FontAttributes="Bold"
                    TextColor="{StaticResource Medication_Font_Primary}"/>
         </VerticalStackLayout>
@@ -103,73 +103,72 @@
                                     <RoundRectangle CornerRadius="8"/>
                                 </Border.StrokeShape>
 
-                                <Grid RowDefinitions="Auto,*,Auto" RowSpacing="6">
+                                <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto" RowSpacing="6" ColumnSpacing="8">
 
-                                    <!-- Big # number -->
+                                    <!-- R0C0: Big # number -->
                                     <Label Text="{Binding DisplayIndex, StringFormat='#{0}'}"
                                            FontSize="24" FontAttributes="Bold"
                                            TextColor="{StaticResource Medication_Font_Secondary}"
                                            Opacity="0.5"/>
 
-                                    <!-- Medication info -->
-                                    <VerticalStackLayout Grid.Row="1" Spacing="2" VerticalOptions="Center">
-                                        <Label FontSize="13"
-                                               TextColor="{StaticResource Medication_Font_Primary}">
-                                            <Label.FormattedText>
-                                                <FormattedString>
-                                                    <Span Text="{Binding MedName}" FontAttributes="Bold"/>
-                                                    <Span Text="  "/>
-                                                    <Span Text="{Binding Quantity, StringFormat='{0}'}" FontSize="11"
-                                                          TextColor="{StaticResource Medication_Font_Secondary}"/>
-                                                    <Span Text=" " FontSize="11"/>
-                                                    <Span Text="{Binding QuantityUnit}" FontSize="11"
-                                                          TextColor="{StaticResource Medication_Font_Secondary}"/>
-                                                    <Span Text="{Binding TimesPerDay, StringFormat=' x {0}/day'}" FontSize="11"
-                                                          TextColor="{StaticResource Medication_Font_Secondary}"/>
-                                                </FormattedString>
-                                            </Label.FormattedText>
-                                        </Label>
-                                        <Label Text="{Binding ScheduleSummary}"
-                                               FontSize="11"
-                                               TextColor="{StaticResource Medication_Font_Secondary}"/>
-                                    </VerticalStackLayout>
+                                    <!-- R0C1: EDIT button -->
+                                    <Border Grid.Row="0" Grid.Column="1"
+                                            StrokeThickness="0" HeightRequest="24" WidthRequest="80"
+                                            BackgroundColor="{StaticResource Button_Icon_Background}"
+                                            VerticalOptions="Center" HorizontalOptions="End">
+                                        <Border.StrokeShape><RoundRectangle CornerRadius="3"/></Border.StrokeShape>
+                                        <Grid ColumnDefinitions="22,*" Margin="0" InputTransparent="True">
+                                            <Image Grid.Column="0" Source="icons8_edit_100.png" HeightRequest="12" WidthRequest="12" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                            <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Edit}" Padding="7,0" StrokeThickness="0" InputTransparent="True">
+                                                <Label Text="EDIT" TextColor="{StaticResource Button_Font_Secondary}" FontSize="10" VerticalOptions="Center" HorizontalOptions="Center" FontAttributes="Bold"/>
+                                            </Border>
+                                        </Grid>
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="OnEditClicked"/>
+                                        </Border.GestureRecognizers>
+                                    </Border>
 
-                                    <!-- Action buttons -->
-                                    <HorizontalStackLayout Grid.Row="2" Spacing="6">
+                                    <!-- R1C0: Medication name + dosage + times -->
+                                    <Label Grid.Row="1" Grid.Column="0"
+                                           FontSize="13"
+                                           TextColor="{StaticResource Medication_Font_Primary}">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="{Binding MedName}" FontAttributes="Bold"/>
+                                                <Span Text="  "/>
+                                                <Span Text="{Binding Quantity, StringFormat='{0}'}" FontSize="11"
+                                                      TextColor="{StaticResource Medication_Font_Secondary}"/>
+                                                <Span Text=" " FontSize="11"/>
+                                                <Span Text="{Binding QuantityUnit}" FontSize="11"
+                                                      TextColor="{StaticResource Medication_Font_Secondary}"/>
+                                                <Span Text="{Binding TimesPerDay, StringFormat=' x {0}/day'}" FontSize="11"
+                                                      TextColor="{StaticResource Medication_Font_Secondary}"/>
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
 
-                                        <!-- EDIT -->
-                                        <Border StrokeThickness="0" HeightRequest="24"
-                                                BackgroundColor="{StaticResource Button_Icon_Background}"
-                                                VerticalOptions="Center">
-                                            <Border.StrokeShape><RoundRectangle CornerRadius="3"/></Border.StrokeShape>
-                                            <Grid ColumnDefinitions="22,Auto" Margin="0" InputTransparent="True">
-                                                <Image Grid.Column="0" Source="icons8_edit_100.png" HeightRequest="12" WidthRequest="12" HorizontalOptions="Center" VerticalOptions="Center"/>
-                                                <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Edit}" Padding="7,0" StrokeThickness="0" InputTransparent="True">
-                                                    <Label Text="EDIT" TextColor="{StaticResource Button_Font_Secondary}" FontSize="10" VerticalOptions="Center" FontAttributes="Bold"/>
-                                                </Border>
-                                            </Grid>
-                                            <Border.GestureRecognizers>
-                                                <TapGestureRecognizer Tapped="OnEditClicked"/>
-                                            </Border.GestureRecognizers>
-                                        </Border>
+                                    <!-- R1-R2 C1: DELETE button spanning rows 2+3 -->
+                                    <Border Grid.Row="1" Grid.Column="1" Grid.RowSpan="2"
+                                            StrokeThickness="0" HeightRequest="24" WidthRequest="80"
+                                            BackgroundColor="{StaticResource Button_Icon_Background}"
+                                            VerticalOptions="Center" HorizontalOptions="End">
+                                        <Border.StrokeShape><RoundRectangle CornerRadius="3"/></Border.StrokeShape>
+                                        <Grid ColumnDefinitions="22,*" Margin="0" InputTransparent="True">
+                                            <Image Grid.Column="0" Source="icons8_delete_100.png" HeightRequest="12" WidthRequest="12" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                            <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Delete}" Padding="7,0" StrokeThickness="0" InputTransparent="True">
+                                                <Label Text="DELETE" TextColor="{StaticResource Button_Font_Primary}" FontSize="10" VerticalOptions="Center" HorizontalOptions="Center" FontAttributes="Bold"/>
+                                            </Border>
+                                        </Grid>
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="OnDeleteClicked"/>
+                                        </Border.GestureRecognizers>
+                                    </Border>
 
-                                        <!-- DELETE -->
-                                        <Border StrokeThickness="0" HeightRequest="24"
-                                                BackgroundColor="{StaticResource Button_Icon_Background}"
-                                                VerticalOptions="Center">
-                                            <Border.StrokeShape><RoundRectangle CornerRadius="3"/></Border.StrokeShape>
-                                            <Grid ColumnDefinitions="22,Auto" Margin="0" InputTransparent="True">
-                                                <Image Grid.Column="0" Source="icons8_delete_100.png" HeightRequest="12" WidthRequest="12" HorizontalOptions="Center" VerticalOptions="Center"/>
-                                                <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Delete}" Padding="7,0" StrokeThickness="0" InputTransparent="True">
-                                                    <Label Text="DELETE" TextColor="{StaticResource Button_Font_Primary}" FontSize="10" VerticalOptions="Center" FontAttributes="Bold"/>
-                                                </Border>
-                                            </Grid>
-                                            <Border.GestureRecognizers>
-                                                <TapGestureRecognizer Tapped="OnDeleteClicked"/>
-                                            </Border.GestureRecognizers>
-                                        </Border>
-
-                                    </HorizontalStackLayout>
+                                    <!-- R2C0: Schedule -->
+                                    <Label Grid.Row="2" Grid.Column="0"
+                                           Text="{Binding ScheduleSummary}"
+                                           FontSize="11"
+                                           TextColor="{StaticResource Medication_Font_Secondary}"/>
 
                                 </Grid>
                             </Border>

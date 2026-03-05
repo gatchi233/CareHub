@@ -5,7 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:conv="clr-namespace:CareHub.Pages.UI.Converters"
     xmlns:beh="clr-namespace:CareHub.Pages.UI.Behaviors"
-    Title="Resident"
+    Title="Edit Resident"
     BackgroundColor="{StaticResource Resident_Main_Background}">
 
     <Grid Padding="16" RowDefinitions="Auto,*" RowSpacing="12">

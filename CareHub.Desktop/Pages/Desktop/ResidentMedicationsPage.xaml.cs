@@ -39,8 +39,8 @@ namespace CareHub.Pages.Desktop
             base.OnAppearing();
 
             HeaderLabel.Text = string.IsNullOrWhiteSpace(ResidentName)
-                ? "Medications"
-                : $"Medications for {ResidentName}";
+                ? "Resident Medications"
+                : ResidentName;
 
             try
             {

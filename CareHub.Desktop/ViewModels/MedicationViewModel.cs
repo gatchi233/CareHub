@@ -333,45 +333,83 @@ namespace CareHub.ViewModels
         {
             var now = DateTimeOffset.Now;
 
-            // Low stock: stockQuantity <= reorderLevel
-            var lowStock = _allMedications
-                .Where(m => m.StockQuantity <= m.ReorderLevel)
-                .OrderBy(m => m.StockQuantity)
+            // Build usable stock per med name from global inventory batches.
+            // Usable stock = total stock − stock of expired/expiring-within-30-days batches.
+            var inventoryGroups = _allMedications
+                .Where(m => m.ResidentId == null || m.ResidentId == Guid.Empty)
+                .GroupBy(m => m.MedName, StringComparer.OrdinalIgnoreCase)
+                .Select(g =>
+                {
+                    var batches = g.ToList();
+                    var totalStock = batches.Sum(b => b.StockQuantity);
+                    var expiringStock = batches
+                        .Where(b => b.IsExpired || b.DaysUntilExpiry <= 30)
+                        .Sum(b => b.StockQuantity);
+                    var usableStock = totalStock - expiringStock;
+                    var reorderLevel = batches.Max(b => b.ReorderLevel);
+                    var representative = batches.First();
+                    return new { representative, usableStock, reorderLevel };
+                })
+                .ToList();
+
+            var usableStockByName = inventoryGroups
+                .ToDictionary(x => x.representative.MedName, x => x.usableStock, StringComparer.OrdinalIgnoreCase);
+
+            // Low stock: one row per med name, usable stock <= reorder level
+            var lowStock = inventoryGroups
+                .Where(x => x.usableStock <= x.reorderLevel)
+                .OrderBy(x => x.usableStock)
                 .ToList();
 
             LowStockCount = lowStock.Count;
             LowStockTop3.Clear();
-            foreach (var m in lowStock.Take(3))
+            foreach (var x in lowStock.Take(3))
             {
                 LowStockTop3.Add(new InventoryAlertItem
                 {
-                    MedName = m.MedName,
-                    Detail = $"{m.StockQuantity} {m.QuantityUnit} (reorder at {m.ReorderLevel})",
-                    ResidentName = m.ResidentName
+                    MedName = x.representative.MedName,
+                    Detail = $"{x.usableStock} {x.representative.QuantityUnit} (reorder at {x.reorderLevel})",
+                    ResidentName = x.representative.ResidentName
                 });
             }
 
-            // Expiring soon: expiryDate within 30 days (local time)
+            // Expiry alert: expired OR expiring within 30 days (local time)
+            // Same dedup: prefer global inventory entries over resident-assigned duplicates.
             var thirtyDaysFromNow = now.AddDays(30);
-            var expiringSoon = _allMedications
+            var expiryAlertAll = _allMedications
                 .Where(m =>
                 {
                     var expiryLocal = m.ExpiryDate.ToLocalTime();
-                    return expiryLocal.Date >= now.Date && expiryLocal.Date <= thirtyDaysFromNow.Date;
+                    return expiryLocal.Date <= thirtyDaysFromNow.Date;
                 })
+                .ToList();
+
+            var globalExpiryNames = new HashSet<string>(
+                expiryAlertAll
+                    .Where(m => m.ResidentId == null || m.ResidentId == Guid.Empty)
+                    .Select(m => m.MedName),
+                StringComparer.OrdinalIgnoreCase);
+
+            var expiryAlerts = expiryAlertAll
+                .Where(m =>
+                    (m.ResidentId == null || m.ResidentId == Guid.Empty) ||
+                    !globalExpiryNames.Contains(m.MedName))
                 .OrderBy(m => m.ExpiryDate)
                 .ToList();
 
-            ExpiringSoonCount = expiringSoon.Count;
+            ExpiringSoonCount = expiryAlerts.Count;
             ExpiringSoonTop3.Clear();
-            foreach (var m in expiringSoon.Take(3))
+            foreach (var m in expiryAlerts.Take(3))
             {
                 var expiryLocal = m.ExpiryDate.ToLocalTime().Date;
                 var daysLeft = (int)(expiryLocal - now.Date).TotalDays;
+                var detail = daysLeft < 0
+                    ? $"EXPIRED ({expiryLocal:dd MMM yyyy})"
+                    : $"{expiryLocal:yyyy-MM-dd} ({daysLeft} day{(daysLeft == 1 ? "" : "s")} left)";
                 ExpiringSoonTop3.Add(new InventoryAlertItem
                 {
                     MedName = m.MedName,
-                    Detail = $"{expiryLocal:yyyy-MM-dd} ({daysLeft} day{(daysLeft == 1 ? "" : "s")} left)",
+                    Detail = detail,
                     ResidentName = m.ResidentName
                 });
             }

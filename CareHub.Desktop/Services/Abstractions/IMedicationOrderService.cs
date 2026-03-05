@@ -12,7 +12,7 @@ namespace CareHub.Services.Abstractions
             string? requestedBy,
             string? notes);
 
-        Task UpdateStatusAsync(Guid orderId, MedicationOrderStatus newStatus);
+        Task UpdateStatusAsync(Guid orderId, MedicationOrderStatus newStatus, DateTimeOffset? expiryDate = null);
 
         Task DeleteAsync(Guid orderId);
 

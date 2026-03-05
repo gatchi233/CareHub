@@ -1,5 +1,8 @@
 using CommunityToolkit.Maui.Views;
+using CareHub.Models;
 using CareHub.Pages.UI.Popups;
+using CareHub.Services;
+using CareHub.Services.Abstractions;
 using CareHub.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -77,7 +80,47 @@ namespace CareHub.Pages.Desktop
                     name, reorderLevel, unit, indication);
             }
 
-            await VM.CreateOrderAsync(medicationId, qty, "Staff", notes);
+            var auth = MauiProgram.Services.GetService<AuthService>();
+            var user = auth?.CurrentUser != null
+                ? $"{auth.CurrentUser.StaffName} ({auth.CurrentUser.Role})"
+                : "Unknown";
+            await VM.CreateOrderAsync(medicationId, qty, user, notes);
+        }
+
+        private async void OnReceiveClicked(object sender, EventArgs e)
+        {
+            MedicationOrderRow? row = null;
+            if (e is TappedEventArgs te && te.Parameter is MedicationOrderRow r1)
+                row = r1;
+            else if ((sender as BindableObject)?.BindingContext is MedicationOrderRow r2)
+                row = r2;
+            if (row == null) return;
+
+            var expiryText = await DisplayPromptAsync(
+                "Expiry Date",
+                "Enter the expiry date for the received stock (YYYY-MM-DD):",
+                accept: "OK",
+                cancel: "Skip",
+                placeholder: "e.g. 2026-12-31");
+
+            DateTimeOffset? expiryDate = null;
+            if (!string.IsNullOrWhiteSpace(expiryText) &&
+                DateTime.TryParse(expiryText, out var parsed))
+            {
+                expiryDate = new DateTimeOffset(parsed.Date, TimeSpan.Zero);
+            }
+
+            try
+            {
+                var services = Application.Current?.Handler?.MauiContext?.Services;
+                var orderService = services?.GetRequiredService<IMedicationOrderService>();
+                if (orderService != null)
+                {
+                    await orderService.UpdateStatusAsync(row.OrderId, MedicationOrderStatus.Received, expiryDate);
+                    await VM.LoadAsync();
+                }
+            }
+            catch { /* local-only service */ }
         }
 
         private async void OnCloseClicked(object sender, TappedEventArgs e) => await NavigateOutAsync();

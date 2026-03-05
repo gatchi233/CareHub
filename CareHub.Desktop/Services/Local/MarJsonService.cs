@@ -83,6 +83,11 @@ public class MarJsonService : IMarService
         await SaveAsync(list);
     }
 
+    public async Task ReplaceAllAsync(List<MarEntry> items)
+    {
+        await SaveAsync(items ?? new List<MarEntry>());
+    }
+
     public async Task UpsertAsync(MarEntry entry)
     {
         var list = await LoadAllAsync();

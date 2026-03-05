@@ -4,7 +4,7 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     x:Name="EditMedPage"
-    Title="Medication"
+    Title="Edit Medication"
     BackgroundColor="{StaticResource Medication_Main_Background}">
 
     <Grid Padding="16" RowDefinitions="Auto,Auto,*" RowSpacing="12">
