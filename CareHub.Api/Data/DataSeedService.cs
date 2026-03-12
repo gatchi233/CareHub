@@ -55,8 +55,19 @@ public static class DataSeedService
                 .ToListAsync(ct);
             var medicationIdSet = existingMedicationIds.ToHashSet();
 
+            // Also check by (MedName, ResidentId) to prevent duplicates when
+            // the desktop app has already pushed the same medications with different IDs.
+            var existingMedKeys = await db.Medications
+                .AsNoTracking()
+                .Select(x => new { x.MedName, x.ResidentId })
+                .ToListAsync(ct);
+            var medKeySet = new HashSet<string>(
+                existingMedKeys.Select(x => $"{(x.MedName ?? "").ToLowerInvariant()}|{x.ResidentId}"),
+                StringComparer.Ordinal);
+
             var missingMedications = medications
                 .Where(x => x.Id != Guid.Empty && !medicationIdSet.Contains(x.Id))
+                .Where(x => !medKeySet.Contains($"{(x.MedName ?? "").ToLowerInvariant()}|{x.ResidentId}"))
                 .ToList();
 
             if (missingMedications.Count > 0)

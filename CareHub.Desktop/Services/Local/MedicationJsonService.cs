@@ -323,7 +323,10 @@ namespace CareHub.Services.Local
                     if (existingKeys.Contains(key))
                         continue;
 
-                    med.Id = Guid.NewGuid(); // fresh ID to avoid collisions
+                    // Keep original seed ID so both API and desktop use the same IDs,
+                    // preventing DataSeedService from re-inserting duplicates on API restart.
+                    if (med.Id == Guid.Empty)
+                        med.Id = Guid.NewGuid();
                     list.Add(med);
                     existingKeys.Add(key);
                     added++;

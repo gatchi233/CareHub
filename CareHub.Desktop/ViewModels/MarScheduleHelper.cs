@@ -45,7 +45,7 @@ public static class MarScheduleHelper
                         ResidentId = med.ResidentId.Value,
                         MedicationId = med.Id,
                         LocalDate = date,
-                        ScheduledLocalTime = timeSpan.ToString(@"HH\:mm"),
+                        ScheduledLocalTime = timeSpan.ToString(@"hh\:mm"),
                         ScheduledForUtc = utcDateTime,
                         MedicationName = med.MedName,
                         DoseQuantity = med.Quantity,

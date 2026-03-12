@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:pages="clr-namespace:CareHub.Pages"
     xmlns:model="clr-namespace:CareHub.Models"
+    xmlns:vm="clr-namespace:CareHub.ViewModels"
     Title="Resident Medications"
     BackgroundColor="{StaticResource Medication_Main_Background}">
 
@@ -54,131 +55,335 @@
 
         </HorizontalStackLayout>
 
-        <!-- ── Main content card ───────────────────────────────────────────── -->
-        <Border Grid.Row="2"
-                Padding="12,10"
-                BackgroundColor="{StaticResource Medication_Card_Background}"
-                Stroke="{StaticResource Medication_Card_Border}"
-                StrokeThickness="1">
-            <Border.StrokeShape>
-                <RoundRectangle CornerRadius="12"/>
-            </Border.StrokeShape>
+        <!-- ── Two-column workspace ──────────────────────────────────────── -->
+        <Grid Grid.Row="2" ColumnDefinitions="2*,3*" ColumnSpacing="12">
 
-            <Grid RowDefinitions="Auto,Auto,*">
+            <!-- ════════════════════════════════════════════════════════════ -->
+            <!-- LEFT COLUMN: Medication Management (40%)                   -->
+            <!-- ════════════════════════════════════════════════════════════ -->
+            <Border Grid.Column="0"
+                    Padding="12,10"
+                    BackgroundColor="{StaticResource Medication_Card_Background}"
+                    Stroke="{StaticResource Medication_Card_Border}"
+                    StrokeThickness="1">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12"/>
+                </Border.StrokeShape>
 
-                <Label Text="RECORDS"
-                       FontSize="11" FontAttributes="Bold" CharacterSpacing="1.5"
-                       TextColor="{StaticResource Medication_Font_Secondary}"/>
+                <Grid RowDefinitions="Auto,Auto,*">
 
-                <BoxView Grid.Row="1" HeightRequest="1" Color="{StaticResource Medication_Card_Border}" Margin="0,6,0,10"/>
+                    <Label Text="ACTIVE MEDICATIONS"
+                           FontSize="11" FontAttributes="Bold" CharacterSpacing="1.5"
+                           TextColor="{StaticResource Medication_Font_Secondary}"/>
 
-                <CollectionView Grid.Row="2"
-                                ItemsSource="{Binding Medications}"
-                                SelectionMode="None">
+                    <BoxView Grid.Row="1" HeightRequest="1" Color="{StaticResource Medication_Card_Border}" Margin="0,6,0,10"/>
 
-                    <CollectionView.EmptyView>
-                        <VerticalStackLayout Padding="20" Spacing="6"
-                                             VerticalOptions="Center" HorizontalOptions="Center">
-                            <Label Text="No medications recorded."
-                                   FontAttributes="Bold" FontSize="14"
-                                   TextColor="{StaticResource Medication_Font_Primary}"
-                                   HorizontalOptions="Center"/>
-                            <Label Text="Use ADD to record a new medication."
-                                   FontSize="12" TextColor="{StaticResource Medication_Font_Secondary}"
-                                   HorizontalOptions="Center"/>
-                        </VerticalStackLayout>
-                    </CollectionView.EmptyView>
+                    <CollectionView Grid.Row="2"
+                                    ItemsSource="{Binding Medications}"
+                                    SelectionMode="None">
 
-                    <CollectionView.ItemsLayout>
-                        <GridItemsLayout Orientation="Vertical" Span="2" HorizontalItemSpacing="8" VerticalItemSpacing="8"/>
-                    </CollectionView.ItemsLayout>
+                        <CollectionView.EmptyView>
+                            <VerticalStackLayout Padding="20" Spacing="6"
+                                                 VerticalOptions="Center" HorizontalOptions="Center">
+                                <Label Text="No medications recorded."
+                                       FontAttributes="Bold" FontSize="14"
+                                       TextColor="{StaticResource Medication_Font_Primary}"
+                                       HorizontalOptions="Center"/>
+                                <Label Text="Use ADD to record a new medication."
+                                       FontSize="12" TextColor="{StaticResource Medication_Font_Secondary}"
+                                       HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                        </CollectionView.EmptyView>
 
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="model:Medication">
-                            <Border Padding="12,10"
-                                    BackgroundColor="{StaticResource Medication_Main_Background}"
-                                    Stroke="{StaticResource Medication_Card_Border}"
-                                    StrokeThickness="1">
-                                <Border.StrokeShape>
-                                    <RoundRectangle CornerRadius="8"/>
-                                </Border.StrokeShape>
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout Orientation="Vertical" ItemSpacing="8"/>
+                        </CollectionView.ItemsLayout>
 
-                                <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto" RowSpacing="6" ColumnSpacing="8">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="model:Medication">
+                                <Border Padding="12,10"
+                                        BackgroundColor="{StaticResource Medication_Main_Background}"
+                                        Stroke="{StaticResource Medication_Card_Border}"
+                                        StrokeThickness="1">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="8"/>
+                                    </Border.StrokeShape>
 
-                                    <!-- R0C0: Big # number -->
-                                    <Label Text="{Binding DisplayIndex, StringFormat='#{0}'}"
-                                           FontSize="24" FontAttributes="Bold"
-                                           TextColor="{StaticResource Medication_Font_Secondary}"
-                                           Opacity="0.5"/>
+                                    <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto" RowSpacing="6" ColumnSpacing="8">
 
-                                    <!-- R0C1: EDIT button -->
-                                    <Border Grid.Row="0" Grid.Column="1"
-                                            StrokeThickness="0" HeightRequest="24" WidthRequest="80"
-                                            BackgroundColor="{StaticResource Button_Icon_Background}"
-                                            VerticalOptions="Center" HorizontalOptions="End">
-                                        <Border.StrokeShape><RoundRectangle CornerRadius="3"/></Border.StrokeShape>
-                                        <Grid ColumnDefinitions="22,*" Margin="0" InputTransparent="True">
-                                            <Image Grid.Column="0" Source="icons8_edit_100.png" HeightRequest="12" WidthRequest="12" HorizontalOptions="Center" VerticalOptions="Center"/>
-                                            <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Edit}" Padding="7,0" StrokeThickness="0" InputTransparent="True">
-                                                <Label Text="EDIT" TextColor="{StaticResource Button_Font_Secondary}" FontSize="10" VerticalOptions="Center" HorizontalOptions="Center" FontAttributes="Bold"/>
-                                            </Border>
-                                        </Grid>
-                                        <Border.GestureRecognizers>
-                                            <TapGestureRecognizer Tapped="OnEditClicked"/>
-                                        </Border.GestureRecognizers>
-                                    </Border>
+                                        <!-- R0C0: Big # number -->
+                                        <Label Text="{Binding DisplayIndex, StringFormat='#{0}'}"
+                                               FontSize="24" FontAttributes="Bold"
+                                               TextColor="{StaticResource Medication_Font_Secondary}"
+                                               Opacity="0.5"/>
 
-                                    <!-- R1C0: Medication name + dosage + times -->
-                                    <Label Grid.Row="1" Grid.Column="0"
-                                           FontSize="13"
-                                           TextColor="{StaticResource Medication_Font_Primary}">
-                                        <Label.FormattedText>
-                                            <FormattedString>
-                                                <Span Text="{Binding MedName}" FontAttributes="Bold"/>
-                                                <Span Text="  "/>
-                                                <Span Text="{Binding Quantity, StringFormat='{0}'}" FontSize="11"
-                                                      TextColor="{StaticResource Medication_Font_Secondary}"/>
-                                                <Span Text=" " FontSize="11"/>
-                                                <Span Text="{Binding QuantityUnit}" FontSize="11"
-                                                      TextColor="{StaticResource Medication_Font_Secondary}"/>
-                                                <Span Text="{Binding TimesPerDay, StringFormat=' x {0}/day'}" FontSize="11"
-                                                      TextColor="{StaticResource Medication_Font_Secondary}"/>
-                                            </FormattedString>
-                                        </Label.FormattedText>
-                                    </Label>
+                                        <!-- R0C1: EDIT button -->
+                                        <Border Grid.Row="0" Grid.Column="1"
+                                                StrokeThickness="0" HeightRequest="24" WidthRequest="80"
+                                                BackgroundColor="{StaticResource Button_Icon_Background}"
+                                                VerticalOptions="Center" HorizontalOptions="End">
+                                            <Border.StrokeShape><RoundRectangle CornerRadius="3"/></Border.StrokeShape>
+                                            <Grid ColumnDefinitions="22,*" Margin="0" InputTransparent="True">
+                                                <Image Grid.Column="0" Source="icons8_edit_100.png" HeightRequest="12" WidthRequest="12" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                                <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Edit}" Padding="7,0" StrokeThickness="0" InputTransparent="True">
+                                                    <Label Text="EDIT" TextColor="{StaticResource Button_Font_Secondary}" FontSize="10" VerticalOptions="Center" HorizontalOptions="Center" FontAttributes="Bold"/>
+                                                </Border>
+                                            </Grid>
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Tapped="OnEditClicked"/>
+                                            </Border.GestureRecognizers>
+                                        </Border>
 
-                                    <!-- R1-R2 C1: DELETE button spanning rows 2+3 -->
-                                    <Border Grid.Row="1" Grid.Column="1" Grid.RowSpan="2"
-                                            StrokeThickness="0" HeightRequest="24" WidthRequest="80"
-                                            BackgroundColor="{StaticResource Button_Icon_Background}"
-                                            VerticalOptions="Center" HorizontalOptions="End">
-                                        <Border.StrokeShape><RoundRectangle CornerRadius="3"/></Border.StrokeShape>
-                                        <Grid ColumnDefinitions="22,*" Margin="0" InputTransparent="True">
-                                            <Image Grid.Column="0" Source="icons8_delete_100.png" HeightRequest="12" WidthRequest="12" HorizontalOptions="Center" VerticalOptions="Center"/>
-                                            <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Delete}" Padding="7,0" StrokeThickness="0" InputTransparent="True">
-                                                <Label Text="DELETE" TextColor="{StaticResource Button_Font_Primary}" FontSize="10" VerticalOptions="Center" HorizontalOptions="Center" FontAttributes="Bold"/>
-                                            </Border>
-                                        </Grid>
-                                        <Border.GestureRecognizers>
-                                            <TapGestureRecognizer Tapped="OnDeleteClicked"/>
-                                        </Border.GestureRecognizers>
-                                    </Border>
+                                        <!-- R1C0: Medication name + dosage + times -->
+                                        <Label Grid.Row="1" Grid.Column="0"
+                                               FontSize="13"
+                                               TextColor="{StaticResource Medication_Font_Primary}">
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span Text="{Binding MedName}" FontAttributes="Bold"/>
+                                                    <Span Text="  "/>
+                                                    <Span Text="{Binding Quantity, StringFormat='{0}'}" FontSize="11"
+                                                          TextColor="{StaticResource Medication_Font_Secondary}"/>
+                                                    <Span Text=" " FontSize="11"/>
+                                                    <Span Text="{Binding QuantityUnit}" FontSize="11"
+                                                          TextColor="{StaticResource Medication_Font_Secondary}"/>
+                                                    <Span Text="{Binding TimesPerDay, StringFormat=' x {0}/day'}" FontSize="11"
+                                                          TextColor="{StaticResource Medication_Font_Secondary}"/>
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
 
-                                    <!-- R2C0: Schedule -->
-                                    <Label Grid.Row="2" Grid.Column="0"
-                                           Text="{Binding ScheduleSummary}"
-                                           FontSize="11"
-                                           TextColor="{StaticResource Medication_Font_Secondary}"/>
+                                        <!-- R1-R2 C1: DELETE button -->
+                                        <Border Grid.Row="1" Grid.Column="1" Grid.RowSpan="2"
+                                                StrokeThickness="0" HeightRequest="24" WidthRequest="80"
+                                                BackgroundColor="{StaticResource Button_Icon_Background}"
+                                                VerticalOptions="Center" HorizontalOptions="End">
+                                            <Border.StrokeShape><RoundRectangle CornerRadius="3"/></Border.StrokeShape>
+                                            <Grid ColumnDefinitions="22,*" Margin="0" InputTransparent="True">
+                                                <Image Grid.Column="0" Source="icons8_delete_100.png" HeightRequest="12" WidthRequest="12" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                                <Border Grid.Column="1" BackgroundColor="{StaticResource Button_Delete}" Padding="7,0" StrokeThickness="0" InputTransparent="True">
+                                                    <Label Text="DELETE" TextColor="{StaticResource Button_Font_Primary}" FontSize="10" VerticalOptions="Center" HorizontalOptions="Center" FontAttributes="Bold"/>
+                                                </Border>
+                                            </Grid>
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Tapped="OnDeleteClicked"/>
+                                            </Border.GestureRecognizers>
+                                        </Border>
 
-                                </Grid>
+                                        <!-- R2C0: Schedule -->
+                                        <Label Grid.Row="2" Grid.Column="0"
+                                               Text="{Binding ScheduleSummary}"
+                                               FontSize="11"
+                                               TextColor="{StaticResource Medication_Font_Secondary}"/>
+
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+
+                    </CollectionView>
+
+                </Grid>
+            </Border>
+
+            <!-- ════════════════════════════════════════════════════════════ -->
+            <!-- RIGHT COLUMN: MAR History (60%)                            -->
+            <!-- ════════════════════════════════════════════════════════════ -->
+            <Border Grid.Column="1"
+                    Padding="12,10"
+                    BackgroundColor="{StaticResource Medication_Card_Background}"
+                    Stroke="{StaticResource Medication_Card_Border}"
+                    StrokeThickness="1">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12"/>
+                </Border.StrokeShape>
+
+                <Grid RowDefinitions="Auto,Auto,Auto,Auto,*">
+
+                    <!-- Header row with title + filter buttons -->
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="MEDICATION ADMINISTRATION HISTORY (MAR)"
+                               FontSize="11" FontAttributes="Bold" CharacterSpacing="1.5"
+                               TextColor="{StaticResource Medication_Font_Secondary}"
+                               VerticalOptions="Center"/>
+
+                        <!-- TODAY / 3 DAYS / 7 DAYS toggle -->
+                        <Grid Grid.Column="1" ColumnDefinitions="*,*,*" WidthRequest="180">
+
+                            <Border Grid.Column="0" HeightRequest="24" Padding="0" StrokeThickness="0"
+                                    BackgroundColor="{StaticResource Button_Cancel}"
+                                    x:Name="BtnToday">
+                                <Border.StrokeShape><RoundRectangle CornerRadius="4,0,4,0"/></Border.StrokeShape>
+                                <Label Text="TODAY" FontSize="9" FontAttributes="Bold"
+                                       TextColor="{StaticResource Button_Font_Primary}"
+                                       VerticalOptions="Center" HorizontalOptions="Center"/>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnMarTodayClicked"/>
+                                </Border.GestureRecognizers>
                             </Border>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
 
-                </CollectionView>
+                            <Border Grid.Column="1" HeightRequest="24" Padding="0" StrokeThickness="0"
+                                    BackgroundColor="{StaticResource Button_Cancel}"
+                                    x:Name="Btn3Days">
+                                <Border.StrokeShape><RoundRectangle CornerRadius="0"/></Border.StrokeShape>
+                                <Label Text="3 DAYS" FontSize="9" FontAttributes="Bold"
+                                       TextColor="{StaticResource Button_Font_Primary}"
+                                       VerticalOptions="Center" HorizontalOptions="Center"/>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnMar3DaysClicked"/>
+                                </Border.GestureRecognizers>
+                            </Border>
 
-            </Grid>
-        </Border>
+                            <Border Grid.Column="2" HeightRequest="24" Padding="0" StrokeThickness="0"
+                                    BackgroundColor="{StaticResource Button_Cancel}"
+                                    x:Name="Btn7Days">
+                                <Border.StrokeShape><RoundRectangle CornerRadius="0,4,0,4"/></Border.StrokeShape>
+                                <Label Text="7 DAYS" FontSize="9" FontAttributes="Bold"
+                                       TextColor="{StaticResource Button_Font_Primary}"
+                                       VerticalOptions="Center" HorizontalOptions="Center"/>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnMar7DaysClicked"/>
+                                </Border.GestureRecognizers>
+                            </Border>
+
+                        </Grid>
+                    </Grid>
+
+                    <BoxView Grid.Row="1" HeightRequest="1" Color="{StaticResource Medication_Card_Border}" Margin="0,6,0,10"/>
+
+                    <!-- Status message -->
+                    <Label Grid.Row="2" x:Name="MarStatusLabel"
+                           Text="" FontSize="11"
+                           TextColor="{StaticResource Medication_Font_Secondary}"
+                           Margin="0,0,0,6"/>
+
+                    <!-- Loading indicator -->
+                    <ActivityIndicator Grid.Row="3" x:Name="MarLoadingIndicator"
+                                       IsRunning="False" IsVisible="False"
+                                       Color="{StaticResource Alert_Info}"
+                                       HorizontalOptions="Center"
+                                       HeightRequest="20"/>
+
+                    <!-- MAR grouped cards -->
+                    <CollectionView Grid.Row="4"
+                                    x:Name="MarCollectionView"
+                                    ItemsSource="{Binding MarGroups}"
+                                    SelectionMode="None">
+
+                        <CollectionView.EmptyView>
+                            <VerticalStackLayout Padding="20" Spacing="6"
+                                                 VerticalOptions="Center" HorizontalOptions="Center">
+                                <Label Text="No MAR records found."
+                                       FontAttributes="Bold" FontSize="14"
+                                       TextColor="{StaticResource Medication_Font_Primary}"
+                                       HorizontalOptions="Center"/>
+                                <Label Text="Administration records will appear here."
+                                       FontSize="12" TextColor="{StaticResource Medication_Font_Secondary}"
+                                       HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                        </CollectionView.EmptyView>
+
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout Orientation="Vertical" ItemSpacing="6"/>
+                        </CollectionView.ItemsLayout>
+
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:MarTimeSlotGroup">
+                                <Border Padding="12,10"
+                                        BackgroundColor="{StaticResource Medication_Main_Background}"
+                                        Stroke="{StaticResource Medication_Card_Border}"
+                                        StrokeThickness="1">
+                                    <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+
+                                    <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="6">
+
+                                        <!-- Row 0: Date header line -->
+                                        <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="10">
+
+                                            <!-- Date badge -->
+                                            <Border Padding="8,4" StrokeThickness="0"
+                                                    BackgroundColor="{StaticResource Medication_Card_Border}"
+                                                    VerticalOptions="Center">
+                                                <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                                                <Label Text="{Binding DateHeader}"
+                                                       FontSize="12" FontAttributes="Bold"
+                                                       TextColor="{StaticResource Medication_Font_Primary}"/>
+                                            </Border>
+
+                                            <!-- Time -->
+                                            <Label Grid.Column="1"
+                                                   Text="{Binding TimeHeader}"
+                                                   FontSize="18" FontAttributes="Bold"
+                                                   TextColor="{StaticResource Medication_Font_Primary}"
+                                                   VerticalOptions="Center"/>
+
+                                        </Grid>
+
+                                        <!-- Row 1: Separator -->
+                                        <BoxView Grid.Row="1" HeightRequest="1"
+                                                 Color="{StaticResource Medication_Card_Border}"
+                                                 Margin="0,0,0,0"/>
+
+                                        <!-- Row 2: Medication detail lines -->
+                                        <VerticalStackLayout Grid.Row="2" Spacing="4"
+                                                             BindableLayout.ItemsSource="{Binding MedicationDetails}">
+                                            <BindableLayout.ItemTemplate>
+                                                <DataTemplate x:DataType="vm:MarSlotViewModel">
+                                                    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+
+                                                        <!-- Med name + dose (matching left column sizes) -->
+                                                        <Label VerticalOptions="Center"
+                                                               FontSize="13"
+                                                               TextColor="{StaticResource Medication_Font_Primary}">
+                                                            <Label.FormattedText>
+                                                                <FormattedString>
+                                                                    <Span Text="{Binding MedicationName}" FontAttributes="Bold"/>
+                                                                    <Span Text="  "/>
+                                                                    <Span Text="{Binding DoseDisplay}" FontSize="11"
+                                                                          TextColor="{StaticResource Medication_Font_Secondary}"/>
+                                                                </FormattedString>
+                                                            </Label.FormattedText>
+                                                        </Label>
+
+                                                        <!-- Staff -->
+                                                        <Label Grid.Column="1"
+                                                               FontSize="11"
+                                                               TextColor="{StaticResource Medication_Font_Secondary}"
+                                                               VerticalOptions="Center"
+                                                               IsVisible="{Binding RecordedBy, Converter={StaticResource StringNotEmptyConverter}}">
+                                                            <Label.Text>
+                                                                <MultiBinding StringFormat="{}by {0}">
+                                                                    <Binding Path="RecordedBy"/>
+                                                                </MultiBinding>
+                                                            </Label.Text>
+                                                        </Label>
+
+                                                        <!-- Status pill -->
+                                                        <Border Grid.Column="2" Padding="8,3" StrokeThickness="0"
+                                                                BackgroundColor="{Binding Status, Converter={StaticResource MarStatusToColorConverter}}"
+                                                                VerticalOptions="Center">
+                                                            <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                                                            <Label Text="{Binding Status}"
+                                                                   FontSize="10" FontAttributes="Bold"
+                                                                   TextColor="{StaticResource Button_Font_Primary}"/>
+                                                        </Border>
+
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </BindableLayout.ItemTemplate>
+                                        </VerticalStackLayout>
+
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+
+                    </CollectionView>
+
+                </Grid>
+            </Border>
+
+        </Grid>
 
     </Grid>
 </pages:AuthPage>

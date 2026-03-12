@@ -10,7 +10,11 @@
       "Bash(tasklist:*)",
       "Bash(tasklist.exe:*)",
       "Bash(powershell.exe:*)",
-      "Bash(netstat:*)"
+      "Bash(netstat:*)",
+      "Bash(xargs grep:*)",
+      "Bash(cd D:/CareHub/CareHub.Api && dotnet run --no-launch-profile --urls \"http://localhost:5001\" 2>&1)",
+      "Bash(for i:*)",
+      "Bash(ls:*)"
     ]
   }
 }

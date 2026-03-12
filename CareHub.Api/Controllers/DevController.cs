@@ -70,4 +70,57 @@ public sealed class DevController : ControllerBase
         await _db.SaveChangesAsync(ct);
         return Ok(new { seeded = true, seededResidents, seededUsers });
     }
+
+    /// <summary>
+    /// Removes duplicate medications that share the same (MedName, ResidentId),
+    /// keeping the oldest record (lowest Id) per group.
+    /// Reassigns MAR entries and inventory ledger records to the kept medication.
+    /// </summary>
+    [HttpPost("dedup-medications")]
+    public async Task<IActionResult> DedupMedications(CancellationToken ct)
+    {
+        var allMeds = await _db.Medications.ToListAsync(ct);
+
+        var groups = allMeds
+            .GroupBy(m => $"{(m.MedName ?? "").ToLowerInvariant()}|{m.ResidentId}")
+            .Where(g => g.Count() > 1)
+            .ToList();
+
+        if (groups.Count == 0)
+            return Ok(new { removed = 0, reassigned = 0, message = "No duplicates found." });
+
+        int totalRemoved = 0;
+        int totalReassigned = 0;
+
+        foreach (var group in groups)
+        {
+            var ordered = group.OrderBy(m => m.Id).ToList();
+            var keep = ordered.First();
+            var dupes = ordered.Skip(1).ToList();
+            var dupeIds = dupes.Select(d => d.Id).ToHashSet();
+
+            // Reassign MAR entries from duplicates to the kept medication
+            var marEntries = await _db.MarEntries
+                .Where(e => dupeIds.Contains(e.MedicationId))
+                .ToListAsync(ct);
+            foreach (var entry in marEntries)
+                entry.MedicationId = keep.Id;
+            totalReassigned += marEntries.Count;
+
+            // Reassign inventory ledger records from duplicates to the kept medication
+            var ledgers = await _db.MedicationInventoryLedgers
+                .Where(l => dupeIds.Contains(l.MedicationId))
+                .ToListAsync(ct);
+            foreach (var ledger in ledgers)
+                ledger.MedicationId = keep.Id;
+            totalReassigned += ledgers.Count;
+
+            _db.Medications.RemoveRange(dupes);
+            totalRemoved += dupes.Count;
+        }
+
+        await _db.SaveChangesAsync(ct);
+
+        return Ok(new { removed = totalRemoved, reassigned = totalReassigned, message = $"Removed {totalRemoved} duplicate medication(s), reassigned {totalReassigned} related record(s)." });
+    }
 }

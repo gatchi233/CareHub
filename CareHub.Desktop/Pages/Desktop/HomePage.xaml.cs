@@ -421,7 +421,14 @@ namespace CareHub.Pages.Desktop
                 results.Add(med);
             }
 
-            var sorted = results.OrderBy(x => x.ResidentName).ThenBy(x => x.MedName).ToList();
+            // Deduplicate by (MedName, ResidentId) — keeps the first occurrence per group.
+            // This handles any existing duplicates in the API database.
+            var deduped = results
+                .GroupBy(m => $"{(m.MedName ?? "").ToLowerInvariant()}|{m.ResidentId}")
+                .Select(g => g.First())
+                .ToList();
+
+            var sorted = deduped.OrderBy(x => x.ResidentName).ThenBy(x => x.MedName).ToList();
             ApplyMarStatuses(sorted);
 
             _vm.Medications.Clear();
