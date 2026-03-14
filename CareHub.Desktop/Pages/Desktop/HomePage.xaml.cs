@@ -74,6 +74,9 @@ namespace CareHub.Pages.Desktop
         {
             base.OnAppearing();
 
+            // Role-based dashboard visibility
+            ApplyHomepageRbac();
+
             try
             {
                 await _vm.InitializeAsync();
@@ -277,6 +280,26 @@ namespace CareHub.Pages.Desktop
                     await _localMar.CreateAsync(entry);
                 }
             }
+        }
+
+        private void ApplyHomepageRbac()
+        {
+            var auth = Application.Current?.Handler?.MauiContext?.Services
+                ?.GetService<AuthService>();
+            if (auth == null) return;
+
+            bool isNurse = auth.HasRole(StaffRole.Nurse);
+            bool isAdmin = auth.HasRole(StaffRole.Admin);
+
+            // MAR card: Nurse only (Admin cannot do clinical tasks, CareStaff has no MAR access)
+            if (MarCard != null)
+                MarCard.IsVisible = isNurse;
+
+            // Inventory cards: Admin and Nurse only (not CareStaff)
+            if (LowStockCard != null)
+                LowStockCard.IsVisible = isAdmin || isNurse;
+            if (ExpiryCard != null)
+                ExpiryCard.IsVisible = isAdmin || isNurse;
         }
 
         private async void OnViewLowStockClicked(object sender, EventArgs e)

@@ -3,6 +3,7 @@ using System;
 using CareHub.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CareHub.Api.Migrations
 {
     [DbContext(typeof(CareHubDbContext))]
-    partial class CareHubDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260312080156_AddAllergyCodeine")]
+    partial class AddAllergyCodeine
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

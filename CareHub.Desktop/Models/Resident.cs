@@ -80,7 +80,7 @@ namespace CareHub.Models
         bool _allergyNone;
         bool _allergyPeanuts, _allergyTreeNuts, _allergyMilk, _allergyEggs;
         bool _allergyShellfish, _allergyFish, _allergyWheat, _allergySoy;
-        bool _allergyLatex, _allergyPenicillin, _allergySulfa, _allergyAspirin;
+        bool _allergyLatex, _allergyPenicillin, _allergySulfa, _allergyAspirin, _allergyCodeine;
         string? _allergyOtherItems;
 
         [JsonIgnore]
@@ -98,6 +98,7 @@ namespace CareHub.Models
         public bool AllergyPenicillin { get => _allergyPenicillin; set { if (_allergyPenicillin == value) return; _allergyPenicillin = value; OnPropertyChanged(); } }
         public bool AllergySulfa { get => _allergySulfa; set { if (_allergySulfa == value) return; _allergySulfa = value; OnPropertyChanged(); } }
         public bool AllergyAspirin { get => _allergyAspirin; set { if (_allergyAspirin == value) return; _allergyAspirin = value; OnPropertyChanged(); } }
+        public bool AllergyCodeine { get => _allergyCodeine; set { if (_allergyCodeine == value) return; _allergyCodeine = value; OnPropertyChanged(); } }
         public string? AllergyOtherItems { get => _allergyOtherItems; set { if (_allergyOtherItems == value) return; _allergyOtherItems = value; OnPropertyChanged(); } }    // e.g. "Pollen..."
         public string? Remarks { get; set; }
 
@@ -106,6 +107,11 @@ namespace CareHub.Models
         public string? RoomNumber { get; set; }  // e.g. "202"
         public string? RoomType { get; set; }    // "Single" / "Couple" / "MedicalBackup"
         public string? BedLabel { get; set; }    // "A" / "B" (Couple rooms)
+
+        public string RoomDisplay =>
+            string.IsNullOrWhiteSpace(BedLabel) || BedLabel == "None"
+                ? $"Room {RoomNumber}"
+                : $"Room {RoomNumber} • {BedLabel}";
 
     }
 }

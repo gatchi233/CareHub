@@ -1,5 +1,6 @@
 using CareHub.Api.Data;
 using CareHub.Api.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,6 +8,7 @@ namespace CareHub.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public sealed class MarController : ControllerBase
 {
     private readonly CareHubDbContext _db;
@@ -15,6 +17,7 @@ public sealed class MarController : ControllerBase
 
     // GET api/mar?residentId=&fromUtc=&toUtc=&includeVoided=false
     [HttpGet]
+    [Authorize(Roles = $"{Roles.Staff},{Roles.Admin},{Roles.Resident}")]
     public async Task<ActionResult<List<MarEntry>>> GetAll(
         [FromQuery] Guid? residentId,
         [FromQuery] DateTimeOffset? fromUtc,
@@ -45,6 +48,7 @@ public sealed class MarController : ControllerBase
 
     // GET api/mar/{id}
     [HttpGet("{id:guid}")]
+    [Authorize(Roles = $"{Roles.Staff},{Roles.Admin},{Roles.Resident}")]
     public async Task<ActionResult<MarEntry>> GetById(Guid id, CancellationToken ct)
     {
         var entry = await _db.MarEntries.AsNoTracking()
@@ -55,6 +59,7 @@ public sealed class MarController : ControllerBase
 
     // POST api/mar
     [HttpPost]
+    [Authorize(Roles = Roles.Staff)]
     public async Task<ActionResult<MarEntry>> Create(
         [FromBody] CreateMarEntryRequest request,
         CancellationToken ct)
@@ -137,6 +142,7 @@ public sealed class MarController : ControllerBase
 
     // POST api/mar/{id}/void
     [HttpPost("{id:guid}/void")]
+    [Authorize(Roles = Roles.Staff)]
     public async Task<IActionResult> Void(
         Guid id,
         [FromBody] VoidMarEntryRequest request,
@@ -211,6 +217,7 @@ public sealed class MarController : ControllerBase
 
     // GET api/mar/report?fromUtc=&toUtc=&residentId=
     [HttpGet("report")]
+    [Authorize(Roles = $"{Roles.Staff},{Roles.Admin}")]
     public async Task<ActionResult<MarReport>> GetReport(
         [FromQuery] DateTimeOffset fromUtc,
         [FromQuery] DateTimeOffset toUtc,
@@ -277,6 +284,7 @@ public sealed class MarController : ControllerBase
 
     // POST api/mar/seed-demo
     [HttpPost("seed-demo")]
+    [Authorize(Roles = Roles.Admin)]
     public async Task<ActionResult> SeedDemo(CancellationToken ct)
     {
         // Use server local time so scheduled times match what the desktop computes

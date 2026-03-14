@@ -1,4 +1,4 @@
-﻿using CareHub.Services;
+using CareHub.Services;
 using Microsoft.Maui.Controls;
 using System.Threading.Tasks;
 
@@ -21,7 +21,14 @@ namespace CareHub.ViewModels
 
         private async Task OnLoginAsync()
         {
-            var success = _auth.Login(Username, Password);
+            if (string.IsNullOrWhiteSpace(Username) || string.IsNullOrWhiteSpace(Password))
+            {
+                await Shell.Current.DisplayAlert("Error", "Please enter username and password.", "OK");
+                return;
+            }
+
+            // Try API login first, falls back to local if offline
+            var success = await _auth.LoginAsync(Username, Password);
 
             if (!success)
             {
@@ -36,7 +43,6 @@ namespace CareHub.ViewModels
 
             // Navigate to Home page after login
             await Shell.Current.GoToAsync("//HomePage");
-
         }
     }
 }

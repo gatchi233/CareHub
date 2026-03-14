@@ -15,7 +15,7 @@
           RowSpacing="16">
 
         <!-- ========== PENDING MAR card (left, spans rows 0-1) ========== -->
-        <Border Grid.Row="0" Grid.Column="0" Grid.RowSpan="2"
+        <Border x:Name="MarCard" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2"
                 Stroke="{StaticResource Homepage_Card_Border}"
                 StrokeThickness="1"
                 BackgroundColor="{StaticResource Homepage_Card_Background}"
@@ -95,7 +95,7 @@
         </Border>
 
         <!-- ========== LOW STOCK card (row 0, col 1) ========== -->
-        <Border Grid.Row="0" Grid.Column="1"
+        <Border x:Name="LowStockCard" Grid.Row="0" Grid.Column="1"
                 Stroke="{StaticResource Homepage_Card_Border}"
                 StrokeThickness="1"
                 BackgroundColor="{StaticResource Homepage_Card_Background}"
@@ -165,7 +165,7 @@
         </Border>
 
         <!-- ========== EXPIRING SOON card (row 0, col 2) ========== -->
-        <Border Grid.Row="0" Grid.Column="2"
+        <Border x:Name="ExpiryCard" Grid.Row="0" Grid.Column="2"
                 Stroke="{StaticResource Homepage_Card_Border}"
                 StrokeThickness="1"
                 BackgroundColor="{StaticResource Homepage_Card_Background}"

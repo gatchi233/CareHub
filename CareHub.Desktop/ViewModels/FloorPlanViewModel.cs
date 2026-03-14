@@ -131,7 +131,7 @@ namespace CareHub.ViewModels
         public string KindShort => IsDouble ? "D" : "S";
         public string KindIcon => IsDouble ? "icons8_two_100.png" : "icons8_one_100.png";
         public string OccupancyText => IsOccupied
-            ? string.Join(", ", Residents.Select(r =>
+            ? string.Join("\n", Residents.OrderBy(r => r.BedLabel).Select(r =>
                 string.IsNullOrWhiteSpace(r.BedLabel) || r.BedLabel == "None"
                     ? r.ResidentName
                     : $"{r.ResidentName} [{r.BedLabel}]"))

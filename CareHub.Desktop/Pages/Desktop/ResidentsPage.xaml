@@ -77,16 +77,7 @@
                             <BoxView WidthRequest="1" HeightRequest="20" Color="{StaticResource Resident_Font_Secondary}" VerticalOptions="Center"/>
 
                             <!-- Room & Bed -->
-                            <Label FontSize="13" TextColor="{StaticResource Resident_Font_Secondary}" VerticalOptions="Center">
-                                <Label.FormattedText>
-                                    <FormattedString>
-                                        <Span Text="Room "/>
-                                        <Span Text="{Binding RoomNumber}"/>
-                                        <Span Text=" • "/>
-                                        <Span Text="{Binding BedLabel}"/>
-                                    </FormattedString>
-                                </Label.FormattedText>
-                            </Label>
+                            <Label Text="{Binding RoomDisplay}" FontSize="13" TextColor="{StaticResource Resident_Font_Secondary}" VerticalOptions="Center"/>
                         </HorizontalStackLayout>
                     </Border>
                 </DataTemplate>

@@ -19,7 +19,7 @@ public sealed class ObservationApiService : IObservationService
     {
         try
         {
-            var items = await _http.GetFromJsonAsync<List<Observation>>("api/Observations");
+            var items = await _http.GetFromJsonAsync<List<Observation>>("api/observations");
             return items ?? new List<Observation>();
         }
         catch (HttpRequestException ex)
@@ -37,7 +37,7 @@ public sealed class ObservationApiService : IObservationService
         try
         {
             var items = await _http.GetFromJsonAsync<List<Observation>>(
-                $"api/Observations/by-resident/{residentId}");
+                $"api/observations/by-resident/{residentId}");
             return items ?? new List<Observation>();
         }
         catch (HttpRequestException ex)
@@ -73,7 +73,7 @@ public sealed class ObservationApiService : IObservationService
             // Create
             if (item.Id == Guid.Empty)
             {
-                var resp = await _http.PostAsJsonAsync("api/Observations", item);
+                var resp = await _http.PostAsJsonAsync("api/observations", item);
                 resp.EnsureSuccessStatusCode();
 
                 var created = await resp.Content.ReadFromJsonAsync<Observation>();
@@ -87,7 +87,7 @@ public sealed class ObservationApiService : IObservationService
             }
 
             // Update
-            var putResp = await _http.PutAsJsonAsync($"api/Observations/{item.Id}", item);
+            var putResp = await _http.PutAsJsonAsync($"api/observations/{item.Id}", item);
             putResp.EnsureSuccessStatusCode();
         }
         catch (HttpRequestException ex)
@@ -108,7 +108,7 @@ public sealed class ObservationApiService : IObservationService
 
         try
         {
-            var resp = await _http.DeleteAsync($"api/Observations/{item.Id}");
+            var resp = await _http.DeleteAsync($"api/observations/{item.Id}");
 
             if (resp.StatusCode == HttpStatusCode.NotFound)
                 return;

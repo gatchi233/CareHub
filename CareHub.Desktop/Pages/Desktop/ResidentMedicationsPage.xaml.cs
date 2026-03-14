@@ -1,6 +1,7 @@
 using CareHub.Desktop.Models;
 using CareHub.Models;
 using CareHub.Services.Abstractions;
+using CareHub.Services.Remote;
 using CareHub.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -314,6 +315,34 @@ namespace CareHub.Pages.Desktop
         private async void OnEditResidentClicked(object sender, EventArgs e)
         {
             await Shell.Current.GoToAsync($"{nameof(EditResidentPage)}?id={ResidentId}");
+        }
+
+        private async void OnAiExplainClicked(object sender, EventArgs e)
+        {
+            if (sender is not BindableObject bindable || bindable.BindingContext is not Medication med)
+                return;
+
+            var ai = MauiProgram.Services.GetService<AiApiService>();
+            if (ai == null)
+            {
+                await DisplayAlert("Unavailable", "AI service is not configured.", "OK");
+                return;
+            }
+
+            try
+            {
+                var result = await ai.MedicationExplainAsync(med.MedName ?? "Unknown", med.Dosage);
+
+                var message = result.Success
+                    ? $"{result.Content}\n\n--- {result.Disclaimer} ---"
+                    : result.Content;
+
+                await DisplayAlert($"AI: {med.MedName}", message, "OK");
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("AI Error", $"Could not get AI response: {ex.Message}", "OK");
+            }
         }
 
     }

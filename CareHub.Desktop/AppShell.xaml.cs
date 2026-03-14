@@ -61,6 +61,38 @@ namespace CareHub
                 return;
             }
 
+            // Role-based navigation guards
+            if (auth.IsLoggedIn)
+            {
+                // Admin cannot access MAR or Observations (clinical tasks)
+                if (auth.HasRole(StaffRole.Admin))
+                {
+                    if (target.Contains("MarPage", StringComparison.OrdinalIgnoreCase) ||
+                        target.Contains("ResidentObservationsPage", StringComparison.OrdinalIgnoreCase))
+                    {
+                        args.Cancel();
+                        return;
+                    }
+                }
+
+                // CareStaff cannot access Medications, MAR, Reports, or Staff Management
+                if (auth.HasRole(StaffRole.CareStaff))
+                {
+                    if (target.Contains("MarPage", StringComparison.OrdinalIgnoreCase) ||
+                        target.Contains("MedicationInventory", StringComparison.OrdinalIgnoreCase) ||
+                        target.Contains("EditMedication", StringComparison.OrdinalIgnoreCase) ||
+                        target.Contains("MedicationBatches", StringComparison.OrdinalIgnoreCase) ||
+                        target.Contains("MedicationOrders", StringComparison.OrdinalIgnoreCase) ||
+                        target.Contains("ResidentMedications", StringComparison.OrdinalIgnoreCase) ||
+                        target.Contains("ResidentReport", StringComparison.OrdinalIgnoreCase) ||
+                        target.Contains("StaffManagement", StringComparison.OrdinalIgnoreCase))
+                    {
+                        args.Cancel();
+                        return;
+                    }
+                }
+            }
+
             // Check for unsaved changes when switching tabs
             if (args.Source == ShellNavigationSource.ShellSectionChanged && !_handlingUnsaved)
             {
@@ -136,22 +168,20 @@ namespace CareHub
         {
             if (!_auth.IsLoggedIn)
             {
-                // Hide everything except login if needed
                 if (StaffManagementItem != null)
                     StaffManagementItem.IsVisible = false;
-
+                if (MedicationInventoryItem != null)
+                    MedicationInventoryItem.IsVisible = false;
                 return;
             }
 
-            // Admin-only
+            // Staff Management: Admin only
             if (StaffManagementItem != null)
-            {
-                StaffManagementItem.IsVisible =
-                    _auth.HasRole(StaffRole.Admin);
-            }
+                StaffManagementItem.IsVisible = _auth.HasRole(StaffRole.Admin);
 
-            // You can expand later:
-            // InventoryItem.IsVisible = _auth.HasRole(StaffRole.Admin, StaffRole.Nurse);
+            // Inventory / Medications: Admin and Nurse only (not CareStaff)
+            if (MedicationInventoryItem != null)
+                MedicationInventoryItem.IsVisible = _auth.HasRole(StaffRole.Admin, StaffRole.Nurse);
         }
 
         public async Task LogoutAsync()

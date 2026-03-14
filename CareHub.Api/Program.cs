@@ -1,5 +1,7 @@
+using System.Net.Http.Headers;
 using System.Text;
 using CareHub.Api.Data;
+using CareHub.Api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -73,6 +75,35 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddAuthorization();
+
+// AI rate limiter — 85% of Groq free tier: 30 RPM / 1K RPD
+builder.Services.AddSingleton(new AiRateLimiter(
+    globalRpm: 25,   // Groq free: 30 RPM  → 85% = 25
+    globalRpd: 850,  // Groq free: 1K RPD  → 85% = 850
+    perUserRpm: 8,   // Single user can't hog more than ~1/3 of RPM
+    perUserRpd: 170  // Single user daily cap
+));
+
+// Groq AI service
+var groqKey = builder.Configuration["Groq:ApiKey"] ?? "";
+if (!string.IsNullOrWhiteSpace(groqKey))
+{
+    builder.Services.AddHttpClient<GroqAiService>(client =>
+    {
+        client.BaseAddress = new Uri("https://api.groq.com/");
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", groqKey);
+        client.Timeout = TimeSpan.FromSeconds(30);
+    });
+}
+else
+{
+    // Register a dummy so DI doesn't fail — controller returns 503
+    builder.Services.AddHttpClient<GroqAiService>(client =>
+    {
+        client.BaseAddress = new Uri("https://api.groq.com/");
+        client.Timeout = TimeSpan.FromSeconds(5);
+    });
+}
 
 var app = builder.Build();
 

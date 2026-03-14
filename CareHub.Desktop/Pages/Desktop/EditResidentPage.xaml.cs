@@ -21,7 +21,7 @@ namespace CareHub.Pages.Desktop
 
         public async Task SaveAsync()
         {
-            if (!ValidateForm())
+            if (!await ValidateForm())
                 return;
 
             CleanRelationshipPlaceholders();
@@ -152,6 +152,7 @@ namespace CareHub.Pages.Desktop
                         AllergyPenicillin = existing.AllergyPenicillin,
                         AllergySulfa = existing.AllergySulfa,
                         AllergyAspirin = existing.AllergyAspirin,
+                        AllergyCodeine = existing.AllergyCodeine,
                         AllergyOtherItems = existing.AllergyOtherItems,
                         Remarks = existing.Remarks
                     };
@@ -162,6 +163,7 @@ namespace CareHub.Pages.Desktop
                                               !WorkingCopy.AllergyWheat && !WorkingCopy.AllergySoy &&
                                               !WorkingCopy.AllergyLatex && !WorkingCopy.AllergyPenicillin &&
                                               !WorkingCopy.AllergySulfa && !WorkingCopy.AllergyAspirin &&
+                                              !WorkingCopy.AllergyCodeine &&
                                               string.IsNullOrWhiteSpace(WorkingCopy.AllergyOtherItems);
 
                     // In case the user opened edit from FloorPlan for an occupied room,
@@ -277,6 +279,7 @@ namespace CareHub.Pages.Desktop
             WorkingCopy.AllergyPenicillin = false;
             WorkingCopy.AllergySulfa = false;
             WorkingCopy.AllergyAspirin = false;
+            WorkingCopy.AllergyCodeine = false;
             WorkingCopy.AllergyOtherItems = string.Empty;
         }
 
@@ -392,7 +395,7 @@ namespace CareHub.Pages.Desktop
                 WorkingCopy.EmergencyRelationship2 = "Select Relationship";
         }
 
-        private bool ValidateForm()
+        private async Task<bool> ValidateForm()
         {
             var errors = new List<string>();
 
@@ -432,6 +435,7 @@ namespace CareHub.Pages.Desktop
                                          WorkingCopy.AllergyWheat || WorkingCopy.AllergySoy ||
                                          WorkingCopy.AllergyLatex || WorkingCopy.AllergyPenicillin ||
                                          WorkingCopy.AllergySulfa || WorkingCopy.AllergyAspirin ||
+                                         WorkingCopy.AllergyCodeine ||
                                          !string.IsNullOrWhiteSpace(WorkingCopy.AllergyOtherItems);
 
             if (!WorkingCopy.AllergyNone && !hasAnySpecificAllergy)
@@ -439,9 +443,35 @@ namespace CareHub.Pages.Desktop
                 errors.Add("Allergies (Must select 'None' or check specific allergies)");
             }
 
+            // Room capacity validation
+            if (!string.IsNullOrWhiteSpace(WorkingCopy.RoomNumber))
+            {
+                try
+                {
+                    var allResidents = await _residentService.LoadAsync();
+                    var roomType = WorkingCopy.RoomType ?? "Single";
+                    var isSingle = !roomType.Equals("Double", StringComparison.OrdinalIgnoreCase)
+                                && !roomType.Equals("Couple", StringComparison.OrdinalIgnoreCase);
+                    var maxOccupants = isSingle ? 1 : 2;
+
+                    var roommates = allResidents
+                        .Where(r => r.RoomNumber == WorkingCopy.RoomNumber && r.Id != WorkingCopy.Id)
+                        .ToList();
+
+                    if (roommates.Count >= maxOccupants)
+                        errors.Add($"Room {WorkingCopy.RoomNumber} is a {roomType} room and is already full");
+                    else if (roommates.Count > 0
+                        && !string.IsNullOrWhiteSpace(WorkingCopy.Gender)
+                        && !string.IsNullOrWhiteSpace(roommates[0].Gender)
+                        && !string.Equals(WorkingCopy.Gender, roommates[0].Gender, StringComparison.OrdinalIgnoreCase))
+                        errors.Add($"Room {WorkingCopy.RoomNumber} has a {roommates[0].Gender} resident — cannot assign a {WorkingCopy.Gender} resident to the same room");
+                }
+                catch { /* offline — skip room check */ }
+            }
+
             if (errors.Count > 0)
             {
-                DisplayAlert("Missing Required Fields", "Please fill in:\n� " + string.Join("\n� ", errors), "OK");
+                await DisplayAlert("Missing Required Fields", "Please fill in:\n\u2022 " + string.Join("\n\u2022 ", errors), "OK");
                 return false;
             }
 
@@ -477,7 +507,7 @@ namespace CareHub.Pages.Desktop
                 return;
             }
 
-            if (!ValidateForm())
+            if (!await ValidateForm())
                 return;
 
             CleanRelationshipPlaceholders();
@@ -534,7 +564,7 @@ namespace CareHub.Pages.Desktop
                 return;
             }
 
-            if (!ValidateForm())
+            if (!await ValidateForm())
                 return;
 
             CleanRelationshipPlaceholders();

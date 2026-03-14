@@ -46,6 +46,7 @@ public sealed class Resident
     public bool AllergyPenicillin { get; set; }
     public bool AllergySulfa { get; set; }
     public bool AllergyAspirin { get; set; }
+    public bool AllergyCodeine { get; set; }
     public string? AllergyOtherItems { get; set; }
     public string? Remarks { get; set; }
 

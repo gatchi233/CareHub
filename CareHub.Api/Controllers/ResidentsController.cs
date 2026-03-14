@@ -48,6 +48,10 @@ public sealed class ResidentsController : ControllerBase
         if (resident.Id == Guid.Empty)
             resident.Id = Guid.NewGuid();
 
+        var roomError = await ValidateRoomAssignment(resident, ct);
+        if (roomError is not null)
+            return BadRequest(new { message = roomError });
+
         _db.Residents.Add(resident);
         await _db.SaveChangesAsync(ct);
 
@@ -61,6 +65,10 @@ public sealed class ResidentsController : ControllerBase
     {
         if (id != resident.Id)
             return BadRequest("Route id does not match resident.Id");
+
+        var roomError = await ValidateRoomAssignment(resident, ct);
+        if (roomError is not null)
+            return BadRequest(new { message = roomError });
 
         var exists = await _db.Residents.AnyAsync(r => r.Id == id, ct);
         if (exists)
@@ -84,5 +92,39 @@ public sealed class ResidentsController : ControllerBase
         await _db.SaveChangesAsync(ct);
 
         return NoContent();
+    }
+
+    /// <summary>
+    /// Validates that a room assignment respects capacity:
+    /// Single rooms allow 1 resident, Double rooms allow 2.
+    /// </summary>
+    private async Task<string?> ValidateRoomAssignment(Resident resident, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(resident.RoomNumber))
+            return null; // no room assigned — nothing to validate
+
+        var roomType = resident.RoomType ?? "Single";
+        var maxOccupants = roomType.Equals("Double", StringComparison.OrdinalIgnoreCase)
+                        || roomType.Equals("Couple", StringComparison.OrdinalIgnoreCase)
+            ? 2 : 1;
+
+        var roommates = await _db.Residents
+            .AsNoTracking()
+            .Where(r => r.RoomNumber == resident.RoomNumber && r.Id != resident.Id)
+            .ToListAsync(ct);
+
+        if (roommates.Count >= maxOccupants)
+            return $"Room {resident.RoomNumber} is a {roomType} room and is already full ({roommates.Count} occupant{(roommates.Count == 1 ? "" : "s")}).";
+
+        // Gender check for shared rooms
+        if (roommates.Count > 0
+            && !string.IsNullOrWhiteSpace(resident.Gender)
+            && !string.IsNullOrWhiteSpace(roommates[0].Gender)
+            && !string.Equals(resident.Gender, roommates[0].Gender, StringComparison.OrdinalIgnoreCase))
+        {
+            return $"Room {resident.RoomNumber} already has a {roommates[0].Gender} resident. Cannot assign a {resident.Gender} resident to the same room.";
+        }
+
+        return null;
     }
 }

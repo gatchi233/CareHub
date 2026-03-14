@@ -74,32 +74,9 @@ public sealed class ObservationsController : ControllerBase
         return Ok(list);
     }
 
-    // GET api/observations/byResident/{residentId}
-    [HttpGet("byResident/{residentId:guid}")]
-    [Authorize(Roles = $"{Roles.Admin},{Roles.Staff},{Roles.Observer},{Roles.Resident}")]
-    public async Task<ActionResult<List<Observation>>> GetByResident(Guid residentId, CancellationToken ct)
-    {
-        if (User.IsInRole(Roles.Resident))
-        {
-            var residentIdText = User.FindFirstValue("resident_id");
-            if (!Guid.TryParse(residentIdText, out var residentClaimId))
-                return Forbid();
-            if (residentId != residentClaimId)
-                return Forbid();
-        }
-
-        var list = await _db.Observations
-            .AsNoTracking()
-            .Where(o => o.ResidentId == residentId)
-            .OrderByDescending(o => o.RecordedAt)
-            .ToListAsync(ct);
-
-        return Ok(list);
-    }
-
     // POST api/observations
     [HttpPost]
-    [Authorize(Roles = $"{Roles.Admin},{Roles.Staff}")]
+    [Authorize(Roles = Roles.Staff)]
     public async Task<ActionResult<Observation>> Create([FromBody] Observation item, CancellationToken ct)
     {
         if (item.Id == Guid.Empty)
@@ -116,7 +93,7 @@ public sealed class ObservationsController : ControllerBase
 
     // PUT api/observations/{id}
     [HttpPut("{id:guid}")]
-    [Authorize(Roles = $"{Roles.Admin},{Roles.Staff}")]
+    [Authorize(Roles = Roles.Staff)]
     public async Task<IActionResult> Update(Guid id, Observation updated)
     {
         if (id != updated.Id)
@@ -143,7 +120,7 @@ public sealed class ObservationsController : ControllerBase
 
     // DELETE api/observations/{id}
     [HttpDelete("{id:guid}")]
-    [Authorize(Roles = $"{Roles.Admin},{Roles.Staff}")]
+    [Authorize(Roles = Roles.Staff)]
     public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
     {
         var entity = await _db.Observations.FirstOrDefaultAsync(o => o.Id == id, ct);

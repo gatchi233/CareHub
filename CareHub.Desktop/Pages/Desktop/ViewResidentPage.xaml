@@ -71,6 +71,44 @@
                 </Border.GestureRecognizers>
             </Border>
 
+            <!-- AI SUMMARY -->
+            <Border x:Name="AiSummaryAction" StrokeThickness="0" HeightRequest="28"
+                    BackgroundColor="{StaticResource Button_Icon_Background}">
+                <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
+                    <Label Grid.Column="0" Text="*" FontSize="16" FontAttributes="Bold"
+                           TextColor="#8B5CF6"
+                           HorizontalOptions="Center" VerticalOptions="Center"/>
+                    <Border Grid.Column="1" BackgroundColor="#7C3AED"
+                            Padding="10,0" StrokeThickness="0" InputTransparent="True">
+                        <Label Text="AI SUMMARY" TextColor="White"
+                               FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
+                    </Border>
+                </Grid>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnAiSummaryClicked"/>
+                </Border.GestureRecognizers>
+            </Border>
+
+            <!-- AI TRENDS -->
+            <Border x:Name="AiTrendsAction" StrokeThickness="0" HeightRequest="28"
+                    BackgroundColor="{StaticResource Button_Icon_Background}">
+                <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                <Grid ColumnDefinitions="32,Auto" Margin="0" InputTransparent="True">
+                    <Label Grid.Column="0" Text="*" FontSize="16" FontAttributes="Bold"
+                           TextColor="#8B5CF6"
+                           HorizontalOptions="Center" VerticalOptions="Center"/>
+                    <Border Grid.Column="1" BackgroundColor="#7C3AED"
+                            Padding="10,0" StrokeThickness="0" InputTransparent="True">
+                        <Label Text="AI TRENDS" TextColor="White"
+                               FontSize="11" VerticalOptions="Center" FontAttributes="Bold"/>
+                    </Border>
+                </Grid>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnAiTrendsClicked"/>
+                </Border.GestureRecognizers>
+            </Border>
+
             <!-- CLOSE -->
             <Border StrokeThickness="0" HeightRequest="28" BackgroundColor="{StaticResource Button_Icon_Background}">
                 <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>

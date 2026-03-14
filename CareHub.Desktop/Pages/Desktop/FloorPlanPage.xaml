@@ -116,7 +116,7 @@
                             <!-- Bottom 2/3: resident names -->
                             <Label Grid.Row="1"
                                    Text="{Binding OccupancyText}" FontSize="12" TextColor="{StaticResource Floorplan_Font_Primary}"
-                                   LineBreakMode="WordWrap" MaxLines="3" Margin="5,8,0,0">
+                                   LineBreakMode="WordWrap" MaxLines="4" Margin="5,8,0,0">
                                 <Label.Triggers>
                                     <DataTrigger TargetType="Label" Binding="{Binding IsSelected}" Value="True">
                                         <Setter Property="TextColor" Value="White"/>

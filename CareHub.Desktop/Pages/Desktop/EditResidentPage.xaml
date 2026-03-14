@@ -474,8 +474,20 @@
                                    TextColor="{StaticResource Resident_Font_Primary}" Margin="-70,0,0,0"/>
                         </HorizontalStackLayout>
 
+                        <HorizontalStackLayout Grid.Row="1" Grid.Column="5" Spacing="0">
+                            <CheckBox IsChecked="{Binding AllergyCodeine}"
+                                      CheckedChanged="OnSpecificAllergyCheckedChanged" Margin="0,0,-10,0">
+                                <CheckBox.IsEnabled>
+                                    <Binding Source="{x:Reference NoneCheck}" Path="IsChecked"
+                                             Converter="{StaticResource InverseBoolConverter}"/>
+                                </CheckBox.IsEnabled>
+                            </CheckBox>
+                            <Label Text="Codeine" VerticalTextAlignment="Center"
+                                   TextColor="{StaticResource Resident_Font_Primary}" Margin="-70,0,0,0"/>
+                        </HorizontalStackLayout>
+
                         <!-- Row 1 – Other items -->
-                        <Grid Grid.Row="1" Grid.Column="5" Grid.ColumnSpan="3"
+                        <Grid Grid.Row="1" Grid.Column="6" Grid.ColumnSpan="2"
                               ColumnDefinitions="Auto,*" ColumnSpacing="10">
                             <Label Grid.Column="0" Text="Other:" FontSize="11"
                                    TextColor="{StaticResource Resident_Font_Secondary}"
