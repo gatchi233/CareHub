@@ -20,11 +20,11 @@
     <EnablePreviewMsixTooling>false</EnablePreviewMsixTooling>
 
     <!-- IMPORTANT: bundle Windows App SDK runtime with app (avoid machine runtime prompt) -->
-    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <!--<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>-->
 
     <!-- IMPORTANT: move off Windows App SDK 1.5 (Runtime 1.5) -->
     <!-- If restore complains this version doesn't exist, change to the latest 1.6.x shown in NuGet Manager -->
-    <WindowsAppSDKVersion>1.6.0</WindowsAppSDKVersion>
+   <!-- <WindowsAppSDKVersion>1.6.0</WindowsAppSDKVersion>-->
 
     <!-- Safety: ensure no accidental cross-target -->
     <TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
