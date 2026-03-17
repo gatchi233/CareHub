@@ -18,7 +18,7 @@ public sealed class ResidentsController : ControllerBase
 
     // GET api/residents
     [HttpGet]
-    [Authorize(Roles = $"{Roles.Admin},{Roles.Observer},{Roles.Resident}")]
+    [Authorize(Roles = $"{Roles.Admin},{Roles.Nurse},{Roles.GeneralCareStaff},{Roles.Observer}")]
     public async Task<ActionResult<List<Resident>>> GetAll(CancellationToken ct)
     {
         var query = _db.Residents
@@ -27,7 +27,7 @@ public sealed class ResidentsController : ControllerBase
             .ThenBy(r => r.ResidentFName)
             .AsQueryable();
 
-        if (User.IsInRole(Roles.Resident))
+        if (User.IsInRole(Roles.Observer))
         {
             var residentIdText = User.FindFirstValue("resident_id");
             if (!Guid.TryParse(residentIdText, out var residentId))

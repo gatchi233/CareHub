@@ -18,11 +18,11 @@ public sealed class ObservationsController : ControllerBase
 
     // GET api/observations
     [HttpGet]
-    [Authorize(Roles = $"{Roles.Admin},{Roles.Staff},{Roles.Observer},{Roles.Resident}")]
+    [Authorize(Roles = $"{Roles.Nurse},{Roles.GeneralCareStaff},{Roles.Observer}")]
     public async Task<ActionResult<List<Observation>>> GetAll()
     {
         var query = _db.Observations.AsNoTracking().AsQueryable();
-        if (User.IsInRole(Roles.Resident))
+        if (User.IsInRole(Roles.Observer))
         {
             var residentIdText = User.FindFirstValue("resident_id");
             if (!Guid.TryParse(residentIdText, out var residentId))
@@ -34,13 +34,13 @@ public sealed class ObservationsController : ControllerBase
 
     // GET api/observations/{id}
     [HttpGet("{id:guid}")]
-    [Authorize(Roles = $"{Roles.Admin},{Roles.Staff},{Roles.Observer},{Roles.Resident}")]
+    [Authorize(Roles = $"{Roles.Nurse},{Roles.GeneralCareStaff},{Roles.Observer}")]
     public async Task<ActionResult<Observation>> GetById(Guid id)
     {
         var obs = await _db.Observations.AsNoTracking()
             .FirstOrDefaultAsync(x => x.Id == id);
 
-        if (obs is not null && User.IsInRole(Roles.Resident))
+        if (obs is not null && User.IsInRole(Roles.Observer))
         {
             var residentIdText = User.FindFirstValue("resident_id");
             if (!Guid.TryParse(residentIdText, out var residentClaimId))
@@ -54,10 +54,10 @@ public sealed class ObservationsController : ControllerBase
 
     // GET api/observations/by-resident/{residentId}
     [HttpGet("by-resident/{residentId:guid}")]
-    [Authorize(Roles = $"{Roles.Admin},{Roles.Staff},{Roles.Observer},{Roles.Resident}")]
+    [Authorize(Roles = $"{Roles.Nurse},{Roles.GeneralCareStaff},{Roles.Observer}")]
     public async Task<ActionResult<List<Observation>>> GetByResidentId(Guid residentId)
     {
-        if (User.IsInRole(Roles.Resident))
+        if (User.IsInRole(Roles.Observer))
         {
             var residentIdText = User.FindFirstValue("resident_id");
             if (!Guid.TryParse(residentIdText, out var residentClaimId))
@@ -76,7 +76,7 @@ public sealed class ObservationsController : ControllerBase
 
     // POST api/observations
     [HttpPost]
-    [Authorize(Roles = Roles.Staff)]
+    [Authorize(Roles = $"{Roles.Nurse},{Roles.GeneralCareStaff}")]
     public async Task<ActionResult<Observation>> Create([FromBody] Observation item, CancellationToken ct)
     {
         if (item.Id == Guid.Empty)
@@ -93,7 +93,7 @@ public sealed class ObservationsController : ControllerBase
 
     // PUT api/observations/{id}
     [HttpPut("{id:guid}")]
-    [Authorize(Roles = Roles.Staff)]
+    [Authorize(Roles = $"{Roles.Nurse},{Roles.GeneralCareStaff}")]
     public async Task<IActionResult> Update(Guid id, Observation updated)
     {
         if (id != updated.Id)
@@ -120,7 +120,7 @@ public sealed class ObservationsController : ControllerBase
 
     // DELETE api/observations/{id}
     [HttpDelete("{id:guid}")]
-    [Authorize(Roles = Roles.Staff)]
+    [Authorize(Roles = $"{Roles.Nurse},{Roles.GeneralCareStaff}")]
     public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
     {
         var entity = await _db.Observations.FirstOrDefaultAsync(o => o.Id == id, ct);

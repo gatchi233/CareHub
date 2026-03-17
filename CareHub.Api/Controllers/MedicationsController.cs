@@ -18,7 +18,7 @@ public sealed class MedicationsController : ControllerBase
 
     // GET api/medications
     [HttpGet]
-    [Authorize(Roles = $"{Roles.Admin},{Roles.Observer},{Roles.Resident}")]
+    [Authorize(Roles = $"{Roles.Admin},{Roles.Nurse},{Roles.Observer}")]
     public async Task<ActionResult<List<Medication>>> GetAll(CancellationToken ct)
     {
         var query = _db.Medications
@@ -26,7 +26,7 @@ public sealed class MedicationsController : ControllerBase
             .OrderBy(m => m.MedName)
             .AsQueryable();
 
-        if (User.IsInRole(Roles.Resident))
+        if (User.IsInRole(Roles.Observer))
         {
             var residentIdText = User.FindFirstValue("resident_id");
             if (!Guid.TryParse(residentIdText, out var residentId))
@@ -41,7 +41,7 @@ public sealed class MedicationsController : ControllerBase
 
     // GET api/medications/lowstock
     [HttpGet("lowstock")]
-    [Authorize(Roles = $"{Roles.Admin},{Roles.Observer}")]
+    [Authorize(Roles = $"{Roles.Admin},{Roles.Nurse}")]
     public async Task<ActionResult<List<Medication>>> GetLowStock(CancellationToken ct)
     {
         var list = await _db.Medications
