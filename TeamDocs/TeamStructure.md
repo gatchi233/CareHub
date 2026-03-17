@@ -6,8 +6,8 @@
 
 ### Members:
 
-- Alice – Backend & Architecture
-- Samuel – Mobile (Offline + Integration)
+- Alice – Technical Lead (Backend & System Architecture)
+- Samuel – Full-Stack Integration (Web + Mobile + API Coordination)
 
 **Responsibilities**
 
@@ -26,7 +26,7 @@
 
 ### Members:
 
-- Samuel - Web UI
+- Samuel -  Web Integration & Frontend Architecture
 - Devi – Web UI
 - Tanvi – Web UI
 
