@@ -120,7 +120,6 @@ public sealed class ObservationsController : ControllerBase
             existing.Value = updated.Value;
             existing.RecordedBy = updated.RecordedBy;
             existing.ResidentName = updated.ResidentName;
-            existing.RecordedAt = updated.RecordedAt;
         }
 
         await _db.SaveChangesAsync();

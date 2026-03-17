@@ -20,7 +20,7 @@ public sealed class StaffController : ControllerBase
 
     // GET api/staff
     [HttpGet]
-    [Authorize(Roles = $"{Roles.Admin},{Roles.Observer}")]
+    [Authorize(Roles = Roles.Admin)]
     public async Task<ActionResult<List<object>>> GetAll(CancellationToken ct)
     {
         var list = await _db.AppUsers
@@ -39,7 +39,7 @@ public sealed class StaffController : ControllerBase
 
     // GET api/staff/{username}
     [HttpGet("{username}")]
-    [Authorize(Roles = $"{Roles.Admin},{Roles.Observer}")]
+    [Authorize(Roles = Roles.Admin)]
     public async Task<ActionResult<object>> GetByUsername(string username, CancellationToken ct)
     {
         var user = await _db.AppUsers
