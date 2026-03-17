@@ -183,6 +183,10 @@ MigrationBackup/
 ## Web / frontend
 node_modules/
 .sass-cache/
+**/.gradle/
+**/android/.gradle/
+**/android/build/
+**/android/app/build/
 
 ## Python
 __pycache__/
