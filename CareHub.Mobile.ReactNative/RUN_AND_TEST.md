@@ -14,8 +14,14 @@ From repo root:
 
 ```powershell
 cd "C:\Users\sambe\Desktop\Term 5\CSTP 2204\ProjectIdea\CareHub"
-docker start carehub-postgres
+docker compose up -d
 dotnet run --project .\CareHub.Api\CareHub.Api.csproj
+```
+
+If Docker already created the container and you only need to restart it:
+
+```powershell
+docker start carehub-postgres
 ```
 
 Confirm:
@@ -80,6 +86,14 @@ Then run from a short path:
 ```powershell
 subst X: "C:\Users\sambe\Desktop\Term 5\CSTP 2204\ProjectIdea\CareHub"
 cd X:\CareHub.Mobile.ReactNative
+cmd /c npm run android
+```
+
+Most reliable option on Windows:
+
+```powershell
+git clone <repo> C:\src\CareHub
+cd C:\src\CareHub\CareHub.Mobile.ReactNative
 cmd /c npm run android
 ```
 

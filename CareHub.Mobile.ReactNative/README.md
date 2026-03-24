@@ -53,11 +53,53 @@ Configured in `src/services/apiClient.js`:
 - iOS/default fallback: `http://localhost:5007/api`
 - Optional override: `CAREHUB_API_BASE_URL`
 
-## Run
+## Backend Startup
+
+Start Docker Desktop first, then from repo root start PostgreSQL:
+
+```powershell
+docker compose up -d
+```
+
+If the container already exists and is stopped, this also works:
+
+```powershell
+docker start carehub-postgres
+```
+
+Then start the API:
+
+```powershell
+dotnet run --project .\CareHub.Api\CareHub.Api.csproj --launch-profile http
+```
+
+Verify:
+
+- `http://localhost:5007/health`
+- `http://localhost:5007/swagger`
+
+## Run Mobile
 
 1. `npm install`
 2. `npm run start`
 3. `npm run android` or `npm run ios`
+
+## Windows Build Note
+
+If Android fails with `react-native-screens` CMake/Ninja errors such as `build.ninja still dirty after 100 tries`, the most likely cause is the long project path on Windows.
+
+Recommended workaround:
+
+1. Move or clone the repo to a short path such as `C:\src\CareHub`
+2. Run the mobile app from that shorter path
+
+Alternative workaround:
+
+```powershell
+subst X: "C:\Users\sambe\Desktop\Term-5\CSTP-2204\ProjectIdea\CareHub"
+cd X:\CareHub.Mobile.ReactNative
+npm run android
+```
 
 ## Known Gaps
 
