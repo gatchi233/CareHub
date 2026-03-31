@@ -13,7 +13,7 @@
 From repo root:
 
 ```powershell
-cd "C:\Users\sambe\Desktop\Term 5\CSTP 2204\ProjectIdea\CareHub"
+cd "ProjectIdea\CareHub"
 docker compose up -d
 dotnet run --project .\CareHub.Api\CareHub.Api.csproj
 ```
@@ -34,7 +34,7 @@ Confirm:
 Open a new terminal:
 
 ```powershell
-cd "C:\Users\sambe\Desktop\Term 5\CSTP 2204\ProjectIdea\CareHub\CareHub.Mobile.ReactNative"
+cd "ProjectIdea\CareHub\CareHub.Mobile.ReactNative"
 cmd /c npm run start
 ```
 
@@ -43,7 +43,7 @@ cmd /c npm run start
 Open Android emulator first, then in another terminal:
 
 ```powershell
-cd "C:\Users\sambe\Desktop\Term 5\CSTP 2204\ProjectIdea\CareHub\CareHub.Mobile.ReactNative"
+cd "ProjectIdea\CareHub\CareHub.Mobile.ReactNative"
 cmd /c npm run android
 ```
 
