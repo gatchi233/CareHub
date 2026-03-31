@@ -1,16 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  ActivityIndicator,
-  Alert,
-  FlatList,
-  RefreshControl,
-  SafeAreaView,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
-} from "react-native";
+import { Alert, FlatList, RefreshControl, Text, View } from "react-native";
 import { useAuth } from "../context/AuthContext";
 import {
   adjustMedicationStock,
@@ -21,6 +10,20 @@ import {
   getResidents,
   updateMedication
 } from "../services/apiClient";
+import {
+  AppInput,
+  Card,
+  Chip,
+  FormLabel,
+  Hero,
+  InfoBanner,
+  ListRow,
+  LoadingBlock,
+  PrimaryButton,
+  Screen,
+  SectionTitle
+} from "../ui/components";
+import { colors, spacing } from "../ui/theme";
 
 const EMPTY_FORM = {
   id: "",
@@ -60,9 +63,7 @@ function toForm(item) {
 
 function parseIntField(value, fallback) {
   const parsed = Number(value);
-  if (!Number.isFinite(parsed)) {
-    return fallback;
-  }
+  if (!Number.isFinite(parsed)) return fallback;
   return Math.max(0, Math.round(parsed));
 }
 
@@ -77,28 +78,11 @@ function toPayload(form) {
     quantityUnit: form.quantityUnit.trim() || "tablet",
     stockQuantity: parseIntField(form.stockQuantity, 0),
     reorderLevel: parseIntField(form.reorderLevel, 10),
-    expiryDate: form.expiryDate
-      ? new Date(`${form.expiryDate}T00:00:00Z`).toISOString()
-      : new Date().toISOString(),
+    expiryDate: form.expiryDate ? new Date(`${form.expiryDate}T00:00:00Z`).toISOString() : new Date().toISOString(),
     residentId: residentId || null,
     residentName: form.residentName.trim() || null,
     timesPerDay: parseIntField(form.timesPerDay, 3)
   };
-}
-
-function Field({ label, value, onChangeText, placeholder, keyboardType }) {
-  return (
-    <View style={{ marginBottom: 8 }}>
-      <Text style={{ marginBottom: 4 }}>{label}</Text>
-      <TextInput
-        value={value}
-        onChangeText={onChangeText}
-        placeholder={placeholder}
-        keyboardType={keyboardType}
-        style={{ borderWidth: 1, borderColor: "#ccc", padding: 10, borderRadius: 6 }}
-      />
-    </View>
-  );
 }
 
 export default function MedicationsScreen() {
@@ -154,9 +138,7 @@ export default function MedicationsScreen() {
           setLowStockItems(lowList);
 
           if (selectedMedicationId) {
-            const selected = medicationList.find(
-              (item) => String(item.id || item.Id) === selectedMedicationId
-            );
+            const selected = medicationList.find((item) => String(item.id || item.Id) === selectedMedicationId);
             if (selected) {
               setForm(toForm(selected));
               return;
@@ -195,12 +177,7 @@ export default function MedicationsScreen() {
       const dosage = String(item.dosage || item.Dosage || "").toLowerCase();
       const usage = String(item.usage || item.Usage || "").toLowerCase();
       const residentName = String(item.residentName || item.ResidentName || "").toLowerCase();
-      return (
-        medName.includes(term) ||
-        dosage.includes(term) ||
-        usage.includes(term) ||
-        residentName.includes(term)
-      );
+      return medName.includes(term) || dosage.includes(term) || usage.includes(term) || residentName.includes(term);
     });
   }, [canManage, items, lowStockItems, query, showLowStock]);
 
@@ -216,8 +193,7 @@ export default function MedicationsScreen() {
   }
 
   function selectMedication(item) {
-    const id = String(item.id || item.Id || "");
-    setSelectedMedicationId(id);
+    setSelectedMedicationId(String(item.id || item.Id || ""));
     setForm(toForm(item));
     setError("");
     setSuccess("");
@@ -226,12 +202,10 @@ export default function MedicationsScreen() {
   async function onSave() {
     setError("");
     setSuccess("");
-
     if (!form.medName.trim()) {
       setError("Medication name is required.");
       return;
     }
-
     if (!form.dosage.trim()) {
       setError("Dosage is required.");
       return;
@@ -240,19 +214,15 @@ export default function MedicationsScreen() {
     try {
       setSaving(true);
       const payload = toPayload(form);
-
       if (selectedMedicationId) {
         await updateMedication(selectedMedicationId, { ...payload, id: selectedMedicationId }, token);
         setSuccess("Medication updated.");
       } else {
         const created = await createMedication(payload, token);
-        setSuccess("Medication created.");
         const createdId = String(created?.id || created?.Id || "");
-        if (createdId) {
-          setSelectedMedicationId(createdId);
-        }
+        if (createdId) setSelectedMedicationId(createdId);
+        setSuccess("Medication created.");
       }
-
       await load();
     } catch (err) {
       setError(err?.message || "Failed to save medication.");
@@ -284,281 +254,166 @@ export default function MedicationsScreen() {
   }
 
   function confirmDelete() {
-    if (!selectedMedicationId) {
-      return;
-    }
-
-    Alert.alert(
-      "Delete medication",
-      "This permanently removes the medication record.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              setDeletingId(selectedMedicationId);
-              setError("");
-              setSuccess("");
-              await deleteMedication(selectedMedicationId, token);
-              setSuccess("Medication deleted.");
-              setSelectedMedicationId("");
-              setForm(EMPTY_FORM);
-              await load();
-            } catch (err) {
-              setError(err?.message || "Failed to delete medication.");
-            } finally {
-              setDeletingId("");
-            }
+    if (!selectedMedicationId) return;
+    Alert.alert("Delete medication", "This permanently removes the medication record.", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            setDeletingId(selectedMedicationId);
+            setError("");
+            setSuccess("");
+            await deleteMedication(selectedMedicationId, token);
+            setSelectedMedicationId("");
+            setForm(EMPTY_FORM);
+            setSuccess("Medication deleted.");
+            await load();
+          } catch (err) {
+            setError(err?.message || "Failed to delete medication.");
+          } finally {
+            setDeletingId("");
           }
         }
-      ]
-    );
+      }
+    ]);
   }
 
-  const modeLabel = useMemo(() => {
-    if (isObserver) return "Observer medication view";
-    if (canManage) return "Nurse medication management";
-    return "Unavailable";
-  }, [canManage, isObserver]);
-
   return (
-    <SafeAreaView style={{ flex: 1, padding: 16 }}>
-      <Text style={{ fontSize: 20, marginBottom: 8 }}>Medications</Text>
-      <Text style={{ marginBottom: 8 }}>Access mode: {modeLabel}</Text>
-      <TextInput
-        value={query}
-        onChangeText={setQuery}
-        placeholder="Search by medication, dosage, usage, or resident"
-        style={{ borderWidth: 1, borderColor: "#ccc", marginBottom: 8, padding: 10, borderRadius: 6 }}
+    <Screen>
+      <Hero
+        eyebrow="Medication Inventory"
+        title="Medication management"
+        subtitle={canManage ? "Manage resident medications, inventory-only stock, and quick inventory adjustments from mobile." : "Review the medication list and stock state for the signed-in resident context."}
+        badge={canManage ? "Nurse inventory controls" : "Observer view"}
       />
-      {canManage ? (
-        <TouchableOpacity onPress={() => setShowLowStock((current) => !current)} style={{ marginBottom: 8 }}>
-          <Text style={{ color: "#2a7" }}>
-            {showLowStock ? "Show all medications" : "Show low-stock medications"}
-          </Text>
-        </TouchableOpacity>
-      ) : null}
-      {error ? <Text style={{ color: "red", marginBottom: 8 }}>{error}</Text> : null}
-      {success ? <Text style={{ color: "#2a7", marginBottom: 8 }}>{success}</Text> : null}
-      {loading ? <ActivityIndicator style={{ marginBottom: 8 }} /> : null}
+
+      {error ? <InfoBanner text={error} tone="danger" /> : null}
+      {success ? <InfoBanner text={success} tone="success" /> : null}
+
+      <Card>
+        <SectionTitle
+          title="Search and Filters"
+          subtitle="Search by medication, dosage, usage, or assigned resident."
+          actionLabel={canManage ? "Toggle low stock" : undefined}
+          onAction={canManage ? () => setShowLowStock((current) => !current) : undefined}
+        />
+        <AppInput value={query} onChangeText={setQuery} placeholder="Medication, dosage, usage, resident" autoCapitalize="none" />
+        {canManage ? (
+          <InfoBanner text={showLowStock ? "Showing only low-stock medications." : "Showing all medications."} />
+        ) : null}
+      </Card>
 
       {canManage ? (
-        <View style={{ marginBottom: 12 }}>
-          <TouchableOpacity onPress={startCreate} style={{ marginBottom: 8 }}>
-            <Text style={{ color: "#2a7", fontWeight: "600" }}>New Medication</Text>
-          </TouchableOpacity>
+        <Card>
+          <SectionTitle title={selectedMedicationId ? "Edit Medication" : "Create Medication"} subtitle="Maintain dosage, inventory levels, and resident assignment." />
           <FlatList
             horizontal
             data={items}
             keyExtractor={(item) => String(item.id || item.Id)}
-            style={{ marginBottom: 8 }}
-            renderItem={({ item }) => {
-              const id = String(item.id || item.Id || "");
-              const selected = id === selectedMedicationId;
-              return (
-                <TouchableOpacity
-                  onPress={() => selectMedication(item)}
-                  style={{
-                    marginRight: 8,
-                    paddingHorizontal: 10,
-                    paddingVertical: 8,
-                    borderWidth: 1,
-                    borderColor: selected ? "#2a7" : "#ccc",
-                    backgroundColor: selected ? "#e7fff4" : "#fff",
-                    borderRadius: 8
-                  }}
-                >
-                  <Text>{medicationName(item)}</Text>
-                </TouchableOpacity>
-              );
-            }}
+            showsHorizontalScrollIndicator={false}
+            renderItem={({ item }) => (
+              <Chip
+                label={medicationName(item)}
+                selected={String(item.id || item.Id) === selectedMedicationId}
+                onPress={() => selectMedication(item)}
+              />
+            )}
+            ListFooterComponent={<Chip label="New +" selected={!selectedMedicationId} onPress={startCreate} />}
+            style={{ marginBottom: spacing.sm }}
           />
 
-          <ScrollView
-            style={{ maxHeight: 430, borderWidth: 1, borderColor: "#ddd", borderRadius: 8, padding: 12 }}
-          >
-            <Text style={{ fontWeight: "600", marginBottom: 8 }}>
-              {selectedMedicationId ? "Edit Medication" : "Create Medication"}
-            </Text>
-            <Field
-              label="Medication Name"
-              value={form.medName}
-              onChangeText={(value) => updateForm("medName", value)}
-              placeholder="Medication name"
-            />
-            <Field
-              label="Dosage"
-              value={form.dosage}
-              onChangeText={(value) => updateForm("dosage", value)}
-              placeholder="Dosage"
-            />
-            <Field
-              label="Usage"
-              value={form.usage}
-              onChangeText={(value) => updateForm("usage", value)}
-              placeholder="Usage"
-            />
-            <Field
-              label="Quantity per Dose"
-              value={form.quantity}
-              onChangeText={(value) => updateForm("quantity", value)}
-              placeholder="1"
-              keyboardType="number-pad"
-            />
-            <Field
-              label="Quantity Unit"
-              value={form.quantityUnit}
-              onChangeText={(value) => updateForm("quantityUnit", value)}
-              placeholder="tablet"
-            />
-            <Field
-              label="Stock Quantity"
-              value={form.stockQuantity}
-              onChangeText={(value) => updateForm("stockQuantity", value)}
-              placeholder="0"
-              keyboardType="number-pad"
-            />
-            <Field
-              label="Reorder Level"
-              value={form.reorderLevel}
-              onChangeText={(value) => updateForm("reorderLevel", value)}
-              placeholder="10"
-              keyboardType="number-pad"
-            />
-            <Field
-              label="Expiry Date"
-              value={form.expiryDate}
-              onChangeText={(value) => updateForm("expiryDate", value)}
-              placeholder="YYYY-MM-DD"
-            />
-            <Field
-              label="Times Per Day"
-              value={form.timesPerDay}
-              onChangeText={(value) => updateForm("timesPerDay", value)}
-              placeholder="3"
-              keyboardType="number-pad"
-            />
+          <FormLabel>Medication Name</FormLabel>
+          <AppInput value={form.medName} onChangeText={(value) => updateForm("medName", value)} placeholder="Medication name" />
+          <FormLabel>Dosage</FormLabel>
+          <AppInput value={form.dosage} onChangeText={(value) => updateForm("dosage", value)} placeholder="Dosage" />
+          <FormLabel>Usage</FormLabel>
+          <AppInput value={form.usage} onChangeText={(value) => updateForm("usage", value)} placeholder="Usage or indication" multiline />
+          <FormLabel>Quantity Per Dose</FormLabel>
+          <AppInput value={form.quantity} onChangeText={(value) => updateForm("quantity", value)} placeholder="1" keyboardType="number-pad" />
+          <FormLabel>Quantity Unit</FormLabel>
+          <AppInput value={form.quantityUnit} onChangeText={(value) => updateForm("quantityUnit", value)} placeholder="tablet" />
+          <FormLabel>Stock Quantity</FormLabel>
+          <AppInput value={form.stockQuantity} onChangeText={(value) => updateForm("stockQuantity", value)} placeholder="0" keyboardType="number-pad" />
+          <FormLabel>Reorder Level</FormLabel>
+          <AppInput value={form.reorderLevel} onChangeText={(value) => updateForm("reorderLevel", value)} placeholder="10" keyboardType="number-pad" />
+          <FormLabel>Expiry Date</FormLabel>
+          <AppInput value={form.expiryDate} onChangeText={(value) => updateForm("expiryDate", value)} placeholder="YYYY-MM-DD" autoCapitalize="none" />
+          <FormLabel>Times Per Day</FormLabel>
+          <AppInput value={form.timesPerDay} onChangeText={(value) => updateForm("timesPerDay", value)} placeholder="3" keyboardType="number-pad" />
 
-            <Text style={{ marginBottom: 4 }}>Resident Assignment</Text>
-            <FlatList
-              horizontal
-              data={residentOptions}
-              keyExtractor={(item) => item.id}
-              ListHeaderComponent={
-                <TouchableOpacity
-                  onPress={() => {
-                    updateForm("residentId", "");
-                    updateForm("residentName", "");
-                  }}
-                  style={{
-                    marginRight: 8,
-                    marginBottom: 8,
-                    paddingHorizontal: 10,
-                    paddingVertical: 8,
-                    borderWidth: 1,
-                    borderColor: !form.residentId ? "#2a7" : "#ccc",
-                    backgroundColor: !form.residentId ? "#e7fff4" : "#fff",
-                    borderRadius: 8
-                  }}
-                >
-                  <Text>Inventory Only</Text>
-                </TouchableOpacity>
-              }
-              renderItem={({ item }) => {
-                const selected = item.id === form.residentId;
-                return (
-                  <TouchableOpacity
-                    onPress={() => {
-                      updateForm("residentId", item.id);
-                      updateForm("residentName", item.name);
-                    }}
-                    style={{
-                      marginRight: 8,
-                      marginBottom: 8,
-                      paddingHorizontal: 10,
-                      paddingVertical: 8,
-                      borderWidth: 1,
-                      borderColor: selected ? "#2a7" : "#ccc",
-                      backgroundColor: selected ? "#e7fff4" : "#fff",
-                      borderRadius: 8
-                    }}
-                  >
-                    <Text>{item.name || "Resident"}</Text>
-                  </TouchableOpacity>
-                );
-              }}
-            />
+          <FormLabel>Resident Assignment</FormLabel>
+          <FlatList
+            horizontal
+            data={residentOptions}
+            keyExtractor={(item) => item.id}
+            showsHorizontalScrollIndicator={false}
+            ListHeaderComponent={<Chip label="Inventory Only" selected={!form.residentId} onPress={() => { updateForm("residentId", ""); updateForm("residentName", ""); }} />}
+            renderItem={({ item }) => (
+              <Chip
+                label={item.name || "Resident"}
+                selected={item.id === form.residentId}
+                onPress={() => {
+                  updateForm("residentId", item.id);
+                  updateForm("residentName", item.name);
+                }}
+              />
+            )}
+            style={{ marginBottom: spacing.sm }}
+          />
 
-            <TouchableOpacity
-              onPress={onSave}
-              disabled={saving}
-              style={{
-                backgroundColor: saving ? "#8fbca8" : "#2a7",
-                paddingVertical: 10,
-                borderRadius: 6,
-                alignItems: "center",
-                marginBottom: 8
-              }}
-            >
-              <Text style={{ color: "white", fontWeight: "600" }}>
-                {saving ? "Saving..." : selectedMedicationId ? "Save Changes" : "Create Medication"}
-              </Text>
-            </TouchableOpacity>
+          <PrimaryButton label={saving ? "Saving..." : selectedMedicationId ? "Save Medication" : "Create Medication"} onPress={onSave} disabled={saving} />
 
-            {selectedMedicationId ? (
-              <>
-                <View style={{ marginBottom: 8 }}>
-                  <Text style={{ marginBottom: 4 }}>Adjust Stock</Text>
-                  <TextInput
-                    value={stockDelta}
-                    onChangeText={setStockDelta}
-                    placeholder="Use positive or negative value"
-                    keyboardType="numbers-and-punctuation"
-                    style={{ borderWidth: 1, borderColor: "#ccc", padding: 10, borderRadius: 6, marginBottom: 8 }}
-                  />
-                  <TouchableOpacity onPress={onAdjustStock} style={{ alignItems: "center", marginBottom: 8 }}>
-                    <Text style={{ color: "#2a7", fontWeight: "600" }}>Apply Stock Delta</Text>
-                  </TouchableOpacity>
-                </View>
-
-                <TouchableOpacity
-                  onPress={confirmDelete}
-                  disabled={deletingId === selectedMedicationId}
-                  style={{ alignItems: "center", paddingVertical: 8 }}
-                >
-                  <Text style={{ color: deletingId === selectedMedicationId ? "#999" : "#c22" }}>
-                    {deletingId === selectedMedicationId ? "Deleting..." : "Delete Medication"}
-                  </Text>
-                </TouchableOpacity>
-              </>
-            ) : null}
-          </ScrollView>
-        </View>
+          {selectedMedicationId ? (
+            <>
+              <FormLabel>Adjust Stock</FormLabel>
+              <AppInput
+                value={stockDelta}
+                onChangeText={setStockDelta}
+                placeholder="Use positive or negative value"
+                keyboardType="numbers-and-punctuation"
+                autoCapitalize="none"
+              />
+              <PrimaryButton label="Apply Stock Delta" onPress={onAdjustStock} tone="secondary" />
+              <PrimaryButton
+                label={deletingId === selectedMedicationId ? "Deleting..." : "Delete Medication"}
+                onPress={confirmDelete}
+                disabled={deletingId === selectedMedicationId}
+                tone="secondary"
+              />
+            </>
+          ) : null}
+        </Card>
       ) : null}
 
-      <FlatList
-        data={filteredItems}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => load(true)} />}
-        keyExtractor={(item) => String(item.id || item.Id)}
-        renderItem={({ item }) => {
-          const stock = item.stockQuantity ?? item.StockQuantity ?? 0;
-          const reorderLevel = item.reorderLevel ?? item.ReorderLevel ?? 0;
-          const residentName = item.residentName || item.ResidentName || "Inventory";
-          return (
-            <View style={{ paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: "#eee" }}>
-              <Text>{medicationName(item)}</Text>
-              <Text style={{ color: "#666" }}>
-                {item.dosage || item.Dosage || "No dosage"} | {residentName}
-              </Text>
-              <Text style={{ color: stock <= reorderLevel ? "#c22" : "#666" }}>
-                Stock: {stock} | Reorder at: {reorderLevel}
-              </Text>
-            </View>
-          );
-        }}
-      />
-    </SafeAreaView>
+      <Card style={{ marginBottom: 0 }}>
+        <SectionTitle title="Medication List" subtitle={`${filteredItems.length} medication records`} />
+        {loading ? <LoadingBlock label="Loading medications" /> : null}
+        <FlatList
+          data={filteredItems}
+          scrollEnabled={false}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => load(true)} tintColor={colors.accent} />}
+          keyExtractor={(item) => String(item.id || item.Id)}
+          renderItem={({ item }) => {
+            const stock = item.stockQuantity ?? item.StockQuantity ?? 0;
+            const reorderLevel = item.reorderLevel ?? item.ReorderLevel ?? 0;
+            const assignedResident = item.residentName || item.ResidentName || "Inventory";
+            return (
+              <ListRow
+                title={medicationName(item)}
+                subtitle={`${item.dosage || item.Dosage || "No dosage"} | ${assignedResident}`}
+                meta={`Stock ${stock} | Reorder at ${reorderLevel}`}
+              >
+                <Text style={{ color: stock <= reorderLevel ? colors.danger : colors.textMuted }}>
+                  {stock <= reorderLevel ? "Low stock attention needed." : "Inventory level is currently above reorder threshold."}
+                </Text>
+              </ListRow>
+            );
+          }}
+          ListEmptyComponent={!loading ? <Text style={{ color: colors.textMuted }}>No medications match the current filter.</Text> : null}
+        />
+      </Card>
+    </Screen>
   );
 }
