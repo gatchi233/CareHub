@@ -27,7 +27,7 @@ cd CareHub
 docker compose up -d
 ```
 
-This starts a PostgreSQL 16 container on `localhost:5432` with:
+This starts a PostgreSQL 16 container on `localhost:5433` with:
 - Database: `carehub`
 - Username: `carehub`
 - Password: `carehub_pw`
@@ -57,7 +57,7 @@ Edit `CareHub.Api/appsettings.Development.json`:
 ```json
 {
   "ConnectionStrings": {
-    "CareHubDb": "Host=localhost;Port=5432;Database=carehub;Username=carehub;Password=carehub_pw"
+    "CareHubDb": "Host=localhost;Port=5433;Database=carehub;Username=carehub;Password=carehub_pw"
   },
   "Groq": {
     "ApiKey": "gsk_your_key_here"

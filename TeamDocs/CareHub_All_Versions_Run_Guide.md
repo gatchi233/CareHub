@@ -32,7 +32,7 @@ docker compose up -d
 
 Expected:
 
-- PostgreSQL runs on `localhost:5432`
+- PostgreSQL runs on `localhost:5433`
 - Container name: `carehub-postgres`
 
 If the existing container is broken:
