@@ -263,12 +263,45 @@ export async function aiShiftSummary(residentId, token) {
   );
 }
 
+export async function aiMedicationExplain(medicationName, dosage, token) {
+  return apiRequest(
+    "/ai/medication-explain",
+    {
+      method: "POST",
+      body: JSON.stringify({ medicationName, dosage })
+    },
+    token
+  );
+}
+
 export async function aiDetectTrends(residentId, token) {
   return apiRequest(
     "/ai/detect-trends",
     {
       method: "POST",
       body: JSON.stringify({ residentId })
+    },
+    token
+  );
+}
+
+export async function aiReportDraft(residentId, token) {
+  return apiRequest(
+    "/ai/report-draft",
+    {
+      method: "POST",
+      body: JSON.stringify({ residentId })
+    },
+    token
+  );
+}
+
+export async function aiShiftHandoff(token) {
+  return apiRequest(
+    "/ai/shift-handoff",
+    {
+      method: "POST",
+      body: JSON.stringify({})
     },
     token
   );

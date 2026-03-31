@@ -12,7 +12,10 @@ import { useAuth } from "../context/AuthContext";
 import {
   aiCareQuery,
   aiDetectTrends,
+  aiMedicationExplain,
+  aiReportDraft,
   aiShiftSummary,
+  aiShiftHandoff,
   aiTrendExplain,
   getResidents
 } from "../services/apiClient";
@@ -22,6 +25,8 @@ export default function AiScreen() {
   const [residents, setResidents] = useState([]);
   const [selectedResidentId, setSelectedResidentId] = useState("");
   const [query, setQuery] = useState("");
+  const [medicationName, setMedicationName] = useState("");
+  const [dosage, setDosage] = useState("");
   const [trendDays, setTrendDays] = useState(7);
   const [responseText, setResponseText] = useState("");
   const [loading, setLoading] = useState(false);
@@ -114,6 +119,53 @@ export default function AiScreen() {
     }
   }
 
+  async function runMedicationExplain() {
+    if (!medicationName.trim()) {
+      setError("Enter a medication name.");
+      return;
+    }
+    setLoading(true);
+    setError("");
+    try {
+      const result = await aiMedicationExplain(medicationName.trim(), dosage.trim() || null, token);
+      setResponseText(result?.content || "No AI content returned.");
+    } catch (err) {
+      setError(err?.message || "AI medication explain failed.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function runReportDraft() {
+    if (!selectedResidentId) {
+      setError("Choose a resident first.");
+      return;
+    }
+    setLoading(true);
+    setError("");
+    try {
+      const result = await aiReportDraft(selectedResidentId, token);
+      setResponseText(result?.content || "No AI content returned.");
+    } catch (err) {
+      setError(err?.message || "AI report draft failed.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function runShiftHandoff() {
+    setLoading(true);
+    setError("");
+    try {
+      const result = await aiShiftHandoff(token);
+      setResponseText(result?.content || "No AI content returned.");
+    } catch (err) {
+      setError(err?.message || "AI shift handoff failed.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   if (!canUseAi) {
     return (
       <SafeAreaView style={{ flex: 1, padding: 16 }}>
@@ -166,6 +218,14 @@ export default function AiScreen() {
         </TouchableOpacity>
       </View>
       <View style={{ flexDirection: "row", marginBottom: 8 }}>
+        <TouchableOpacity onPress={runReportDraft} style={{ marginRight: 12 }}>
+          <Text style={{ color: "#2a7" }}>Report Draft</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={runShiftHandoff}>
+          <Text style={{ color: "#2a7" }}>Shift Handoff</Text>
+        </TouchableOpacity>
+      </View>
+      <View style={{ flexDirection: "row", marginBottom: 8 }}>
         <TouchableOpacity onPress={() => setTrendDays(3)} style={{ marginRight: 12 }}>
           <Text style={{ color: trendDays === 3 ? "#2a7" : "#666" }}>3-Day</Text>
         </TouchableOpacity>
@@ -188,6 +248,25 @@ export default function AiScreen() {
         style={{ backgroundColor: "#2a7", paddingVertical: 10, borderRadius: 6, alignItems: "center", marginBottom: 10 }}
       >
         <Text style={{ color: "white", fontWeight: "600" }}>Run Care Query</Text>
+      </TouchableOpacity>
+
+      <TextInput
+        value={medicationName}
+        onChangeText={setMedicationName}
+        placeholder="Medication name for explain..."
+        style={{ borderWidth: 1, borderColor: "#ccc", marginBottom: 8, padding: 10, borderRadius: 6 }}
+      />
+      <TextInput
+        value={dosage}
+        onChangeText={setDosage}
+        placeholder="Dosage (optional)"
+        style={{ borderWidth: 1, borderColor: "#ccc", marginBottom: 8, padding: 10, borderRadius: 6 }}
+      />
+      <TouchableOpacity
+        onPress={runMedicationExplain}
+        style={{ backgroundColor: "#2a7", paddingVertical: 10, borderRadius: 6, alignItems: "center", marginBottom: 10 }}
+      >
+        <Text style={{ color: "white", fontWeight: "600" }}>Explain Medication</Text>
       </TouchableOpacity>
 
       {loading ? <ActivityIndicator style={{ marginBottom: 8 }} /> : null}
