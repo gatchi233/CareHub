@@ -41,17 +41,14 @@ function AppTabs() {
           borderTopColor: colors.border,
           paddingTop: 10,
           paddingBottom: 10,
-          paddingHorizontal: 10,
-          height: 74,
+          paddingHorizontal: 6,
+          height: 70,
           borderTopLeftRadius: radii.lg,
           borderTopRightRadius: radii.lg
         },
         tabBarItemStyle: {
-          borderRadius: radii.pill,
-          marginHorizontal: 4,
-          paddingVertical: 2
+          marginHorizontal: 2
         },
-        tabBarActiveBackgroundColor: colors.accentSoft,
         tabBarLabelStyle: {
           fontSize: 12,
           fontWeight: "700"
