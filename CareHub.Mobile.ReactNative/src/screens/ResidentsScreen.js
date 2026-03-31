@@ -1,23 +1,21 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  ActivityIndicator,
-  Alert,
-  FlatList,
-  RefreshControl,
-  SafeAreaView,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
-} from "react-native";
+import { Alert, FlatList, RefreshControl, Text, View } from "react-native";
 import { useAuth } from "../context/AuthContext";
+import { createResident, deleteResident, getResidents, updateResident } from "../services/apiClient";
 import {
-  createResident,
-  deleteResident,
-  getResidents,
-  updateResident
-} from "../services/apiClient";
+  AppInput,
+  Card,
+  Chip,
+  FormLabel,
+  Hero,
+  InfoBanner,
+  ListRow,
+  LoadingBlock,
+  PrimaryButton,
+  Screen,
+  SectionTitle
+} from "../ui/components";
+import { colors, spacing } from "../ui/theme";
 
 const EMPTY_FORM = {
   id: "",
@@ -80,20 +78,6 @@ function toPayload(form) {
   };
 }
 
-function FormField({ label, value, onChangeText, placeholder }) {
-  return (
-    <View style={{ marginBottom: 8 }}>
-      <Text style={{ marginBottom: 4 }}>{label}</Text>
-      <TextInput
-        value={value}
-        onChangeText={onChangeText}
-        placeholder={placeholder}
-        style={{ borderWidth: 1, borderColor: "#ccc", padding: 10, borderRadius: 6 }}
-      />
-    </View>
-  );
-}
-
 export default function ResidentsScreen() {
   const { token, user } = useAuth();
   const [items, setItems] = useState([]);
@@ -119,14 +103,10 @@ export default function ResidentsScreen() {
         const list = Array.isArray(data) ? data : [];
         setItems(list);
 
-        if (!canManage) {
-          return;
-        }
+        if (!canManage) return;
 
         if (selectedResidentId) {
-          const selected = list.find(
-            (item) => String(item.id || item.Id) === selectedResidentId
-          );
+          const selected = list.find((item) => String(item.id || item.Id) === selectedResidentId);
           if (selected) {
             setForm(toForm(selected));
             return;
@@ -159,16 +139,10 @@ export default function ResidentsScreen() {
     const term = query.trim().toLowerCase();
     if (!term) return items;
     return items.filter((item) => {
-      const first = (item.residentFName || item.ResidentFName || "").toLowerCase();
-      const last = (item.residentLName || item.ResidentLName || "").toLowerCase();
+      const full = residentName(item).toLowerCase();
       const room = String(item.roomNumber || item.RoomNumber || "").toLowerCase();
       const doctor = String(item.doctorName || item.DoctorName || "").toLowerCase();
-      const full = `${first} ${last}`.trim();
-      return (
-        full.includes(term) ||
-        room.includes(term) ||
-        doctor.includes(term)
-      );
+      return full.includes(term) || room.includes(term) || doctor.includes(term);
     });
   }, [items, query]);
 
@@ -184,8 +158,7 @@ export default function ResidentsScreen() {
   }
 
   function selectResident(item) {
-    const id = String(item.id || item.Id || "");
-    setSelectedResidentId(id);
+    setSelectedResidentId(String(item.id || item.Id || ""));
     setForm(toForm(item));
     setError("");
     setSuccess("");
@@ -194,17 +167,14 @@ export default function ResidentsScreen() {
   async function onSave() {
     setError("");
     setSuccess("");
-
     if (!form.residentFName.trim() || !form.residentLName.trim()) {
       setError("Resident first and last name are required.");
       return;
     }
-
     if (!form.roomNumber.trim()) {
       setError("Room number is required.");
       return;
     }
-
     if (!form.dateOfBirth.trim()) {
       setError("Date of birth is required.");
       return;
@@ -213,19 +183,15 @@ export default function ResidentsScreen() {
     try {
       setSaving(true);
       const payload = toPayload(form);
-
       if (selectedResidentId) {
         await updateResident(selectedResidentId, { ...payload, id: selectedResidentId }, token);
         setSuccess("Resident updated.");
       } else {
         const created = await createResident(payload, token);
-        setSuccess("Resident created.");
         const createdId = String(created?.id || created?.Id || "");
-        if (createdId) {
-          setSelectedResidentId(createdId);
-        }
+        if (createdId) setSelectedResidentId(createdId);
+        setSuccess("Resident created.");
       }
-
       await load();
     } catch (err) {
       setError(err?.message || "Failed to save resident.");
@@ -235,219 +201,142 @@ export default function ResidentsScreen() {
   }
 
   function confirmDelete() {
-    if (!selectedResidentId) {
-      return;
-    }
-
-    Alert.alert(
-      "Delete resident",
-      "This permanently removes the resident record.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              setDeletingId(selectedResidentId);
-              setError("");
-              setSuccess("");
-              await deleteResident(selectedResidentId, token);
-              setSuccess("Resident deleted.");
-              setSelectedResidentId("");
-              setForm(EMPTY_FORM);
-              await load();
-            } catch (err) {
-              setError(err?.message || "Failed to delete resident.");
-            } finally {
-              setDeletingId("");
-            }
+    if (!selectedResidentId) return;
+    Alert.alert("Delete resident", "This permanently removes the resident record.", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            setDeletingId(selectedResidentId);
+            setError("");
+            setSuccess("");
+            await deleteResident(selectedResidentId, token);
+            setSelectedResidentId("");
+            setForm(EMPTY_FORM);
+            setSuccess("Resident deleted.");
+            await load();
+          } catch (err) {
+            setError(err?.message || "Failed to delete resident.");
+          } finally {
+            setDeletingId("");
           }
         }
-      ]
-    );
+      }
+    ]);
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, padding: 16 }}>
-      <Text style={{ fontSize: 20, marginBottom: 8 }}>Residents</Text>
-      <Text style={{ marginBottom: 8 }}>
-        Access mode: {canManage ? "Nurse resident management" : "Read-only resident list"}
-      </Text>
-      <TextInput
-        value={query}
-        onChangeText={setQuery}
-        placeholder="Search by name, room, or doctor"
-        style={{ borderWidth: 1, borderColor: "#ccc", marginBottom: 8, padding: 10, borderRadius: 6 }}
+    <Screen>
+      <Hero
+        eyebrow="Resident Directory"
+        title="Resident management"
+        subtitle={canManage ? "Review, update, and add residents without leaving the mobile workflow." : "Browse resident records with the details that matter most on shift."}
+        badge={canManage ? "Nurse editing enabled" : "Read only"}
       />
-      {error ? <Text style={{ color: "red", marginBottom: 8 }}>{error}</Text> : null}
-      {success ? <Text style={{ color: "#2a7", marginBottom: 8 }}>{success}</Text> : null}
-      {loading ? <ActivityIndicator style={{ marginBottom: 8 }} /> : null}
+
+      {error ? <InfoBanner text={error} tone="danger" /> : null}
+      {success ? <InfoBanner text={success} tone="success" /> : null}
+
+      <Card>
+        <SectionTitle
+          title="Resident Search"
+          subtitle="Filter by resident name, room, or doctor."
+          actionLabel={canManage ? "New resident" : undefined}
+          onAction={canManage ? startCreate : undefined}
+        />
+        <AppInput
+          value={query}
+          onChangeText={setQuery}
+          placeholder="Search by name, room, or doctor"
+          autoCapitalize="none"
+        />
+      </Card>
 
       {canManage ? (
-        <View style={{ marginBottom: 12 }}>
-          <TouchableOpacity onPress={startCreate} style={{ marginBottom: 8 }}>
-            <Text style={{ color: "#2a7", fontWeight: "600" }}>New Resident</Text>
-          </TouchableOpacity>
+        <Card>
+          <SectionTitle
+            title={selectedResidentId ? "Edit Resident" : "Create Resident"}
+            subtitle="Core resident profile details for rooming and contact records."
+          />
           <FlatList
             horizontal
             data={items}
             keyExtractor={(item) => String(item.id || item.Id)}
-            style={{ marginBottom: 8 }}
-            renderItem={({ item }) => {
-              const id = String(item.id || item.Id || "");
-              const selected = id === selectedResidentId;
-              return (
-                <TouchableOpacity
-                  onPress={() => selectResident(item)}
-                  style={{
-                    marginRight: 8,
-                    paddingHorizontal: 10,
-                    paddingVertical: 8,
-                    borderWidth: 1,
-                    borderColor: selected ? "#2a7" : "#ccc",
-                    backgroundColor: selected ? "#e7fff4" : "#fff",
-                    borderRadius: 8
-                  }}
-                >
-                  <Text>{residentName(item) || "Resident"}</Text>
-                </TouchableOpacity>
-              );
-            }}
+            showsHorizontalScrollIndicator={false}
+            renderItem={({ item }) => (
+              <Chip
+                label={residentName(item) || "Resident"}
+                selected={String(item.id || item.Id) === selectedResidentId}
+                onPress={() => selectResident(item)}
+              />
+            )}
+            ListFooterComponent={<Chip label="New +" selected={!selectedResidentId} onPress={startCreate} />}
+            style={{ marginBottom: spacing.sm }}
           />
 
-          <ScrollView
-            style={{ maxHeight: 360, borderWidth: 1, borderColor: "#ddd", borderRadius: 8, padding: 12 }}
-          >
-            <Text style={{ fontWeight: "600", marginBottom: 8 }}>
-              {selectedResidentId ? "Edit Resident" : "Create Resident"}
-            </Text>
-            <FormField
-              label="First Name"
-              value={form.residentFName}
-              onChangeText={(value) => updateForm("residentFName", value)}
-              placeholder="First name"
-            />
-            <FormField
-              label="Last Name"
-              value={form.residentLName}
-              onChangeText={(value) => updateForm("residentLName", value)}
-              placeholder="Last name"
-            />
-            <FormField
-              label="Room Number"
-              value={form.roomNumber}
-              onChangeText={(value) => updateForm("roomNumber", value)}
-              placeholder="Room number"
-            />
-            <FormField
-              label="Room Type"
-              value={form.roomType}
-              onChangeText={(value) => updateForm("roomType", value)}
-              placeholder="Single or Double"
-            />
-            <FormField
-              label="Bed Label"
-              value={form.bedLabel}
-              onChangeText={(value) => updateForm("bedLabel", value)}
-              placeholder="Bed label"
-            />
-            <FormField
-              label="Gender"
-              value={form.gender}
-              onChangeText={(value) => updateForm("gender", value)}
-              placeholder="Gender"
-            />
-            <FormField
-              label="Date of Birth"
-              value={form.dateOfBirth}
-              onChangeText={(value) => updateForm("dateOfBirth", value)}
-              placeholder="YYYY-MM-DD"
-            />
-            <FormField
-              label="Doctor Name"
-              value={form.doctorName}
-              onChangeText={(value) => updateForm("doctorName", value)}
-              placeholder="Doctor name"
-            />
-            <FormField
-              label="Doctor Contact"
-              value={form.doctorContact}
-              onChangeText={(value) => updateForm("doctorContact", value)}
-              placeholder="Doctor contact"
-            />
-            <FormField
-              label="Emergency Contact"
-              value={form.emergencyContactName1}
-              onChangeText={(value) => updateForm("emergencyContactName1", value)}
-              placeholder="Primary contact name"
-            />
-            <FormField
-              label="Emergency Phone"
-              value={form.emergencyContactPhone1}
-              onChangeText={(value) => updateForm("emergencyContactPhone1", value)}
-              placeholder="Primary contact phone"
-            />
-            <FormField
-              label="Emergency Relationship"
-              value={form.emergencyRelationship1}
-              onChangeText={(value) => updateForm("emergencyRelationship1", value)}
-              placeholder="Relationship"
-            />
-            <FormField
-              label="Remarks"
-              value={form.remarks}
-              onChangeText={(value) => updateForm("remarks", value)}
-              placeholder="Remarks"
-            />
+          <FormLabel>First Name</FormLabel>
+          <AppInput value={form.residentFName} onChangeText={(value) => updateForm("residentFName", value)} placeholder="First name" />
+          <FormLabel>Last Name</FormLabel>
+          <AppInput value={form.residentLName} onChangeText={(value) => updateForm("residentLName", value)} placeholder="Last name" />
+          <FormLabel>Room Number</FormLabel>
+          <AppInput value={form.roomNumber} onChangeText={(value) => updateForm("roomNumber", value)} placeholder="Room number" />
+          <FormLabel>Room Type</FormLabel>
+          <AppInput value={form.roomType} onChangeText={(value) => updateForm("roomType", value)} placeholder="Single or Double" />
+          <FormLabel>Bed Label</FormLabel>
+          <AppInput value={form.bedLabel} onChangeText={(value) => updateForm("bedLabel", value)} placeholder="Bed label" />
+          <FormLabel>Gender</FormLabel>
+          <AppInput value={form.gender} onChangeText={(value) => updateForm("gender", value)} placeholder="Gender" />
+          <FormLabel>Date of Birth</FormLabel>
+          <AppInput value={form.dateOfBirth} onChangeText={(value) => updateForm("dateOfBirth", value)} placeholder="YYYY-MM-DD" autoCapitalize="none" />
+          <FormLabel>Doctor Name</FormLabel>
+          <AppInput value={form.doctorName} onChangeText={(value) => updateForm("doctorName", value)} placeholder="Doctor name" />
+          <FormLabel>Doctor Contact</FormLabel>
+          <AppInput value={form.doctorContact} onChangeText={(value) => updateForm("doctorContact", value)} placeholder="Doctor contact" />
+          <FormLabel>Emergency Contact</FormLabel>
+          <AppInput value={form.emergencyContactName1} onChangeText={(value) => updateForm("emergencyContactName1", value)} placeholder="Primary contact name" />
+          <FormLabel>Emergency Phone</FormLabel>
+          <AppInput value={form.emergencyContactPhone1} onChangeText={(value) => updateForm("emergencyContactPhone1", value)} placeholder="Primary contact phone" autoCapitalize="none" />
+          <FormLabel>Emergency Relationship</FormLabel>
+          <AppInput value={form.emergencyRelationship1} onChangeText={(value) => updateForm("emergencyRelationship1", value)} placeholder="Relationship" />
+          <FormLabel>Remarks</FormLabel>
+          <AppInput value={form.remarks} onChangeText={(value) => updateForm("remarks", value)} placeholder="Remarks" multiline />
 
-            <TouchableOpacity
-              onPress={onSave}
-              disabled={saving}
-              style={{
-                backgroundColor: saving ? "#8fbca8" : "#2a7",
-                paddingVertical: 10,
-                borderRadius: 6,
-                alignItems: "center",
-                marginBottom: 8
-              }}
-            >
-              <Text style={{ color: "white", fontWeight: "600" }}>
-                {saving ? "Saving..." : selectedResidentId ? "Save Changes" : "Create Resident"}
-              </Text>
-            </TouchableOpacity>
-
-            {selectedResidentId ? (
-              <TouchableOpacity
-                onPress={confirmDelete}
-                disabled={deletingId === selectedResidentId}
-                style={{ alignItems: "center", paddingVertical: 8 }}
-              >
-                <Text style={{ color: deletingId === selectedResidentId ? "#999" : "#c22" }}>
-                  {deletingId === selectedResidentId ? "Deleting..." : "Delete Resident"}
-                </Text>
-              </TouchableOpacity>
-            ) : null}
-          </ScrollView>
-        </View>
+          <PrimaryButton
+            label={saving ? "Saving..." : selectedResidentId ? "Save Resident" : "Create Resident"}
+            onPress={onSave}
+            disabled={saving}
+          />
+          {selectedResidentId ? (
+            <PrimaryButton
+              label={deletingId === selectedResidentId ? "Deleting..." : "Delete Resident"}
+              onPress={confirmDelete}
+              disabled={deletingId === selectedResidentId}
+              tone="secondary"
+            />
+          ) : null}
+        </Card>
       ) : null}
 
-      <FlatList
-        data={filteredItems}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => load(true)} />}
-        keyExtractor={(item) => String(item.id || item.Id)}
-        renderItem={({ item }) => (
-          <View style={{ paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: "#eee" }}>
-            <Text>{residentName(item) || "Unknown resident"}</Text>
-            <Text style={{ color: "#666" }}>
-              Room {item.roomNumber || item.RoomNumber || "N/A"} | DOB {item.dateOfBirth || item.DateOfBirth || "N/A"}
-            </Text>
-            <Text style={{ color: "#666" }}>
-              Doctor: {item.doctorName || item.DoctorName || "Not set"}
-            </Text>
-          </View>
-        )}
-      />
-    </SafeAreaView>
+      <Card style={{ marginBottom: 0 }}>
+        <SectionTitle title="Residents" subtitle={`${filteredItems.length} resident records`} />
+        {loading ? <LoadingBlock label="Loading residents" /> : null}
+        <FlatList
+          data={filteredItems}
+          scrollEnabled={false}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => load(true)} tintColor={colors.accent} />}
+          keyExtractor={(item) => String(item.id || item.Id)}
+          renderItem={({ item }) => (
+            <ListRow
+              title={residentName(item) || "Unknown resident"}
+              subtitle={`Room ${item.roomNumber || item.RoomNumber || "N/A"} | DOB ${item.dateOfBirth || item.DateOfBirth || "N/A"}`}
+              meta={`Doctor: ${item.doctorName || item.DoctorName || "Not set"}`}
+            />
+          )}
+          ListEmptyComponent={!loading ? <Text style={{ color: colors.textMuted }}>No residents match the current filter.</Text> : null}
+        />
+      </Card>
+    </Screen>
   );
 }

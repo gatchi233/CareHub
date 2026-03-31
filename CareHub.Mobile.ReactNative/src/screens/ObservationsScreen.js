@@ -1,15 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  ActivityIndicator,
-  Alert,
-  FlatList,
-  RefreshControl,
-  SafeAreaView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
-} from "react-native";
+import { Alert, FlatList, RefreshControl, Text, TouchableOpacity, View } from "react-native";
 import { useAuth } from "../context/AuthContext";
 import {
   createObservation,
@@ -19,6 +9,20 @@ import {
   getResidents,
   updateObservation
 } from "../services/apiClient";
+import {
+  AppInput,
+  Card,
+  Chip,
+  FormLabel,
+  Hero,
+  InfoBanner,
+  ListRow,
+  LoadingBlock,
+  PrimaryButton,
+  Screen,
+  SectionTitle
+} from "../ui/components";
+import { colors, spacing } from "../ui/theme";
 
 function residentName(item) {
   const first = item.residentFName || item.ResidentFName || "";
@@ -64,15 +68,6 @@ export default function ObservationsScreen() {
     [canRecord, selectedResidentId, token]
   );
 
-  const onRefresh = useCallback(async () => {
-    try {
-      setRefreshing(true);
-      await loadObservations();
-    } finally {
-      setRefreshing(false);
-    }
-  }, [loadObservations]);
-
   const loadResidents = useCallback(async () => {
     if (!canRecord) {
       setResidents([]);
@@ -85,8 +80,8 @@ export default function ObservationsScreen() {
       setResidents(list);
       if (list.length > 0) {
         const first = list[0];
-        const residentId = String(first.id || first.Id || "");
-        setSelectedResidentId((current) => current || residentId);
+        const firstId = String(first.id || first.Id || "");
+        setSelectedResidentId((current) => current || firstId);
         setSelectedResidentName((current) => current || residentName(first));
       }
     } catch (err) {
@@ -102,11 +97,20 @@ export default function ObservationsScreen() {
     loadObservations();
   }, [loadObservations]);
 
+  const onRefresh = useCallback(async () => {
+    try {
+      setRefreshing(true);
+      await loadObservations();
+    } finally {
+      setRefreshing(false);
+    }
+  }, [loadObservations]);
+
   function pickResident(resident) {
-    const residentId = String(resident.id || resident.Id || "");
-    setSelectedResidentId(residentId);
+    const id = String(resident.id || resident.Id || "");
+    setSelectedResidentId(id);
     setSelectedResidentName(residentName(resident));
-    loadObservations(residentId);
+    loadObservations(id);
   }
 
   function resetForm() {
@@ -118,12 +122,10 @@ export default function ObservationsScreen() {
   async function onSaveObservation() {
     setSuccess("");
     setError("");
-
     if (!selectedResidentId) {
       setError("Choose a resident.");
       return;
     }
-
     if (!type.trim() || !value.trim()) {
       setError("Type and value are required.");
       return;
@@ -169,36 +171,30 @@ export default function ObservationsScreen() {
 
   function confirmDelete(item) {
     const observationId = String(item.id || item.Id || "");
-    Alert.alert(
-      "Delete observation",
-      "This permanently removes the observation.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              setError("");
-              setSuccess("");
-              await deleteObservation(observationId, token);
-              if (editingId === observationId) {
-                resetForm();
-              }
-              setSuccess("Observation deleted.");
-              await loadObservations(selectedResidentId);
-            } catch (err) {
-              setError(err?.message || "Failed to delete observation.");
-            }
+    Alert.alert("Delete observation", "This permanently removes the observation.", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            setError("");
+            setSuccess("");
+            await deleteObservation(observationId, token);
+            if (editingId === observationId) resetForm();
+            setSuccess("Observation deleted.");
+            await loadObservations(selectedResidentId);
+          } catch (err) {
+            setError(err?.message || "Failed to delete observation.");
           }
         }
-      ]
-    );
+      }
+    ]);
   }
 
   const modeLabel = useMemo(() => {
-    if (isObserver) return "Read-only (own observations)";
-    if (canRecord) return "Staff observation management";
+    if (isObserver) return "Observer history";
+    if (canRecord) return "Observation recording";
     return "Unavailable";
   }, [canRecord, isObserver]);
 
@@ -210,130 +206,92 @@ export default function ObservationsScreen() {
       const valueText = String(item.value || item.Value || "").toLowerCase();
       const nameText = String(item.residentName || item.ResidentName || "").toLowerCase();
       const recorder = String(item.recordedBy || item.RecordedBy || "").toLowerCase();
-      return (
-        typeText.includes(term) ||
-        valueText.includes(term) ||
-        nameText.includes(term) ||
-        recorder.includes(term)
-      );
+      return typeText.includes(term) || valueText.includes(term) || nameText.includes(term) || recorder.includes(term);
     });
   }, [items, query]);
 
   return (
-    <SafeAreaView style={{ flex: 1, padding: 16 }}>
-      <Text style={{ fontSize: 20, marginBottom: 8 }}>Observations</Text>
-      <Text style={{ marginBottom: 8 }}>Access mode: {modeLabel}</Text>
-      <TextInput
-        value={query}
-        onChangeText={setQuery}
-        placeholder="Filter observations"
-        style={{ borderWidth: 1, borderColor: "#ccc", marginBottom: 8, padding: 10, borderRadius: 6 }}
+    <Screen>
+      <Hero
+        eyebrow="Observation Feed"
+        title="Track resident observations"
+        subtitle={canRecord ? "Capture notes and vitals quickly, then review the shift feed in one place." : "Read-only observation history for the signed-in resident account."}
+        badge={modeLabel}
       />
+
+      {error ? <InfoBanner text={error} tone="danger" /> : null}
+      {success ? <InfoBanner text={success} tone="success" /> : null}
+      {isObserver ? <InfoBanner text="Observer accounts can only review their own observation records." /> : null}
+
+      <Card>
+        <SectionTitle title="Search Feed" subtitle="Filter by observation type, resident, value, or recorder." />
+        <AppInput value={query} onChangeText={setQuery} placeholder="Filter observations" autoCapitalize="none" />
+      </Card>
+
       {canRecord ? (
-        <View
-          style={{
-            marginBottom: 12,
-            padding: 12,
-            borderWidth: 1,
-            borderColor: "#ddd",
-            borderRadius: 8
-          }}
-        >
-          <Text style={{ fontWeight: "600", marginBottom: 8 }}>
-            {editingId ? "Edit Observation" : "Record Observation"}
-          </Text>
-          <Text style={{ marginBottom: 4 }}>Resident</Text>
+        <Card>
+          <SectionTitle
+            title={editingId ? "Edit Observation" : "Record Observation"}
+            subtitle="Select a resident, record the type, and capture the value."
+          />
           <FlatList
             horizontal
             data={residents}
             keyExtractor={(item) => String(item.id || item.Id)}
-            renderItem={({ item }) => {
-              const id = String(item.id || item.Id);
-              const fullName = residentName(item);
-              const selected = id === selectedResidentId;
-              return (
-                <TouchableOpacity
-                  onPress={() => pickResident(item)}
-                  style={{
-                    marginRight: 8,
-                    marginBottom: 8,
-                    paddingHorizontal: 10,
-                    paddingVertical: 8,
-                    borderWidth: 1,
-                    borderColor: selected ? "#2a7" : "#ccc",
-                    backgroundColor: selected ? "#e7fff4" : "#fff",
-                    borderRadius: 8
-                  }}
-                >
-                  <Text>{fullName || "Unknown"}</Text>
-                </TouchableOpacity>
-              );
-            }}
+            showsHorizontalScrollIndicator={false}
+            renderItem={({ item }) => (
+              <Chip
+                label={residentName(item) || "Resident"}
+                selected={String(item.id || item.Id) === selectedResidentId}
+                onPress={() => pickResident(item)}
+              />
+            )}
+            style={{ marginBottom: spacing.sm }}
           />
-          <TextInput
-            placeholder="Type (e.g., BP, Temp, Note)"
-            value={type}
-            onChangeText={setType}
-            style={{ borderWidth: 1, borderColor: "#ccc", marginBottom: 8, padding: 10, borderRadius: 6 }}
-          />
-          <TextInput
-            placeholder="Value (e.g., 120/80)"
-            value={value}
-            onChangeText={setValue}
-            style={{ borderWidth: 1, borderColor: "#ccc", marginBottom: 8, padding: 10, borderRadius: 6 }}
-          />
-          <TouchableOpacity
+
+          <FormLabel>Observation Type</FormLabel>
+          <AppInput value={type} onChangeText={setType} placeholder="BP, Temp, Mood, Note" />
+          <FormLabel>Observation Value</FormLabel>
+          <AppInput value={value} onChangeText={setValue} placeholder="120/80, 37.1, Resident resting comfortably" multiline />
+
+          <PrimaryButton
+            label={saving ? "Saving..." : editingId ? "Save Changes" : "Save Observation"}
             onPress={onSaveObservation}
             disabled={saving}
-            style={{
-              backgroundColor: saving ? "#8fbca8" : "#2a7",
-              paddingVertical: 10,
-              borderRadius: 6,
-              alignItems: "center",
-              marginBottom: editingId ? 8 : 0
-            }}
-          >
-            <Text style={{ color: "white", fontWeight: "600" }}>
-              {saving ? "Saving..." : editingId ? "Save Changes" : "Save Observation"}
-            </Text>
-          </TouchableOpacity>
-          {editingId ? (
-            <TouchableOpacity onPress={resetForm} style={{ alignItems: "center", paddingVertical: 4 }}>
-              <Text style={{ color: "#666" }}>Cancel Edit</Text>
-            </TouchableOpacity>
-          ) : null}
-        </View>
+          />
+          {editingId ? <PrimaryButton label="Cancel Edit" onPress={resetForm} tone="secondary" /> : null}
+        </Card>
       ) : null}
-      {error ? <Text style={{ color: "red", marginBottom: 8 }}>{error}</Text> : null}
-      {success ? <Text style={{ color: "#2a7", marginBottom: 8 }}>{success}</Text> : null}
-      {isObserver ? <Text style={{ marginBottom: 8 }}>Observer can only view their own records.</Text> : null}
-      {loadingList ? <ActivityIndicator style={{ marginBottom: 8 }} /> : null}
-      <FlatList
-        data={filteredItems}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-        keyExtractor={(item) => String(item.id || item.Id)}
-        renderItem={({ item }) => (
-          <View style={{ paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: "#eee" }}>
-            <Text>
-              {(item.type || item.Type || "").toString()}: {(item.value || item.Value || "").toString()}
-            </Text>
-            <Text style={{ color: "#666" }}>
-              {(item.residentName || item.ResidentName || "").toString()} | {(item.recordedBy || item.RecordedBy || "").toString()}
-            </Text>
-            <Text style={{ color: "#666" }}>{(item.recordedAt || item.RecordedAt || "").toString()}</Text>
-            {canRecord ? (
-              <View style={{ flexDirection: "row", marginTop: 6 }}>
-                <TouchableOpacity onPress={() => startEdit(item)} style={{ marginRight: 12 }}>
-                  <Text style={{ color: "#2a7" }}>Edit</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => confirmDelete(item)}>
-                  <Text style={{ color: "#c22" }}>Delete</Text>
-                </TouchableOpacity>
-              </View>
-            ) : null}
-          </View>
-        )}
-      />
-    </SafeAreaView>
+
+      <Card style={{ marginBottom: 0 }}>
+        <SectionTitle title="Observation Feed" subtitle={`${filteredItems.length} items in the current view`} />
+        {loadingList ? <LoadingBlock label="Loading observations" /> : null}
+        <FlatList
+          data={filteredItems}
+          scrollEnabled={false}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.accent} />}
+          keyExtractor={(item) => String(item.id || item.Id)}
+          renderItem={({ item }) => (
+            <ListRow
+              title={`${(item.type || item.Type || "").toString()}: ${(item.value || item.Value || "").toString()}`}
+              subtitle={`${(item.residentName || item.ResidentName || "").toString()} | ${(item.recordedBy || item.RecordedBy || "").toString()}`}
+              meta={(item.recordedAt || item.RecordedAt || "").toString()}
+            >
+              {canRecord ? (
+                <View style={{ flexDirection: "row", marginTop: spacing.xs }}>
+                  <TouchableOpacity onPress={() => startEdit(item)} style={{ marginRight: spacing.md }}>
+                    <Text style={{ color: colors.accent, fontWeight: "700" }}>Edit</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => confirmDelete(item)}>
+                    <Text style={{ color: colors.danger, fontWeight: "700" }}>Delete</Text>
+                  </TouchableOpacity>
+                </View>
+              ) : null}
+            </ListRow>
+          )}
+          ListEmptyComponent={!loadingList ? <Text style={{ color: colors.textMuted }}>No observations match the current filter.</Text> : null}
+        />
+      </Card>
+    </Screen>
   );
 }
