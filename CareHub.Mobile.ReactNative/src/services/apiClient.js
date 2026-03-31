@@ -196,6 +196,14 @@ export async function getMarEntries(token, query = {}) {
   return apiRequest(`/mar${qs ? `?${qs}` : ""}`, { method: "GET" }, token);
 }
 
+export async function getMarReport(token, query) {
+  const params = new URLSearchParams();
+  params.set("fromUtc", query.fromUtc);
+  params.set("toUtc", query.toUtc);
+  if (query.residentId) params.set("residentId", query.residentId);
+  return apiRequest(`/mar/report?${params.toString()}`, { method: "GET" }, token);
+}
+
 export async function createMarEntry(entry, token) {
   return apiRequest(
     "/mar",

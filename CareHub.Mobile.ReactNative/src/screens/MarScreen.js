@@ -13,6 +13,7 @@ import { useAuth } from "../context/AuthContext";
 import {
   createMarEntry,
   getMarEntries,
+  getMarReport,
   getMedications,
   getResidents,
   voidMarEntry
@@ -48,6 +49,8 @@ export default function MarScreen() {
   const [voidingId, setVoidingId] = useState("");
   const [query, setQuery] = useState("");
   const [includeVoided, setIncludeVoided] = useState(false);
+  const [reportLoading, setReportLoading] = useState(false);
+  const [report, setReport] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -192,6 +195,22 @@ export default function MarScreen() {
     }
   }
 
+  async function onLoadReport() {
+    try {
+      setReportLoading(true);
+      setError("");
+      const fromUtc = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      const toUtc = new Date().toISOString();
+      const residentId = selectedResidentId || undefined;
+      const data = await getMarReport(token, { fromUtc, toUtc, residentId });
+      setReport(data);
+    } catch (err) {
+      setError(err?.message || "Failed to load MAR report.");
+    } finally {
+      setReportLoading(false);
+    }
+  }
+
   return (
     <SafeAreaView style={{ flex: 1, padding: 16 }}>
       <Text style={{ fontSize: 20, marginBottom: 8 }}>MAR (Nurse)</Text>
@@ -208,6 +227,11 @@ export default function MarScreen() {
       >
         <Text style={{ color: "#2a7" }}>
           {includeVoided ? "Hide voided entries" : "Show voided entries"}
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={onLoadReport} style={{ marginBottom: 10 }}>
+        <Text style={{ color: "#2a7" }}>
+          {reportLoading ? "Loading MAR report..." : "Load 24h MAR report"}
         </Text>
       </TouchableOpacity>
 
@@ -335,6 +359,17 @@ export default function MarScreen() {
       {error ? <Text style={{ color: "red", marginBottom: 8 }}>{error}</Text> : null}
       {success ? <Text style={{ color: "#2a7", marginBottom: 8 }}>{success}</Text> : null}
       {loading ? <ActivityIndicator style={{ marginBottom: 8 }} /> : null}
+      {report ? (
+        <View style={{ padding: 12, borderWidth: 1, borderColor: "#ddd", borderRadius: 8, marginBottom: 12 }}>
+          <Text style={{ fontWeight: "600", marginBottom: 6 }}>MAR Report (Last 24 Hours)</Text>
+          <Text>Total Entries: {report.summary?.totalEntries ?? report.Summary?.TotalEntries ?? 0}</Text>
+          <Text>Given: {report.summary?.givenCount ?? report.Summary?.GivenCount ?? 0}</Text>
+          <Text>Refused: {report.summary?.refusedCount ?? report.Summary?.RefusedCount ?? 0}</Text>
+          <Text>Missed: {report.summary?.missedCount ?? report.Summary?.MissedCount ?? 0}</Text>
+          <Text>Held: {report.summary?.heldCount ?? report.Summary?.HeldCount ?? 0}</Text>
+          <Text>Not Available: {report.summary?.notAvailableCount ?? report.Summary?.NotAvailableCount ?? 0}</Text>
+        </View>
+      ) : null}
 
       <FlatList
         data={filteredEntries}
