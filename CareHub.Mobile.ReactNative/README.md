@@ -14,16 +14,25 @@ React Native mobile client for CareHub, connected to `CareHub.Api` JWT auth and 
   - Manual refresh and loading/error states
 - Residents
   - List view with search and pull-to-refresh
+  - Nurse create, edit, and delete workflow
+  - Resident detail form for room, doctor, contact, and remarks fields
 - Observations
   - List view with filter and pull-to-refresh
   - Create observation flow for `Nurse` and `General CareStaff`
+  - Resident-scoped filtering for staff workflows
+  - Edit and delete workflow for `Nurse` and `General CareStaff`
 - Medications
   - List view with search, stock visibility, and pull-to-refresh
+  - Nurse create, edit, and delete workflow
+  - Resident assignment and inventory-only medication support
+  - Stock adjustment action
+  - Low-stock filter wired to `GET /api/medications/lowstock`
 - MAR (Nurse)
   - View recent MAR entries
   - Create MAR entries
   - Void MAR entries
   - Filter entries and optional include-voided toggle
+  - 24-hour MAR report summary
 - Medication Orders (Nurse)
   - List orders
   - Create order
@@ -33,6 +42,9 @@ React Native mobile client for CareHub, connected to `CareHub.Api` JWT auth and 
   - Detect trends
   - Care query
   - Trend explain (3-day and 7-day options)
+  - Medication explain
+  - Resident report draft
+  - Facility shift handoff
 
 ## Current Role Matrix
 
@@ -103,6 +115,6 @@ npm run android
 
 ## Known Gaps
 
-1. Mobile is still not full parity with desktop for all workflows.
+1. Full runtime validation on device/emulator is still required after each local environment change.
 2. No dedicated automated role regression suite yet.
-3. Android environment/toolchain stability may vary by local setup.
+3. Android environment/toolchain stability may vary by local setup, especially on long Windows paths.

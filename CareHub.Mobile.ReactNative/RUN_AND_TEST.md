@@ -120,14 +120,20 @@ Configured in `src/services/apiClient.js`:
 ### Nurse
 
 - Login works
-- Can open: Dashboard, Residents, Observations, Medications
-- Can create observation
+- Can open: Dashboard, Residents, Observations, Medications, MAR, Orders, AI
+- Can create, edit, and delete residents
+- Can create, edit, and delete medications
+- Can adjust medication stock and review low-stock items
+- Can create, edit, and delete observations
+- Can create and void MAR entries and view 24h MAR report
+- Can create medication orders and update statuses
+- Can run all mobile AI actions
 
 ### General CareStaff
 
 - Login works
 - Can open: Dashboard, Residents, Observations
-- Can create observation
+- Can create, edit, and delete observations
 - No medication management actions
 
 ### Observer
