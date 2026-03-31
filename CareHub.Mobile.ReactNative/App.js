@@ -12,6 +12,7 @@ import MedicationsScreen from "./src/screens/MedicationsScreen";
 import MarScreen from "./src/screens/MarScreen";
 import OrdersScreen from "./src/screens/OrdersScreen";
 import AiScreen from "./src/screens/AiScreen";
+import { colors, radii } from "./src/ui/theme";
 
 const Stack = createNativeStackNavigator();
 const Tabs = createBottomTabNavigator();
@@ -29,7 +30,29 @@ function AppTabs() {
   const canSeeAi = role === "Nurse";
 
   return (
-    <Tabs.Navigator>
+    <Tabs.Navigator
+      screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: colors.accent,
+        tabBarInactiveTintColor: "#8a8176",
+        tabBarStyle: {
+          backgroundColor: colors.surface,
+          borderTopColor: colors.border,
+          paddingTop: 8,
+          paddingBottom: 8,
+          height: 68,
+          borderTopLeftRadius: radii.lg,
+          borderTopRightRadius: radii.lg
+        },
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontWeight: "700"
+        },
+        sceneStyle: {
+          backgroundColor: colors.background
+        }
+      }}
+    >
       <Tabs.Screen name="Dashboard" component={DashboardScreen} />
       {canSeeResidents ? (
         <Tabs.Screen name="Residents" component={ResidentsScreen} />
@@ -52,8 +75,15 @@ function RootNavigator() {
 
   if (initializing) {
     return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        <ActivityIndicator size="large" />
+      <View
+        style={{
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: colors.background
+        }}
+      >
+        <ActivityIndicator size="large" color={colors.accent} />
       </View>
     );
   }
