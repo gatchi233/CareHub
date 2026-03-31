@@ -22,6 +22,13 @@ export function getApiBaseUrl() {
   return apiBaseUrl;
 }
 
+function buildQueryString(params) {
+  return Object.entries(params)
+    .filter(([, value]) => value !== undefined && value !== null && value !== "")
+    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`)
+    .join("&");
+}
+
 export async function apiRequest(path, options = {}, token = "") {
   const response = await fetch(`${apiBaseUrl}${path}`, {
     headers: {
@@ -187,21 +194,22 @@ export async function adjustMedicationStock(medicationId, delta, token) {
 }
 
 export async function getMarEntries(token, query = {}) {
-  const params = new URLSearchParams();
-  if (query.residentId) params.set("residentId", query.residentId);
-  if (query.fromUtc) params.set("fromUtc", query.fromUtc);
-  if (query.toUtc) params.set("toUtc", query.toUtc);
-  if (query.includeVoided) params.set("includeVoided", "true");
-  const qs = params.toString();
+  const qs = buildQueryString({
+    residentId: query.residentId,
+    fromUtc: query.fromUtc,
+    toUtc: query.toUtc,
+    includeVoided: query.includeVoided ? "true" : undefined
+  });
   return apiRequest(`/mar${qs ? `?${qs}` : ""}`, { method: "GET" }, token);
 }
 
 export async function getMarReport(token, query) {
-  const params = new URLSearchParams();
-  params.set("fromUtc", query.fromUtc);
-  params.set("toUtc", query.toUtc);
-  if (query.residentId) params.set("residentId", query.residentId);
-  return apiRequest(`/mar/report?${params.toString()}`, { method: "GET" }, token);
+  const qs = buildQueryString({
+    fromUtc: query.fromUtc,
+    toUtc: query.toUtc,
+    residentId: query.residentId
+  });
+  return apiRequest(`/mar/report?${qs}`, { method: "GET" }, token);
 }
 
 export async function createMarEntry(entry, token) {
