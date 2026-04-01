@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -8,14 +9,23 @@ import {
   View
 } from "react-native";
 import { useAuth } from "../context/AuthContext";
+import {
+  API_BASE_URL_STORAGE_KEY,
+  getApiBaseUrl,
+  setApiBaseUrl
+} from "../services/apiClient";
 import { colors, radii, shadows, spacing, typography } from "../ui/theme";
 
 export default function LoginScreen() {
   const { login, error, loading } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [apiUrl, setApiUrl] = useState(getApiBaseUrl());
 
   async function onLogin() {
+    const trimmedApiUrl = apiUrl.trim().replace(/\/+$/, "");
+    setApiBaseUrl(trimmedApiUrl);
+    await AsyncStorage.setItem(API_BASE_URL_STORAGE_KEY, trimmedApiUrl);
     await login(username.trim(), password);
   }
 
@@ -83,6 +93,35 @@ export default function LoginScreen() {
             <Text style={{ color: colors.textMuted, marginBottom: spacing.md }}>
               Roles enabled on mobile: Nurse, General CareStaff, Observer.
             </Text>
+
+            <Text
+              style={{
+                color: colors.text,
+                fontWeight: "700",
+                marginBottom: spacing.xs
+              }}
+            >
+              API Base URL
+            </Text>
+            <TextInput
+              placeholder="http://192.168.1.134:5007/api"
+              placeholderTextColor="#8f8477"
+              value={apiUrl}
+              onChangeText={setApiUrl}
+              autoCapitalize="none"
+              autoCorrect={false}
+              keyboardType="url"
+              style={{
+                backgroundColor: colors.background,
+                borderWidth: 1,
+                borderColor: colors.border,
+                borderRadius: radii.md,
+                marginBottom: spacing.sm,
+                paddingHorizontal: spacing.md,
+                paddingVertical: 14,
+                color: colors.text
+              }}
+            />
 
             <TextInput
               placeholder="Username"

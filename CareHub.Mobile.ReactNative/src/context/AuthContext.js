@@ -1,6 +1,11 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { login as loginApi, me as meApi } from "../services/apiClient";
+import {
+  API_BASE_URL_STORAGE_KEY,
+  login as loginApi,
+  me as meApi,
+  setApiBaseUrl
+} from "../services/apiClient";
 
 const AuthContext = createContext(null);
 const AUTH_STORAGE_KEY = "carehub_mobile_auth";
@@ -19,6 +24,11 @@ export function AuthProvider({ children }) {
 
     async function restoreSession() {
       try {
+        const savedApiBaseUrl = await AsyncStorage.getItem(API_BASE_URL_STORAGE_KEY);
+        if (savedApiBaseUrl) {
+          setApiBaseUrl(savedApiBaseUrl);
+        }
+
         const raw = await AsyncStorage.getItem(AUTH_STORAGE_KEY);
         if (!raw) {
           return;
