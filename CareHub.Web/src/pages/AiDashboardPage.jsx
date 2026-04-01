@@ -52,6 +52,7 @@ const FACILITY_TOOL_CARDS = [
 function AiDashboardPage({ loading, error, residents = [] }) {
   const [activeTab, setActiveTab] = useState("resident-tools");
   const [selectedResidentId, setSelectedResidentId] = useState("");
+  const [trendDays, setTrendDays] = useState("7");
   const [careQuery, setCareQuery] = useState("");
   const [medicationName, setMedicationName] = useState("");
   const [dosage, setDosage] = useState("");
@@ -116,7 +117,9 @@ function AiDashboardPage({ loading, error, residents = [] }) {
   }
 
   const canRunShiftSummary = Boolean(selectedResidentId) && !loading && !error;
+  const canRunDetectTrends = Boolean(selectedResidentId) && !loading && !error;
   const canRunCareQuery = Boolean(careQuery.trim()) && !loading && !error;
+  const canRunMedicationExplain = Boolean(medicationName.trim()) && !loading && !error;
 
   return (
     <section className="page-shell">
@@ -141,7 +144,7 @@ function AiDashboardPage({ loading, error, residents = [] }) {
               </label>
               <label>
                 Trend Window
-                <select defaultValue="7">
+                <select value={trendDays} onChange={(event) => setTrendDays(event.target.value)}>
                   <option value="3">3 days</option>
                   <option value="7">7 days</option>
                 </select>
@@ -210,7 +213,31 @@ function AiDashboardPage({ loading, error, residents = [] }) {
                       {activeTool === tool.key ? "Running..." : "Run Tool"}
                     </button>
                   ) : null}
-                  {!["shift-summary", "care-query"].includes(tool.key) ? (
+                  {tool.key === "detect-trends" ? (
+                    <button
+                      type="button"
+                      className="ghost-button"
+                      onClick={() => runTool(tool.key, () => apiService.aiDetectTrends(selectedResidentId))}
+                      disabled={!canRunDetectTrends || activeTool === tool.key}
+                    >
+                      {activeTool === tool.key ? "Running..." : "Run Tool"}
+                    </button>
+                  ) : null}
+                  {tool.key === "medication-explain" ? (
+                    <button
+                      type="button"
+                      className="ghost-button"
+                      onClick={() =>
+                        runTool(tool.key, () =>
+                          apiService.aiMedicationExplain(medicationName.trim(), dosage.trim() || null)
+                        )
+                      }
+                      disabled={!canRunMedicationExplain || activeTool === tool.key}
+                    >
+                      {activeTool === tool.key ? "Running..." : "Run Tool"}
+                    </button>
+                  ) : null}
+                  {!["shift-summary", "detect-trends", "care-query", "medication-explain"].includes(tool.key) ? (
                     <button type="button" className="ghost-button" disabled>
                       Available Soon
                     </button>
