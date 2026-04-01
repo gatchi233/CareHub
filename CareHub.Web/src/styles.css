@@ -676,6 +676,70 @@ body,
     width: 100%;
     order: 3;
   }
+
+  .content {
+    padding: 0.85rem;
+  }
+
+  .section-tools {
+    position: static;
+  }
+
+  .list-row,
+  .recent-row,
+  .section-meta {
+    align-items: flex-start;
+  }
+
+  .list-row,
+  .recent-row,
+  .list-row-actions,
+  .ai-response-meta {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 640px) {
+  body {
+    overflow: auto;
+  }
+
+  .content {
+    padding: 0.75rem;
+  }
+
+  .card {
+    padding: 1rem;
+  }
+
+  .topbar {
+    align-items: stretch;
+  }
+
+  .topbar-title {
+    justify-content: space-between;
+  }
+
+  .topbar button,
+  .secondary-button,
+  .section-tools select,
+  .section-tools input,
+  .ghost-button {
+    width: 100%;
+  }
+
+  .pager {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .pager select {
+    width: 100%;
+  }
+
+  .page-tabs {
+    padding-bottom: 0.35rem;
+  }
 }
 
 .backdrop {
