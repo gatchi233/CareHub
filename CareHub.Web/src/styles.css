@@ -624,10 +624,22 @@ body,
   font: inherit;
   color: #15343f;
   line-height: 1.6;
+  border: 1px solid #dbe8ed;
+  border-radius: 12px;
+  background: #f8fbfc;
+  padding: 1rem;
 }
 
 .ai-inline-state {
   padding: 0.9rem;
+}
+
+.ai-response-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  color: #365b67;
 }
 
 @media (max-width: 920px) {

@@ -64,6 +64,7 @@ function AiDashboardPage({ loading, error, residents = [] }) {
   const [response, setResponse] = useState(null);
   const [requestError, setRequestError] = useState("");
   const [activeTool, setActiveTool] = useState("");
+  const [copyState, setCopyState] = useState("idle");
 
   const residentOptions = useMemo(() => {
     return residents
@@ -245,6 +246,21 @@ function AiDashboardPage({ loading, error, residents = [] }) {
     );
   }
 
+  async function handleCopyResponse() {
+    if (!response?.content) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(response.content);
+      setCopyState("copied");
+      window.setTimeout(() => setCopyState("idle"), 1800);
+    } catch {
+      setCopyState("error");
+      window.setTimeout(() => setCopyState("idle"), 1800);
+    }
+  }
+
   return (
     <section className="page-shell">
       <PageTabs tabs={AI_TABS} activeTab={activeTab} onChange={setActiveTab} />
@@ -342,8 +358,13 @@ function AiDashboardPage({ loading, error, residents = [] }) {
           <article className="card ai-response-card">
             <div className="ai-tool-header">
               <h3>Latest AI Response</h3>
-              <button type="button" className="ghost-button">
-                Copy
+              <button
+                type="button"
+                className="ghost-button"
+                onClick={handleCopyResponse}
+                disabled={responseState !== "ready" || !response?.content}
+              >
+                {copyState === "copied" ? "Copied" : copyState === "error" ? "Retry Copy" : "Copy"}
               </button>
             </div>
             {responseState === "loading" ? (
@@ -356,8 +377,9 @@ function AiDashboardPage({ loading, error, residents = [] }) {
             ) : null}
             {responseState === "ready" && response ? (
               <>
-                <div className="list-row">
-                  <span>{response.title}</span>
+                <div className="ai-response-meta">
+                  <span className="row-index">AI</span>
+                  <strong>{response.title}</strong>
                   <small>{response.residentName || "Facility context"}</small>
                 </div>
                 <pre className="ai-response-body">{response.content}</pre>
