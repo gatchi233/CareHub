@@ -94,6 +94,7 @@ function App() {
     const role = authSession?.role || "";
     return ROLE_SECTIONS[role] || [];
   }, [authSession]);
+  const canAccessAiDashboard = ["Admin", "Nurse"].includes(authSession?.role || "");
 
   useEffect(() => {
     async function bootstrapAuth() {
@@ -879,11 +880,16 @@ function App() {
     }
 
     if (activeSection === "AI Dashboard") {
+      if (!canAccessAiDashboard) {
+        return <article className="card error">AI Dashboard is restricted to Admin and Nurse roles.</article>;
+      }
+
       return (
         <AiDashboardPage
           loading={loading}
           error={error}
           residents={residents}
+          authRole={authSession?.role}
         />
       );
     }

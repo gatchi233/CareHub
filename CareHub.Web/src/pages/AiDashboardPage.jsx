@@ -53,7 +53,7 @@ const TOOL_LABELS = new Map(
   [...RESIDENT_TOOL_CARDS, ...FACILITY_TOOL_CARDS].map((tool) => [tool.key, tool.title])
 );
 
-function AiDashboardPage({ loading, error, residents = [] }) {
+function AiDashboardPage({ loading, error, residents = [], authRole }) {
   const [activeTab, setActiveTab] = useState("resident-tools");
   const [selectedResidentId, setSelectedResidentId] = useState("");
   const [trendDays, setTrendDays] = useState("7");
@@ -138,6 +138,10 @@ function AiDashboardPage({ loading, error, residents = [] }) {
   const canRunReportDraft = Boolean(selectedResidentId) && !loading && !error;
   const canRunTrendExplain = Boolean(selectedResidentId) && !loading && !error;
   const canRunShiftHandoff = !loading && !error;
+
+  if (!["Admin", "Nurse"].includes(authRole || "")) {
+    return <article className="card error">AI Dashboard is restricted to Admin and Nurse roles.</article>;
+  }
 
   function renderToolButton(toolKey) {
     if (toolKey === "shift-summary") {
