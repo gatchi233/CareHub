@@ -2,9 +2,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { API_BASE, api, getAuthToken, setAuthToken } from "./api";
 import ListToolbar from "./components/ListToolbar";
 import SectionMetaPager from "./components/SectionMetaPager";
+import AiDashboardPage from "./pages/AiDashboardPage";
 import DashboardPage from "./pages/DashboardPage";
 import InventoryPage from "./pages/InventoryPage";
+import MarPage from "./pages/MarPage";
 import ObservationsPage from "./pages/ObservationsPage";
+import OrdersPage from "./pages/OrdersPage";
 import ResidentsPage from "./pages/ResidentsPage";
 import StaffPage from "./pages/StaffPage";
 
@@ -12,13 +15,16 @@ const SECTIONS = [
   { key: "Dashboard", label: "Dashboard" },
   { key: "Residents", label: "Residents" },
   { key: "Inventory", label: "Inventory" },
+  { key: "MAR", label: "MAR" },
+  { key: "Orders", label: "Orders" },
+  { key: "AI Dashboard", label: "AI Dashboard" },
   { key: "Observations", label: "Observations" },
   { key: "Staff", label: "Staff" }
 ];
 
 const ROLE_SECTIONS = {
-  Admin: ["Dashboard", "Residents", "Inventory", "Staff"],
-  Nurse: ["Dashboard", "Residents", "Inventory", "Observations"],
+  Admin: ["Dashboard", "Residents", "Inventory", "Orders", "AI Dashboard", "Staff"],
+  Nurse: ["Dashboard", "Residents", "Inventory", "MAR", "Orders", "AI Dashboard", "Observations"],
   "General CareStaff": ["Dashboard", "Residents", "Observations"],
   Observer: ["Dashboard", "Inventory", "Observations"],
 };
@@ -666,6 +672,18 @@ function App() {
       );
     }
 
+    if (activeSection === "MAR") {
+      return <MarPage />;
+    }
+
+    if (activeSection === "Orders") {
+      return <OrdersPage />;
+    }
+
+    if (activeSection === "AI Dashboard") {
+      return <AiDashboardPage />;
+    }
+
     if (activeSection === "Observations") {
       return (
         <ObservationsPage
@@ -758,6 +776,9 @@ function App() {
               <span>{section.label}</span>
               {section.key === "Residents" && <small>{residents.length}</small>}
               {section.key === "Inventory" && <small>{medications.length}</small>}
+              {section.key === "MAR" && <small>New</small>}
+              {section.key === "Orders" && <small>New</small>}
+              {section.key === "AI Dashboard" && <small>AI</small>}
               {section.key === "Observations" && <small>{observations.length}</small>}
               {section.key === "Staff" && authSession.role !== "Observer" && (
                 <small>{staffMembers.length}</small>
