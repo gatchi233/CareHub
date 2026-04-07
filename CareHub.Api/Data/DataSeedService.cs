@@ -198,6 +198,10 @@ public static class DataSeedService
         if (!string.IsNullOrWhiteSpace(configured) && Directory.Exists(configured))
             return configured;
 
+        var apiSeedData = Path.Combine(env.ContentRootPath, "SeedData");
+        if (Directory.Exists(apiSeedData))
+            return apiSeedData;
+
         var sharedData = Path.GetFullPath(Path.Combine(env.ContentRootPath, "..", "SharedData"));
         if (Directory.Exists(sharedData))
             return sharedData;

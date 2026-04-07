@@ -26,7 +26,7 @@ public sealed class StaffController : ControllerBase
     {
         _db = db;
         _staffDirectoryPath = ResolveStaffDirectoryPath(config, env);
-        _desktopSeedStaffPath = Path.GetFullPath(Path.Combine(env.ContentRootPath, "..", "CareHub.Desktop", "Resources", "Raw", "Staff.json"));
+        _desktopSeedStaffPath = ResolveSeedStaffPath(env);
     }
 
     // GET api/staff
@@ -254,12 +254,29 @@ public sealed class StaffController : ControllerBase
             return configured;
         }
 
+        var apiSeedData = Path.Combine(env.ContentRootPath, "SeedData");
+        if (Directory.Exists(apiSeedData))
+            return Path.Combine(apiSeedData, "Staff.json");
+
         var sharedData = Path.GetFullPath(Path.Combine(env.ContentRootPath, "..", "SharedData"));
         if (Directory.Exists(sharedData))
             return Path.Combine(sharedData, "Staff.json");
 
         var desktopRaw = Path.GetFullPath(Path.Combine(env.ContentRootPath, "..", "CareHub.Desktop", "Resources", "Raw"));
         return Path.Combine(desktopRaw, "Staff.json");
+    }
+
+    private static string ResolveSeedStaffPath(IWebHostEnvironment env)
+    {
+        var apiSeedStaff = Path.Combine(env.ContentRootPath, "SeedData", "Staff.json");
+        if (System.IO.File.Exists(apiSeedStaff))
+            return apiSeedStaff;
+
+        var sharedDataStaff = Path.GetFullPath(Path.Combine(env.ContentRootPath, "..", "SharedData", "Staff.json"));
+        if (System.IO.File.Exists(sharedDataStaff))
+            return sharedDataStaff;
+
+        return Path.GetFullPath(Path.Combine(env.ContentRootPath, "..", "CareHub.Desktop", "Resources", "Raw", "Staff.json"));
     }
 }
 

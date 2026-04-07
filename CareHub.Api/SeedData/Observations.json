@@ -1,0 +1,226 @@
+[
+  {
+    "Id": "00000000-0000-0000-0000-000000000001",
+    "ResidentId": "00000000-0000-0000-0000-000000000013",
+    "RecordedAt": "2026-01-15T07:40:00-08:00",
+    "RecordedBy": "EMP-004",
+    "Type": "Medication",
+    "Severity": "Normal",
+    "Value": "Morning medications taken without difficulty. No adverse reactions.",
+    "Vitals": {
+      "TemperatureC": 36.6,
+      "Systolic": 124,
+      "Diastolic": 78,
+      "HeartRate": 74,
+      "OxygenSaturation": 96
+    }
+  },
+  {
+    "Id": "00000000-0000-0000-0000-000000000002",
+    "ResidentId": "00000000-0000-0000-0000-000000000013",
+    "RecordedAt": "2026-01-15T19:15:00-08:00",
+    "RecordedBy": "EMP-004",
+    "Type": "Symptom",
+    "Severity": "Low",
+    "Value": "Resident reported mild dizziness before bedtime. Resolved after rest.",
+    "Vitals": {
+      "TemperatureC": 36.7,
+      "Systolic": 110,
+      "Diastolic": 68,
+      "HeartRate": 82,
+      "OxygenSaturation": 95
+    }
+  },
+  {
+    "Id": "00000000-0000-0000-0000-000000000003",
+    "ResidentId": "00000000-0000-0000-0000-000000000001",
+    "RecordedAt": "2026-01-16T08:10:00-08:00",
+    "RecordedBy": "EMP-002",
+    "Type": "Mobility",
+    "Severity": "Medium",
+    "Value": "Required assistance transferring from bed to wheelchair.",
+    "Vitals": {
+      "TemperatureC": 36.5,
+      "Systolic": 132,
+      "Diastolic": 84,
+      "HeartRate": 78,
+      "OxygenSaturation": 97
+    }
+  },
+  {
+    "Id": "00000000-0000-0000-0000-000000000004",
+    "ResidentId": "00000000-0000-0000-0000-000000000006",
+    "RecordedAt": "2026-01-16T06:55:00-08:00",
+    "RecordedBy": "EMP-017",
+    "Type": "General",
+    "Severity": "Normal",
+    "Value": "Slept well overnight. Appetite normal at breakfast.",
+    "Vitals": {
+      "TemperatureC": 36.4,
+      "Systolic": 128,
+      "Diastolic": 80,
+      "HeartRate": 68,
+      "OxygenSaturation": 98
+    }
+  },
+  {
+    "Id": "00000000-0000-0000-0000-000000000005",
+    "ResidentId": "00000000-0000-0000-0000-000000000003",
+    "RecordedAt": "2026-01-16T11:30:00-08:00",
+    "RecordedBy": "EMP-002",
+    "Type": "Diet",
+    "Severity": "Low",
+    "Value": "Blood sugar slightly elevated before lunch. Diabetic diet reinforced.",
+    "Vitals": {
+      "TemperatureC": 36.6,
+      "Systolic": 138,
+      "Diastolic": 86,
+      "HeartRate": 76,
+      "OxygenSaturation": 96
+    }
+  },
+  {
+    "Id": "00000000-0000-0000-0000-000000000006",
+    "ResidentId": "00000000-0000-0000-0000-000000000004",
+    "RecordedAt": "2026-01-16T21:10:00-08:00",
+    "RecordedBy": "EMP-004",
+    "Type": "Sleep",
+    "Severity": "Medium",
+    "Value": "Difficulty falling asleep. Resident requested sleep aid.",
+    "Vitals": {
+      "TemperatureC": 36.8,
+      "Systolic": 134,
+      "Diastolic": 82,
+      "HeartRate": 84,
+      "OxygenSaturation": 97
+    }
+  },
+  {
+    "Id": "00000000-0000-0000-0000-000000000007",
+    "ResidentId": "00000000-0000-0000-0000-000000000010",
+    "RecordedAt": "2026-01-17T08:00:00-08:00",
+    "RecordedBy": "EMP-017",
+    "Type": "Vital Signs",
+    "Severity": "Normal",
+    "Value": "Blood pressure and heart rate within normal range.",
+    "Vitals": {
+      "TemperatureC": 36.8,
+      "Systolic": 118,
+      "Diastolic": 76,
+      "HeartRate": 72,
+      "OxygenSaturation": 97
+    }
+  },
+  {
+    "Id": "00000000-0000-0000-0000-000000000008",
+    "ResidentId": "00000000-0000-0000-0000-000000000011",
+    "RecordedAt": "2026-01-17T09:45:00-08:00",
+    "RecordedBy": "EMP-002",
+    "Type": "Hearing",
+    "Severity": "Low",
+    "Value": "Resident had difficulty hearing instructions. Repeated slowly.",
+    "Vitals": {
+      "TemperatureC": 36.5,
+      "Systolic": 126,
+      "Diastolic": 78,
+      "HeartRate": 70,
+      "OxygenSaturation": 96
+    }
+  },
+  {
+    "Id": "00000000-0000-0000-0000-000000000009",
+    "ResidentId": "00000000-0000-0000-0000-000000000014",
+    "RecordedAt": "2026-01-17T12:20:00-08:00",
+    "RecordedBy": "EMP-004",
+    "Type": "Diet",
+    "Severity": "Medium",
+    "Value": "Accidentally served food containing gluten. No reaction observed.",
+    "Vitals": {
+      "TemperatureC": 36.7,
+      "Systolic": 122,
+      "Diastolic": 74,
+      "HeartRate": 76,
+      "OxygenSaturation": 98
+    }
+  },
+  {
+    "Id": "00000000-0000-0000-0000-000000000010",
+    "ResidentId": "00000000-0000-0000-0000-000000000002",
+    "RecordedAt": "2026-01-17T18:30:00-08:00",
+    "RecordedBy": "EMP-017",
+    "Type": "Medication",
+    "Severity": "Medium",
+    "Value": "Evening medication delayed due to resident being asleep.",
+    "Vitals": {
+      "TemperatureC": 36.3,
+      "Systolic": 116,
+      "Diastolic": 72,
+      "HeartRate": 64,
+      "OxygenSaturation": 97
+    }
+  },
+  {
+    "Id": "00000000-0000-0000-0000-000000000011",
+    "ResidentId": "00000000-0000-0000-0000-000000000005",
+    "RecordedAt": "2026-01-18T07:20:00-08:00",
+    "RecordedBy": "EMP-002",
+    "Type": "Respiratory",
+    "Severity": "Low",
+    "Value": "Mild coughing noted in the morning. No fever.",
+    "Vitals": {
+      "TemperatureC": 36.9,
+      "Systolic": 130,
+      "Diastolic": 82,
+      "HeartRate": 80,
+      "OxygenSaturation": 94
+    }
+  },
+  {
+    "Id": "00000000-0000-0000-0000-000000000012",
+    "ResidentId": "00000000-0000-0000-0000-000000000007",
+    "RecordedAt": "2026-01-18T13:50:00-08:00",
+    "RecordedBy": "EMP-004",
+    "Type": "General",
+    "Severity": "Normal",
+    "Value": "Participated in group activity. Appeared in good spirits.",
+    "Vitals": {
+      "TemperatureC": 36.6,
+      "Systolic": 120,
+      "Diastolic": 76,
+      "HeartRate": 74,
+      "OxygenSaturation": 98
+    }
+  },
+  {
+    "Id": "00000000-0000-0000-0000-000000000013",
+    "ResidentId": "00000000-0000-0000-0000-000000000009",
+    "RecordedAt": "2026-01-18T17:40:00-08:00",
+    "RecordedBy": "EMP-017",
+    "Type": "Allergy",
+    "Severity": "Low",
+    "Value": "Reported mild itching after outdoor walk. No swelling observed.",
+    "Vitals": {
+      "TemperatureC": 36.7,
+      "Systolic": 128,
+      "Diastolic": 80,
+      "HeartRate": 78,
+      "OxygenSaturation": 97
+    }
+  },
+  {
+    "Id": "00000000-0000-0000-0000-000000000014",
+    "ResidentId": "00000000-0000-0000-0000-000000000015",
+    "RecordedAt": "2026-01-18T20:05:00-08:00",
+    "RecordedBy": "EMP-002",
+    "Type": "Medication",
+    "Severity": "Medium",
+    "Value": "Refused evening dose stating nausea. Will monitor.",
+    "Vitals": {
+      "TemperatureC": 37.1,
+      "Systolic": 136,
+      "Diastolic": 84,
+      "HeartRate": 86,
+      "OxygenSaturation": 95
+    }
+  }
+]
