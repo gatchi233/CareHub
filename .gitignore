@@ -226,6 +226,10 @@ AutoTest.Net/
 
 ## Secrets / local overrides
 appsettings.Development.json
+CareHub.Mobile.ReactNative/android/keystore.properties
+CareHub.Mobile.ReactNative/android/keystores/
+*.keystore
+*.jks
 
 ## Misc
 ClientBin/
