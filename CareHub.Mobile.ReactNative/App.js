@@ -41,7 +41,7 @@ function AppTabs() {
 
   return (
     <Tabs.Navigator
-      screenOptions={{
+      screenOptions={({ route }) => ({
         headerShown: false,
         tabBarShowLabel: false,
         tabBarActiveTintColor: colors.accent,
@@ -89,7 +89,7 @@ function AppTabs() {
         sceneStyle: {
           backgroundColor: colors.background
         }
-      }}
+      })}
     >
       <Tabs.Screen name="Dashboard" component={DashboardScreen} />
       {canSeeResidents ? (
