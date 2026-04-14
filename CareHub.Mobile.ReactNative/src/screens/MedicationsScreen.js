@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Alert, FlatList, RefreshControl, Text, View } from "react-native";
+import { Alert, FlatList, RefreshControl, Text } from "react-native";
 import { useAuth } from "../context/AuthContext";
 import {
   adjustMedicationStock,
@@ -95,6 +95,7 @@ export default function MedicationsScreen() {
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState("");
   const [selectedMedicationId, setSelectedMedicationId] = useState("");
+  const [formMode, setFormMode] = useState("");
   const [query, setQuery] = useState("");
   const [stockDelta, setStockDelta] = useState("1");
   const [showLowStock, setShowLowStock] = useState(false);
@@ -140,17 +141,19 @@ export default function MedicationsScreen() {
           if (selectedMedicationId) {
             const selected = medicationList.find((item) => String(item.id || item.Id) === selectedMedicationId);
             if (selected) {
-              setForm(toForm(selected));
+              if (formMode === "edit") {
+                setForm(toForm(selected));
+              }
               return;
             }
+
+            setSelectedMedicationId("");
+            setFormMode("");
           }
 
-          if (medicationList.length > 0) {
-            const first = medicationList[0];
-            setSelectedMedicationId(String(first.id || first.Id || ""));
-            setForm(toForm(first));
-          } else {
+          if (medicationList.length === 0) {
             setSelectedMedicationId("");
+            setFormMode("");
             setForm(EMPTY_FORM);
           }
         }
@@ -161,7 +164,7 @@ export default function MedicationsScreen() {
         else setLoading(false);
       }
     },
-    [canManage, selectedMedicationId, token]
+    [canManage, formMode, selectedMedicationId, token]
   );
 
   useEffect(() => {
@@ -181,12 +184,18 @@ export default function MedicationsScreen() {
     });
   }, [canManage, items, lowStockItems, query, showLowStock]);
 
+  const selectedMedication = useMemo(
+    () => items.find((item) => String(item.id || item.Id || "") === selectedMedicationId),
+    [items, selectedMedicationId]
+  );
+
   function updateForm(key, value) {
     setForm((current) => ({ ...current, [key]: value }));
   }
 
   function startCreate() {
     setSelectedMedicationId("");
+    setFormMode("create");
     setForm(EMPTY_FORM);
     setError("");
     setSuccess("");
@@ -194,7 +203,16 @@ export default function MedicationsScreen() {
 
   function selectMedication(item) {
     setSelectedMedicationId(String(item.id || item.Id || ""));
-    setForm(toForm(item));
+    setFormMode("");
+    setError("");
+    setSuccess("");
+  }
+
+  function startEditMedication() {
+    if (!selectedMedication) return;
+    setSelectedMedicationId(String(selectedMedication.id || selectedMedication.Id || ""));
+    setForm(toForm(selectedMedication));
+    setFormMode("edit");
     setError("");
     setSuccess("");
   }
@@ -214,7 +232,7 @@ export default function MedicationsScreen() {
     try {
       setSaving(true);
       const payload = toPayload(form);
-      if (selectedMedicationId) {
+      if (formMode === "edit" && selectedMedicationId) {
         await updateMedication(selectedMedicationId, { ...payload, id: selectedMedicationId }, token);
         setSuccess("Medication updated.");
       } else {
@@ -223,6 +241,7 @@ export default function MedicationsScreen() {
         if (createdId) setSelectedMedicationId(createdId);
         setSuccess("Medication created.");
       }
+      setFormMode("");
       await load();
     } catch (err) {
       setError(err?.message || "Failed to save medication.");
@@ -267,6 +286,7 @@ export default function MedicationsScreen() {
             setSuccess("");
             await deleteMedication(selectedMedicationId, token);
             setSelectedMedicationId("");
+            setFormMode("");
             setForm(EMPTY_FORM);
             setSuccess("Medication deleted.");
             await load();
@@ -303,26 +323,41 @@ export default function MedicationsScreen() {
         {canManage ? (
           <InfoBanner text={showLowStock ? "Showing only low-stock medications." : "Showing all medications."} />
         ) : null}
+        {canManage ? (
+          <PrimaryButton label="New Medication" onPress={startCreate} tone="secondary" />
+        ) : null}
       </Card>
 
-      {canManage ? (
+      {selectedMedication ? (
         <Card>
-          <SectionTitle title={selectedMedicationId ? "Edit Medication" : "Create Medication"} subtitle="Maintain dosage, inventory levels, and resident assignment." />
-          <FlatList
-            horizontal
-            data={items}
-            keyExtractor={(item) => String(item.id || item.Id)}
-            showsHorizontalScrollIndicator={false}
-            renderItem={({ item }) => (
-              <Chip
-                label={medicationName(item)}
-                selected={String(item.id || item.Id) === selectedMedicationId}
-                onPress={() => selectMedication(item)}
-              />
-            )}
-            ListFooterComponent={<Chip label="New +" selected={!selectedMedicationId} onPress={startCreate} />}
-            style={{ marginBottom: spacing.sm }}
+          <SectionTitle
+            title="Medication Detail"
+            subtitle="Review medication details before choosing an action."
           />
+          <Text style={{ color: colors.text, fontWeight: "900", fontSize: 18, marginBottom: spacing.sm }}>
+            {medicationName(selectedMedication)}
+          </Text>
+          <Text style={{ color: colors.textMuted, marginBottom: spacing.xs }}>
+            Dosage: {selectedMedication.dosage || selectedMedication.Dosage || "N/A"}
+          </Text>
+          <Text style={{ color: colors.textMuted, marginBottom: spacing.xs }}>
+            Assigned to: {selectedMedication.residentName || selectedMedication.ResidentName || "Inventory"}
+          </Text>
+          <Text style={{ color: colors.textMuted, marginBottom: spacing.xs }}>
+            Stock: {selectedMedication.stockQuantity ?? selectedMedication.StockQuantity ?? 0}
+          </Text>
+          <Text style={{ color: colors.textMuted, marginBottom: spacing.md }}>
+            Reorder at: {selectedMedication.reorderLevel ?? selectedMedication.ReorderLevel ?? 0}
+          </Text>
+          {canManage ? (
+            <PrimaryButton label="Edit Medication" onPress={startEditMedication} />
+          ) : null}
+        </Card>
+      ) : null}
+
+      {canManage && formMode ? (
+        <Card>
+          <SectionTitle title={formMode === "edit" ? "Edit Medication" : "Create Medication"} subtitle="Maintain dosage, inventory levels, and resident assignment." />
 
           <FormLabel>Medication Name</FormLabel>
           <AppInput value={form.medName} onChangeText={(value) => updateForm("medName", value)} placeholder="Medication name" />
@@ -363,9 +398,9 @@ export default function MedicationsScreen() {
             style={{ marginBottom: spacing.sm }}
           />
 
-          <PrimaryButton label={saving ? "Saving..." : selectedMedicationId ? "Save Medication" : "Create Medication"} onPress={onSave} disabled={saving} />
+          <PrimaryButton label={saving ? "Saving..." : formMode === "edit" ? "Save Medication" : "Create Medication"} onPress={onSave} disabled={saving} />
 
-          {selectedMedicationId ? (
+          {formMode === "edit" && selectedMedicationId ? (
             <>
               <FormLabel>Adjust Stock</FormLabel>
               <AppInput
@@ -384,6 +419,15 @@ export default function MedicationsScreen() {
               />
             </>
           ) : null}
+          <PrimaryButton
+            label="Cancel"
+            onPress={() => {
+              setFormMode("");
+              setForm(EMPTY_FORM);
+            }}
+            disabled={saving}
+            tone="secondary"
+          />
         </Card>
       ) : null}
 
@@ -408,6 +452,11 @@ export default function MedicationsScreen() {
                 <Text style={{ color: stock <= reorderLevel ? colors.danger : colors.textMuted }}>
                   {stock <= reorderLevel ? "Low stock attention needed." : "Inventory level is currently above reorder threshold."}
                 </Text>
+                <PrimaryButton
+                  label={String(item.id || item.Id || "") === selectedMedicationId ? "Viewing Details" : "View Details"}
+                  onPress={() => selectMedication(item)}
+                  tone="secondary"
+                />
               </ListRow>
             );
           }}

@@ -5,7 +5,6 @@ import { createResident, deleteResident, getResidents, updateResident } from "..
 import {
   AppInput,
   Card,
-  Chip,
   FormLabel,
   Hero,
   InfoBanner,
@@ -89,6 +88,7 @@ export default function ResidentsScreen() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [selectedResidentId, setSelectedResidentId] = useState("");
+  const [formMode, setFormMode] = useState("");
   const [form, setForm] = useState(EMPTY_FORM);
 
   const canManage = user?.role === "Nurse";
@@ -108,17 +108,19 @@ export default function ResidentsScreen() {
         if (selectedResidentId) {
           const selected = list.find((item) => String(item.id || item.Id) === selectedResidentId);
           if (selected) {
-            setForm(toForm(selected));
+            if (formMode === "edit") {
+              setForm(toForm(selected));
+            }
             return;
           }
+
+          setSelectedResidentId("");
+          setFormMode("");
         }
 
-        if (list.length > 0) {
-          const first = list[0];
-          setSelectedResidentId(String(first.id || first.Id || ""));
-          setForm(toForm(first));
-        } else {
+        if (list.length === 0) {
           setSelectedResidentId("");
+          setFormMode("");
           setForm(EMPTY_FORM);
         }
       } catch (err) {
@@ -128,7 +130,7 @@ export default function ResidentsScreen() {
         else setLoading(false);
       }
     },
-    [canManage, selectedResidentId, token]
+    [canManage, formMode, selectedResidentId, token]
   );
 
   useEffect(() => {
@@ -146,12 +148,18 @@ export default function ResidentsScreen() {
     });
   }, [items, query]);
 
+  const selectedResident = useMemo(
+    () => items.find((item) => String(item.id || item.Id || "") === selectedResidentId),
+    [items, selectedResidentId]
+  );
+
   function updateForm(key, value) {
     setForm((current) => ({ ...current, [key]: value }));
   }
 
   function startCreate() {
     setSelectedResidentId("");
+    setFormMode("create");
     setForm(EMPTY_FORM);
     setError("");
     setSuccess("");
@@ -159,7 +167,16 @@ export default function ResidentsScreen() {
 
   function selectResident(item) {
     setSelectedResidentId(String(item.id || item.Id || ""));
-    setForm(toForm(item));
+    setFormMode("");
+    setError("");
+    setSuccess("");
+  }
+
+  function startEditResident() {
+    if (!selectedResident) return;
+    setSelectedResidentId(String(selectedResident.id || selectedResident.Id || ""));
+    setForm(toForm(selectedResident));
+    setFormMode("edit");
     setError("");
     setSuccess("");
   }
@@ -183,7 +200,7 @@ export default function ResidentsScreen() {
     try {
       setSaving(true);
       const payload = toPayload(form);
-      if (selectedResidentId) {
+      if (formMode === "edit" && selectedResidentId) {
         await updateResident(selectedResidentId, { ...payload, id: selectedResidentId }, token);
         setSuccess("Resident updated.");
       } else {
@@ -192,6 +209,7 @@ export default function ResidentsScreen() {
         if (createdId) setSelectedResidentId(createdId);
         setSuccess("Resident created.");
       }
+      setFormMode("");
       await load();
     } catch (err) {
       setError(err?.message || "Failed to save resident.");
@@ -214,6 +232,7 @@ export default function ResidentsScreen() {
             setSuccess("");
             await deleteResident(selectedResidentId, token);
             setSelectedResidentId("");
+            setFormMode("");
             setForm(EMPTY_FORM);
             setSuccess("Resident deleted.");
             await load();
@@ -254,26 +273,41 @@ export default function ResidentsScreen() {
         />
       </Card>
 
-      {canManage ? (
+      {selectedResident ? (
         <Card>
           <SectionTitle
-            title={selectedResidentId ? "Edit Resident" : "Create Resident"}
-            subtitle="Core resident profile details for rooming and contact records."
+            title="Resident Detail"
+            subtitle="Review the resident profile before choosing an action."
           />
-          <FlatList
-            horizontal
-            data={items}
-            keyExtractor={(item) => String(item.id || item.Id)}
-            showsHorizontalScrollIndicator={false}
-            renderItem={({ item }) => (
-              <Chip
-                label={residentName(item) || "Resident"}
-                selected={String(item.id || item.Id) === selectedResidentId}
-                onPress={() => selectResident(item)}
-              />
-            )}
-            ListFooterComponent={<Chip label="New +" selected={!selectedResidentId} onPress={startCreate} />}
-            style={{ marginBottom: spacing.sm }}
+          <Text style={{ color: colors.text, fontWeight: "900", fontSize: 18, marginBottom: spacing.sm }}>
+            {residentName(selectedResident) || "Unknown resident"}
+          </Text>
+          <Text style={{ color: colors.textMuted, marginBottom: spacing.xs }}>
+            Room {selectedResident.roomNumber || selectedResident.RoomNumber || "N/A"}
+          </Text>
+          <Text style={{ color: colors.textMuted, marginBottom: spacing.xs }}>
+            DOB {selectedResident.dateOfBirth || selectedResident.DateOfBirth || "N/A"}
+          </Text>
+          <Text style={{ color: colors.textMuted, marginBottom: spacing.xs }}>
+            Doctor: {selectedResident.doctorName || selectedResident.DoctorName || "Not set"}
+          </Text>
+          <Text style={{ color: colors.textMuted, marginBottom: spacing.md }}>
+            Contact: {selectedResident.emergencyContactName1 || selectedResident.EmergencyContactName1 || "N/A"}
+            {selectedResident.emergencyContactPhone1 || selectedResident.EmergencyContactPhone1
+              ? ` | ${selectedResident.emergencyContactPhone1 || selectedResident.EmergencyContactPhone1}`
+              : ""}
+          </Text>
+          {canManage ? (
+            <PrimaryButton label="Edit Resident" onPress={startEditResident} />
+          ) : null}
+        </Card>
+      ) : null}
+
+      {canManage && formMode ? (
+        <Card>
+          <SectionTitle
+            title={formMode === "edit" ? "Edit Resident" : "Create Resident"}
+            subtitle="Core resident profile details for rooming and contact records."
           />
 
           <FormLabel>First Name</FormLabel>
@@ -304,11 +338,11 @@ export default function ResidentsScreen() {
           <AppInput value={form.remarks} onChangeText={(value) => updateForm("remarks", value)} placeholder="Remarks" multiline />
 
           <PrimaryButton
-            label={saving ? "Saving..." : selectedResidentId ? "Save Resident" : "Create Resident"}
+            label={saving ? "Saving..." : formMode === "edit" ? "Save Resident" : "Create Resident"}
             onPress={onSave}
             disabled={saving}
           />
-          {selectedResidentId ? (
+          {formMode === "edit" && selectedResidentId ? (
             <PrimaryButton
               label={deletingId === selectedResidentId ? "Deleting..." : "Delete Resident"}
               onPress={confirmDelete}
@@ -316,6 +350,15 @@ export default function ResidentsScreen() {
               tone="secondary"
             />
           ) : null}
+          <PrimaryButton
+            label="Cancel"
+            onPress={() => {
+              setFormMode("");
+              setForm(EMPTY_FORM);
+            }}
+            disabled={saving}
+            tone="secondary"
+          />
         </Card>
       ) : null}
 
@@ -332,7 +375,13 @@ export default function ResidentsScreen() {
               title={residentName(item) || "Unknown resident"}
               subtitle={`Room ${item.roomNumber || item.RoomNumber || "N/A"} | DOB ${item.dateOfBirth || item.DateOfBirth || "N/A"}`}
               meta={`Doctor: ${item.doctorName || item.DoctorName || "Not set"}`}
-            />
+            >
+              <PrimaryButton
+                label={String(item.id || item.Id || "") === selectedResidentId ? "Viewing Details" : "View Details"}
+                onPress={() => selectResident(item)}
+                tone="secondary"
+              />
+            </ListRow>
           )}
           ListEmptyComponent={!loading ? <Text style={{ color: colors.textMuted }}>No residents match the current filter.</Text> : null}
         />

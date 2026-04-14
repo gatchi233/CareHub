@@ -31,6 +31,7 @@ export default function AiScreen() {
   const [medicationName, setMedicationName] = useState("");
   const [dosage, setDosage] = useState("");
   const [trendDays, setTrendDays] = useState(7);
+  const [responseTitle, setResponseTitle] = useState("AI Response");
   const [responseText, setResponseText] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -54,10 +55,11 @@ export default function AiScreen() {
     loadResidents();
   }, [canUseAi, token]);
 
-  async function runRequest(task) {
+  async function runRequest(title, task) {
     try {
       setLoading(true);
       setError("");
+      setResponseTitle(title);
       const result = await task();
       setResponseText(result?.content || "No AI content returned.");
     } catch (err) {
@@ -108,9 +110,9 @@ export default function AiScreen() {
 
       <Card>
         <SectionTitle title="Resident Insight Actions" subtitle="Summaries, trends, and report drafts." />
-        <PrimaryButton label="Shift Summary" onPress={() => selectedResidentId ? runRequest(() => aiShiftSummary(selectedResidentId, token)) : setError("Choose a resident first.")} />
-        <PrimaryButton label="Detect Trends" onPress={() => selectedResidentId ? runRequest(() => aiDetectTrends(selectedResidentId, token)) : setError("Choose a resident first.")} tone="secondary" />
-        <PrimaryButton label="Report Draft" onPress={() => selectedResidentId ? runRequest(() => aiReportDraft(selectedResidentId, token)) : setError("Choose a resident first.")} tone="secondary" />
+        <PrimaryButton label="Shift Summary" onPress={() => selectedResidentId ? runRequest("Shift Summary", () => aiShiftSummary(selectedResidentId, token)) : setError("Choose a resident first.")} />
+        <PrimaryButton label="Detect Trends" onPress={() => selectedResidentId ? runRequest("Detect Trends", () => aiDetectTrends(selectedResidentId, token)) : setError("Choose a resident first.")} tone="secondary" />
+        <PrimaryButton label="Report Draft" onPress={() => selectedResidentId ? runRequest("Report Draft", () => aiReportDraft(selectedResidentId, token)) : setError("Choose a resident first.")} tone="secondary" />
         <FlatList
           horizontal
           data={[3, 7]}
@@ -118,7 +120,7 @@ export default function AiScreen() {
           showsHorizontalScrollIndicator={false}
           renderItem={({ item }) => <Chip label={`${item}-Day`} selected={trendDays === item} onPress={() => setTrendDays(item)} />}
         />
-        <PrimaryButton label="Trend Explain" onPress={() => selectedResidentId ? runRequest(() => aiTrendExplain(selectedResidentId, trendDays, token)) : setError("Choose a resident first.")} tone="secondary" />
+        <PrimaryButton label="Trend Explain" onPress={() => selectedResidentId ? runRequest("Trend Explain", () => aiTrendExplain(selectedResidentId, trendDays, token)) : setError("Choose a resident first.")} tone="secondary" />
       </Card>
 
       <Card>
@@ -126,7 +128,7 @@ export default function AiScreen() {
         <AppInput value={query} onChangeText={setQuery} placeholder="Ask a care question..." multiline />
         <PrimaryButton
           label="Run Care Query"
-          onPress={() => query.trim() ? runRequest(() => aiCareQuery(query.trim(), selectedResidentId || null, token)) : setError("Enter a care query.")}
+          onPress={() => query.trim() ? runRequest("Care Query", () => aiCareQuery(query.trim(), selectedResidentId || null, token)) : setError("Enter a care query.")}
         />
       </Card>
 
@@ -136,13 +138,17 @@ export default function AiScreen() {
         <AppInput value={dosage} onChangeText={setDosage} placeholder="Dosage (optional)" />
         <PrimaryButton
           label="Explain Medication"
-          onPress={() => medicationName.trim() ? runRequest(() => aiMedicationExplain(medicationName.trim(), dosage.trim() || null, token)) : setError("Enter a medication name.")}
+          onPress={() => medicationName.trim() ? runRequest("Medication Explain", () => aiMedicationExplain(medicationName.trim(), dosage.trim() || null, token)) : setError("Enter a medication name.")}
         />
       </Card>
 
-      <Card style={{ marginBottom: 0 }}>
+      <Card>
         <SectionTitle title="Shift Handoff" subtitle="Generate a facility-wide handoff note for the next team." />
-        <PrimaryButton label="Generate Shift Handoff" onPress={() => runRequest(() => aiShiftHandoff(token))} tone="secondary" />
+        <PrimaryButton label="Generate Shift Handoff" onPress={() => runRequest("Shift Handoff", () => aiShiftHandoff(token))} tone="secondary" />
+      </Card>
+
+      <Card style={{ marginBottom: 0 }}>
+        <SectionTitle title="AI Responses" subtitle={responseText ? responseTitle : "Run an AI action to review the generated response here."} />
         {loading ? <LoadingBlock label="Generating AI response" /> : null}
         <Text style={{ color: "#6c6257", marginBottom: 10 }}>AI responses are informational and should be reviewed by staff before use.</Text>
         <Text style={{ color: "#1f1911", lineHeight: 22 }}>{responseText || "No response yet."}</Text>

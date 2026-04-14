@@ -343,17 +343,34 @@ function AiDashboardPage({ loading, error, residents = [], authRole }) {
               </article>
             ))}
 
-          {activeTab === "facility-tools" &&
-            FACILITY_TOOL_CARDS.map((tool) => (
-              <article key={tool.key} className="card ai-tool-card">
+          {activeTab === "facility-tools" ? (
+            <>
+              <article className="card ai-tool-card">
                 <div className="ai-tool-header">
-                  <h3>{tool.title}</h3>
-                  <span className="row-index">AI</span>
+                  <h3>Shift Handoff</h3>
+                  <span className="row-index">Handoff</span>
                 </div>
-                <p>{tool.description}</p>
-                <div className="action-row">{renderToolButton(tool.key)}</div>
+                <p>Generate a facility-wide handoff note for the incoming team.</p>
+                <div className="action-row">{renderToolButton("shift-handoff")}</div>
               </article>
-            ))}
+
+              <article className="card ai-response-card">
+                <div className="ai-tool-header">
+                  <h3>AI Responses</h3>
+                  <span className="row-index">Review</span>
+                </div>
+                <p>
+                  Generated output is kept separate from handoff controls so staff can review, copy,
+                  and verify it before using it.
+                </p>
+                <div className="action-row">
+                  <button type="button" className="ghost-button" onClick={() => setActiveTab("response-center")}>
+                    Open Response Center
+                  </button>
+                </div>
+              </article>
+            </>
+          ) : null}
         </section>
       )}
 
@@ -361,7 +378,7 @@ function AiDashboardPage({ loading, error, residents = [], authRole }) {
         <section className="dashboard-grid">
           <article className="card ai-response-card">
             <div className="ai-tool-header">
-              <h3>Latest AI Response</h3>
+              <h3>AI Responses</h3>
               <button
                 type="button"
                 className="ghost-button"
