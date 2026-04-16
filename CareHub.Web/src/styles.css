@@ -473,6 +473,18 @@ body,
   color: #15343f;
 }
 
+.resident-edit-form input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+  padding: 0;
+}
+
+.resident-edit-form label span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
 .resident-edit-form select {
   border: 1px solid #cedfe6;
   border-radius: 10px;

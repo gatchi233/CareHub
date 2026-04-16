@@ -14,6 +14,7 @@ function StaffPage({
   currentResident,
   canEditStaff,
   onSaveStaff,
+  onCreateStaff,
   staffMembers = [],
   residents = []
 }) {
@@ -21,10 +22,27 @@ function StaffPage({
   const [editingUsername, setEditingUsername] = useState("");
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
+  const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState("");
   const [editForm, setEditForm] = useState({
     displayName: "",
     role: "",
     password: ""
+  });
+  const [createForm, setCreateForm] = useState({
+    employeeId: "",
+    staffFName: "",
+    staffLName: "",
+    jobTitle: "",
+    department: "Care",
+    employmentStatus: "Full-time",
+    hourlyWage: "",
+    shiftPreference: "Day",
+    role: "General CareStaff",
+    hasFirstAid: false,
+    firstAidExpiry: "",
+    foodSafeCertified: false,
+    foodSafeExpiry: ""
   });
 
   const doctors = useMemo(() => {
@@ -128,6 +146,43 @@ function StaffPage({
     }
   }
 
+  async function handleCreate(event) {
+    event.preventDefault();
+    if (!onCreateStaff) {
+      return;
+    }
+
+    setCreating(true);
+    setCreateError("");
+
+    try {
+      await onCreateStaff(createForm);
+      setCreateForm({
+        employeeId: "",
+        staffFName: "",
+        staffLName: "",
+        jobTitle: "",
+        department: "Care",
+        employmentStatus: "Full-time",
+        hourlyWage: "",
+        shiftPreference: "Day",
+        role: "General CareStaff",
+        hasFirstAid: false,
+        firstAidExpiry: "",
+        foodSafeCertified: false,
+        foodSafeExpiry: ""
+      });
+    } catch (err) {
+      setCreateError(err?.message || "Failed to add staff.");
+    } finally {
+      setCreating(false);
+    }
+  }
+
+  function updateCreateForm(key, value) {
+    setCreateForm((current) => ({ ...current, [key]: value }));
+  }
+
   return (
     <section className="page-shell">
       <PageTabs tabs={STAFF_TABS} activeTab={activeTab} onChange={setActiveTab} />
@@ -206,6 +261,146 @@ function StaffPage({
               </form>
             )}
           </article>
+
+          {canEditStaff && (
+            <article className="card">
+              <h3>Add Staff</h3>
+              <form className="resident-edit-form" onSubmit={handleCreate}>
+                <label>
+                  Employee ID
+                  <input
+                    value={createForm.employeeId}
+                    onChange={(event) => updateCreateForm("employeeId", event.target.value)}
+                    placeholder="EMP-021"
+                    required
+                  />
+                </label>
+                <label>
+                  First Name
+                  <input
+                    value={createForm.staffFName}
+                    onChange={(event) => updateCreateForm("staffFName", event.target.value)}
+                    required
+                  />
+                </label>
+                <label>
+                  Last Name
+                  <input
+                    value={createForm.staffLName}
+                    onChange={(event) => updateCreateForm("staffLName", event.target.value)}
+                    required
+                  />
+                </label>
+                <label>
+                  Job Title
+                  <input
+                    value={createForm.jobTitle}
+                    onChange={(event) => updateCreateForm("jobTitle", event.target.value)}
+                    placeholder="Registered Nurse"
+                    required
+                  />
+                </label>
+                <label>
+                  Department
+                  <input
+                    value={createForm.department}
+                    onChange={(event) => updateCreateForm("department", event.target.value)}
+                  />
+                </label>
+                <label>
+                  Employment Status
+                  <select
+                    value={createForm.employmentStatus}
+                    onChange={(event) => updateCreateForm("employmentStatus", event.target.value)}
+                  >
+                    <option value="Full-time">Full-time</option>
+                    <option value="Part-time">Part-time</option>
+                    <option value="Casual">Casual</option>
+                  </select>
+                </label>
+                <label>
+                  Hourly Wage
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={createForm.hourlyWage}
+                    onChange={(event) => updateCreateForm("hourlyWage", event.target.value)}
+                  />
+                </label>
+                <label>
+                  Shift Preference
+                  <select
+                    value={createForm.shiftPreference}
+                    onChange={(event) => updateCreateForm("shiftPreference", event.target.value)}
+                  >
+                    <option value="Day">Day</option>
+                    <option value="Evening">Evening</option>
+                    <option value="Night">Night</option>
+                    <option value="Any">Any</option>
+                  </select>
+                </label>
+                <label>
+                  Role
+                  <select
+                    value={createForm.role}
+                    onChange={(event) => updateCreateForm("role", event.target.value)}
+                  >
+                    <option value="Admin">Admin</option>
+                    <option value="Nurse">Nurse</option>
+                    <option value="General CareStaff">General CareStaff</option>
+                    <option value="Care">Care</option>
+                    <option value="Kitchen">Kitchen</option>
+                    <option value="Facilities">Facilities</option>
+                  </select>
+                </label>
+                <label>
+                  <span>
+                    <input
+                      type="checkbox"
+                      checked={createForm.hasFirstAid}
+                      onChange={(event) => updateCreateForm("hasFirstAid", event.target.checked)}
+                    />{" "}
+                    First Aid certified
+                  </span>
+                </label>
+                <label>
+                  First Aid Expiry
+                  <input
+                    type="date"
+                    value={createForm.firstAidExpiry}
+                    onChange={(event) => updateCreateForm("firstAidExpiry", event.target.value)}
+                  />
+                </label>
+                <label>
+                  <span>
+                    <input
+                      type="checkbox"
+                      checked={createForm.foodSafeCertified}
+                      onChange={(event) =>
+                        updateCreateForm("foodSafeCertified", event.target.checked)
+                      }
+                    />{" "}
+                    Food Safe certified
+                  </span>
+                </label>
+                <label>
+                  Food Safe Expiry
+                  <input
+                    type="date"
+                    value={createForm.foodSafeExpiry}
+                    onChange={(event) => updateCreateForm("foodSafeExpiry", event.target.value)}
+                  />
+                </label>
+                {createError ? <p className="auth-error">{createError}</p> : null}
+                <div className="action-row">
+                  <button type="submit" className="ghost-button" disabled={creating}>
+                    {creating ? "Adding..." : "Add Staff"}
+                  </button>
+                </div>
+              </form>
+            </article>
+          )}
 
           <article className="card">
             <h3>Doctors From Residents</h3>

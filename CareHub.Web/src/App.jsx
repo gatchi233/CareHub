@@ -785,6 +785,36 @@ function App() {
     setStaffMembers(Array.isArray(refreshed) ? refreshed.map(toStaffListItem) : []);
   }
 
+  async function handleCreateStaff(nextStaff) {
+    const employeeId = String(nextStaff?.employeeId || "").trim();
+    if (!employeeId) {
+      throw new Error("Employee ID is required.");
+    }
+
+    const payload = {
+      employeeId,
+      staffFName: String(nextStaff?.staffFName || "").trim(),
+      staffLName: String(nextStaff?.staffLName || "").trim(),
+      jobTitle: String(nextStaff?.jobTitle || "").trim(),
+      department: String(nextStaff?.department || "").trim(),
+      employmentStatus: String(nextStaff?.employmentStatus || "").trim(),
+      hourlyWage: Number(nextStaff?.hourlyWage || 0),
+      shiftPreference: String(nextStaff?.shiftPreference || "").trim(),
+      role: nextStaff?.role || "General CareStaff",
+      isEnabled: true,
+      compliance: {
+        hasFirstAid: Boolean(nextStaff?.hasFirstAid),
+        firstAidExpiry: String(nextStaff?.firstAidExpiry || "").trim(),
+        foodSafeCertified: Boolean(nextStaff?.foodSafeCertified),
+        foodSafeExpiry: String(nextStaff?.foodSafeExpiry || "").trim()
+      }
+    };
+
+    await api.put(`/staff/directory/${encodeURIComponent(employeeId)}`, payload);
+    const refreshed = await api.get("/staff/directory");
+    setStaffMembers(Array.isArray(refreshed) ? refreshed.map(toStaffListItem) : []);
+  }
+
   function renderActivePage() {
     if (!visibleSectionKeys.includes(activeSection)) {
       return <article className="card error">Access denied for your role.</article>;
@@ -919,6 +949,7 @@ function App() {
         currentResident={currentResident}
         canEditStaff={authSession?.role === "Admin"}
         onSaveStaff={handleSaveStaff}
+        onCreateStaff={handleCreateStaff}
         staffMembers={staffMembers}
         residents={residents}
       />
