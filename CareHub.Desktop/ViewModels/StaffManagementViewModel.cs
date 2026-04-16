@@ -14,8 +14,10 @@ namespace CareHub.ViewModels
     public class StaffManagementViewModel : INotifyPropertyChanged
     {
         private readonly IStaffService _staffService;
+        private readonly IResidentService _residentService;
 
         public ObservableCollection<StaffRecord> Staff { get; } = new();
+        public ObservableCollection<DoctorStaffEntry> Doctors { get; } = new();
         public IList<string> Roles { get; } = new List<string> { "Admin", "Nurse", "General CareStaff", "Observer" };
 
         // ── Selection & mode ────────────────────────────────────────────────
@@ -160,9 +162,10 @@ namespace CareHub.ViewModels
         public ICommand SetActiveCommand { get; }
         public ICommand SetInactiveCommand { get; }
 
-        public StaffManagementViewModel(IStaffService staffService)
+        public StaffManagementViewModel(IStaffService staffService, IResidentService residentService)
         {
             _staffService = staffService;
+            _residentService = residentService;
 
             RefreshCommand = new Command(async () => await RefreshAsync());
             NewCommand     = new Command(NewStaff);
@@ -185,6 +188,30 @@ namespace CareHub.ViewModels
                 var items = await _staffService.GetAllAsync();
                 foreach (var s in items.OrderBy(s => s.EmployeeId))
                     Staff.Add(s);
+
+                Doctors.Clear();
+                var residents = await _residentService.LoadAsync();
+                var doctors = residents
+                    .Where(r => !string.IsNullOrWhiteSpace(r.DoctorName))
+                    .GroupBy(r => $"{r.DoctorName.Trim().ToLowerInvariant()}|{(r.DoctorContact ?? "").Trim().ToLowerInvariant()}")
+                    .Select(g =>
+                    {
+                        var first = g.First();
+                        return new DoctorStaffEntry
+                        {
+                            DoctorName = first.DoctorName.Trim(),
+                            DoctorContact = string.IsNullOrWhiteSpace(first.DoctorContact) ? "No contact listed" : first.DoctorContact.Trim(),
+                            ResidentCount = g.Count(),
+                            ResidentSummary = string.Join(", ", g
+                                .Select(r => string.IsNullOrWhiteSpace(r.ResidentName) ? "Unnamed resident" : r.ResidentName)
+                                .OrderBy(name => name)
+                                .Take(4))
+                        };
+                    })
+                    .OrderBy(d => d.DoctorName);
+
+                foreach (var doctor in doctors)
+                    Doctors.Add(doctor);
             }
             catch (Exception ex)
             {

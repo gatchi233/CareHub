@@ -322,5 +322,41 @@
       "FoodSafeCertified": true,
       "FoodSafeExpiry": "2026-09-15"
     }
+  },
+  {
+    "EmployeeId": "EMP-019",
+    "StaffFName": "Maya",
+    "StaffLName": "Singh",
+    "JobTitle": "Registered Nurse",
+    "Department": "Care",
+    "EmploymentStatus": "Full-time",
+    "HourlyWage": 42.00,
+    "ShiftPreference": "Evening",
+    "Role": "Nurse",
+    "IsEnabled": true,
+    "Compliance": {
+      "HasFirstAid": true,
+      "FirstAidExpiry": "2027-08-30",
+      "FoodSafeCertified": false,
+      "FoodSafeExpiry": ""
+    }
+  },
+  {
+    "EmployeeId": "EMP-020",
+    "StaffFName": "Owen",
+    "StaffLName": "Brooks",
+    "JobTitle": "Care Aide",
+    "Department": "Care",
+    "EmploymentStatus": "Part-time",
+    "HourlyWage": 26.50,
+    "ShiftPreference": "Night",
+    "Role": "General CareStaff",
+    "IsEnabled": true,
+    "Compliance": {
+      "HasFirstAid": true,
+      "FirstAidExpiry": "2026-12-12",
+      "FoodSafeCertified": false,
+      "FoodSafeExpiry": ""
+    }
   }
 ]

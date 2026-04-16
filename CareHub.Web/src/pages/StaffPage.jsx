@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import PageTabs from "../components/PageTabs";
 
 const STAFF_TABS = [
@@ -14,7 +14,8 @@ function StaffPage({
   currentResident,
   canEditStaff,
   onSaveStaff,
-  staffMembers = []
+  staffMembers = [],
+  residents = []
 }) {
   const [activeTab, setActiveTab] = useState("directory");
   const [editingUsername, setEditingUsername] = useState("");
@@ -25,6 +26,39 @@ function StaffPage({
     role: "",
     password: ""
   });
+
+  const doctors = useMemo(() => {
+    const byDoctor = new Map();
+
+    residents.forEach((resident) => {
+      const doctorName = String(resident.doctorName || resident.DoctorName || "").trim();
+      if (!doctorName) {
+        return;
+      }
+
+      const doctorContact = String(resident.doctorContact || resident.DoctorContact || "").trim();
+      const residentFirstName = resident.firstName || resident.residentFName || resident.ResidentFName || "";
+      const residentLastName = resident.lastName || resident.residentLName || resident.ResidentLName || "";
+      const residentName =
+        resident.fullName ||
+        resident.name ||
+        `${residentFirstName} ${residentLastName}`.trim() ||
+        "Unnamed resident";
+      const key = `${doctorName.toLowerCase()}|${doctorContact.toLowerCase()}`;
+
+      if (!byDoctor.has(key)) {
+        byDoctor.set(key, {
+          name: doctorName,
+          contact: doctorContact,
+          residents: []
+        });
+      }
+
+      byDoctor.get(key).residents.push(residentName);
+    });
+
+    return Array.from(byDoctor.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }, [residents]);
 
   if (loading) {
     return (
@@ -171,6 +205,20 @@ function StaffPage({
                 </div>
               </form>
             )}
+          </article>
+
+          <article className="card">
+            <h3>Doctors From Residents</h3>
+            {doctors.length === 0 && <p>No assigned doctors found in resident records.</p>}
+            {doctors.map((doctor) => (
+              <div className="list-row" key={`${doctor.name}-${doctor.contact}`}>
+                <span>{doctor.name}</span>
+                <span className="list-row-actions">
+                  <small>{doctor.contact || "No contact listed"}</small>
+                  <small>{doctor.residents.length} resident{doctor.residents.length === 1 ? "" : "s"}</small>
+                </span>
+              </div>
+            ))}
           </article>
         </section>
       )}

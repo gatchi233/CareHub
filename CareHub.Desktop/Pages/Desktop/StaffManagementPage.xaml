@@ -94,7 +94,7 @@
                     <RoundRectangle CornerRadius="12"/>
                 </Border.StrokeShape>
 
-                <Grid RowDefinitions="Auto,Auto,*">
+                <Grid RowDefinitions="Auto,Auto,*,Auto,Auto,Auto">
 
                     <Label Text="STAFF"
                            FontSize="11" FontAttributes="Bold" CharacterSpacing="1.5"
@@ -178,6 +178,58 @@
                                             </Label.FormattedText>
                                         </Label>
 
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <Label Grid.Row="3"
+                           Text="DOCTORS FROM RESIDENTS"
+                           FontSize="11" FontAttributes="Bold" CharacterSpacing="1.5"
+                           TextColor="{StaticResource Staff_Font_Secondary}"
+                           Margin="0,14,0,0"/>
+
+                    <BoxView Grid.Row="4" HeightRequest="1" Color="{StaticResource Staff_Card_Border}" Margin="0,6,0,10"/>
+
+                    <CollectionView Grid.Row="5"
+                                    ItemsSource="{Binding Doctors}"
+                                    HeightRequest="190"
+                                    SelectionMode="None">
+                        <CollectionView.EmptyView>
+                            <Label Text="No assigned doctors found in resident records."
+                                   TextColor="{StaticResource Staff_Font_Secondary}" FontSize="13"/>
+                        </CollectionView.EmptyView>
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout Orientation="Vertical" ItemSpacing="6"/>
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="model:DoctorStaffEntry">
+                                <Border Padding="10,8"
+                                        BackgroundColor="{StaticResource Staff_Main_Background}"
+                                        Stroke="{StaticResource Staff_Card_Border}"
+                                        StrokeThickness="1">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="8"/>
+                                    </Border.StrokeShape>
+
+                                    <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="3">
+                                        <Label Text="{Binding DoctorName}"
+                                               FontSize="15" FontAttributes="Bold"
+                                               TextColor="{StaticResource Staff_Font_Primary}"/>
+                                        <Label Grid.Row="1"
+                                               Text="{Binding DoctorContact}"
+                                               FontSize="11"
+                                               TextColor="{StaticResource Staff_Font_Secondary}"/>
+                                        <Label Grid.Row="2" FontSize="11" TextColor="{StaticResource Staff_Font_Secondary}">
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span Text="{Binding ResidentCount}"/>
+                                                    <Span Text=" residents • "/>
+                                                    <Span Text="{Binding ResidentSummary}"/>
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
                                     </Grid>
                                 </Border>
                             </DataTemplate>

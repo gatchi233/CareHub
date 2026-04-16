@@ -920,6 +920,7 @@ function App() {
         canEditStaff={authSession?.role === "Admin"}
         onSaveStaff={handleSaveStaff}
         staffMembers={staffMembers}
+        residents={residents}
       />
     );
   }
